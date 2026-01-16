@@ -1,7 +1,7 @@
 {
   "Group": "dev.hytalemodding",
   "Name": "ExamplePlugin",
-  "Version": "1.0.0",
+  "Version": "${version}",
   "Description": "Description of your plugin",
   "Authors": [
     {
