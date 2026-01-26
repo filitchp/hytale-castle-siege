@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>dev.hytalemodding</groupId>
-    <artifactId>ExamplePlugin</artifactId>
+    <artifactId>Test 01</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>
