@@ -1,14 +1,15 @@
-//
-// Not needed, but you can switch using it here too!
-//
-//plugins {
-//    id("dev.scaffoldit") version "0.2.1"
-//}
-//
-//hytale {
-//    manifest {
-//        Group = "HytaleModding"
-//        Name = "ExamplePlugin"
-//        Main = "dev.hytalemodding.ExamplePlugin"
-//    }
-//}
+plugins {
+    java
+}
+
+group = "dev.hytalemodding"
+version = "0.0.1"
+
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Any dependency you also want to include
+}
