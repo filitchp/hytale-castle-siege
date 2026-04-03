@@ -22,7 +22,7 @@ hytale {
 
     manifest {
         Group = "HytaleModding"
-        Name = "ExamplePlugin"
-        Main = "dev.hytalemodding.ExamplePlugin"
+        Name = "CastleDefense"
+        Main = "dev.hytalemodding.CastleDefense"
     }
 }

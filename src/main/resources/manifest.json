@@ -1,20 +1,20 @@
 {
     "Group": "HytaleModding",
-    "Name": "ExamplePlugin",
-    "Version": "0.0.0",
+    "Name": "CastleDefense",
+    "Version": "0.0.1",
     "Description": "Description of your plugin",
     "Authors": [
         {
-            "Name": "Your Name",
+            "Name": "PookyVampire",
             "Email": "your.email@example.com",
-            "Url": "https://your-website.com"
+            "Url": "https://pooky.world"
         }
     ],
-    "Website": "https://your-plugin-website.com",
+    "Website": "https://pooky.world",
     "DisabledByDefault": false,
     "IncludesAssetPack": false,
     "Dependencies": {},
     "OptionalDependencies": {},
-    "ServerVersion": "*",
-    "Main": "dev.hytalemodding.ExamplePlugin"
+    "ServerVersion": "2026.*",
+    "Main": "dev.hytalemodding.CastleDefense"
 }
