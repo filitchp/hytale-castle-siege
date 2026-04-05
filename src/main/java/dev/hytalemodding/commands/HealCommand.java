@@ -27,7 +27,7 @@ public class HealCommand extends AbstractTargetPlayerCommand {
     private final FlagArg debugArg;
 
     public HealCommand() {
-        super("heal", "Healing a player for an <input> amount of HP (default: 100)");
+        super("healme", "Healing a player for an <input> amount of HP (default: 100)");
 
         // Abstract TargetPlayerCommand passes the player that ran the command by default and implements
         // the use of `--player <value>` to specify someone else
