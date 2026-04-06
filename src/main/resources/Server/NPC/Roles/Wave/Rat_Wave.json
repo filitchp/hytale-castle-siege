@@ -1,0 +1,20 @@
+{
+  "Type": "Variant",
+  "Reference": "Template_Intelligent",
+  "Modify": {
+    "Appearance": "Rat",
+    "MaxHealth": 21,
+    "MaxSpeed": 8,
+    "ViewRange": 8,
+    "HearingRange": 10,
+    "AlertedRange": 12,
+    "Attack": "Root_NPC_Rat_Attack",
+    "AttackDistance": 2,
+    "CombatBehaviorDistance": 3,
+    "CombatBackOffAfterAttack": false,
+    "ChaseRelativeSpeed": 0.6,
+    "WakingPeriod": [0, 24],
+    "FollowPatrolPath": true,
+    "BreathesInWater": false
+  }
+}
