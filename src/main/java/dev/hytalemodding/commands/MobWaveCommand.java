@@ -28,10 +28,16 @@ import it.unimi.dsi.fastutil.Pair;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Random;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class MobWaveCommand extends AbstractTargetPlayerCommand {
     private final RequiredArg<Integer> waveArg;
@@ -39,6 +45,15 @@ public class MobWaveCommand extends AbstractTargetPlayerCommand {
     private final FlagArg debugArg;
 
     private record MobEntry(String name, int count) {}
+    private record WavePath(IPath<?> path, double totalDistance) {}
+    private record PendingMob(NPCEntity npcEntity, WavePath wavePath, double distanceFromOrigin) {}
+
+    private static final ScheduledExecutorService WAVE_SCHEDULER =
+            Executors.newSingleThreadScheduledExecutor(r -> {
+                Thread t = new Thread(r, "MobWave-Scheduler");
+                t.setDaemon(true);
+                return t;
+            });
 
     private static final Map<Integer, List<MobEntry>> WAVE_TABLE = Map.ofEntries(
             Map.entry(1, List.of(
@@ -163,47 +178,67 @@ public class MobWaveCommand extends AbstractTargetPlayerCommand {
         );
     }
 
+    private static final Random RANDOM = new Random();
+
     /**
-     * Creates a flanking path using relative waypoints based on the mob's lateral
-     * offset from the grid center. Mobs near the center march straight toward the
-     * castle (positive X). Mobs on the sides angle outward, curve around the castle
-     * walls, and converge on the far side.
+     * Creates a randomized path for a wave mob. All mobs march forward (-Z) for
+     * 23 blocks, then randomly branch:
+     *   1/3 chance: turn right and move to a central attack position (+X)
+     *   1/3 chance: turn left and move to a central attack position (-X)
+     *   1/3 chance: continue forward to the stairs, then branch again:
+     *       50% turn right and up the stairs (+X)
+     *       50% turn left and up the stairs (-X)
      *
-     * @param spawnPos  the mob's spawn position (path origin)
-     * @param zOffset   the mob's Z offset from the grid center (negative = left, positive = right)
-     * @param maxOffset the maximum absolute Z offset in the grid (used to normalize)
+     * @param spawnPos       the mob's spawn position (path origin)
+     * @param forwardRotation the initial facing direction
      * @return a path the mob will follow
      */
-    private static IPath<?> createFlankingPath(Vector3d spawnPos, double zOffset, double maxOffset) {
-        // Normalize lateral position to [-1, 1]; 0 = center, ±1 = outermost edge
-        double flankFactor = (maxOffset > 0) ? (zOffset / maxOffset) : 0.0;
-
-        // Max angle that the outermost mobs will turn to flank the castle
-        float maxFlankAngle = 45f;
-        float flankAngle = (float) (flankFactor * maxFlankAngle);
-
+    private static WavePath createWavePath(Vector3d spawnPos, Vector3f forwardRotation) {
         Queue<RelativeWaypointDefinition> waypoints = new LinkedList<>();
+        double totalDistance = 0;
 
-        if (Math.abs(flankFactor) < 0.25) {
-            // Center mobs: march straight toward the castle front
-            waypoints.add(new RelativeWaypointDefinition(0f, 100.0));
+        final double initialDistance = 23.0;
+
+        // All mobs march forward 23 blocks (-Z direction / North)
+        waypoints.add(new RelativeWaypointDefinition(0f, initialDistance));
+        totalDistance += initialDistance;
+
+        int branch = RANDOM.nextInt(3);
+        final double firstBranchDistance = 8.0;
+        if (branch == 0) {
+            // Turn right toward +X (facing East)
+            waypoints.add(new RelativeWaypointDefinition(-90f, firstBranchDistance));
+            totalDistance += firstBranchDistance;
+        } else if (branch == 1) {
+            // Turn left toward -X (facing West)
+            waypoints.add(new RelativeWaypointDefinition(90f, firstBranchDistance));
+            totalDistance += firstBranchDistance;
         } else {
-            // Flanking mobs: angle out to the side of the castle, curve around it,
-            // then converge toward the back/entrance
-            waypoints.add(new RelativeWaypointDefinition(flankAngle, 15.0));         // angle outward
-            waypoints.add(new RelativeWaypointDefinition(-flankAngle * 2f, 20.0));   // curve around the wall
-            waypoints.add(new RelativeWaypointDefinition(flankAngle * 0.5f, 20.0));   // converge on the castle
+
+            final double secondBranchForwardDistance = 8.0;
+            // Continue up the stairs
+            waypoints.add(new RelativeWaypointDefinition(0f, secondBranchForwardDistance));
+            totalDistance += secondBranchForwardDistance;
+            // Second branch: left or right
+
+            final double secondBranchTurnDistance = 16.0;
+            if (RANDOM.nextBoolean()) {
+                // Turn right toward +X (facing East)
+                waypoints.add(new RelativeWaypointDefinition(-90f, secondBranchTurnDistance));
+            } else {
+                // Turn left toward -X (facing West)
+                waypoints.add(new RelativeWaypointDefinition(90f, secondBranchTurnDistance));
+            }
+            totalDistance += secondBranchTurnDistance;
         }
 
-        // All mobs initially face +X (toward the castle)
-        var forwardRotation = new Vector3f(0f, 0f, 0f);
-        return TransientPath.buildPath(spawnPos, forwardRotation, waypoints, 1.0);
+        var path = TransientPath.buildPath(spawnPos, forwardRotation, waypoints, 1.0);
+        return new WavePath(path, totalDistance);
     }
 
     /**
-     * Spawns all mobs for the given wave number and assigns each mob a flanking
-     * path toward the castle. Center mobs charge straight ahead while side mobs
-     * flank around the structure.
+     * Spawns all mobs for the given wave number, then staggers their path
+     * assignments one second apart, starting with the mob closest to the origin.
      *
      * @param waveNumber     the wave number (1-20)
      * @param origin         the center spawn position
@@ -221,9 +256,10 @@ public class MobWaveCommand extends AbstractTargetPlayerCommand {
 
         int totalMobs = entries.stream().mapToInt(MobEntry::count).sum();
         int gridSize = (int) Math.ceil(Math.sqrt(totalMobs));
-        double halfGrid = (gridSize - 1) / 2.0;
         var rotation = new Vector3f(0f, 0f, 0f);
 
+        // Phase 1: Spawn all mobs and collect them (no paths yet)
+        List<PendingMob> pendingMobs = new ArrayList<>();
         int mobIndex = 0;
         for (MobEntry entry : entries) {
             if (debug) {
@@ -232,24 +268,19 @@ public class MobWaveCommand extends AbstractTargetPlayerCommand {
             }
             for (int i = 0; i < entry.count(); i++) {
                 Vector3d pos = computeSpawnPosition(origin, mobIndex, gridSize);
-                int row = mobIndex / gridSize;
-                double zOffset = row - halfGrid;
 
                 Pair<Ref<EntityStore>, INonPlayerCharacter> result =
                         NPCPlugin.get().spawnNPC(store, entry.name(), null, pos, rotation);
 
                 if (result != null) {
-                    // Retrieve the NPCEntity component to access the path manager
                     NPCEntity npcEntity = store.getComponent(
                             result.first(), NPCEntity.getComponentType());
                     if (npcEntity != null) {
-                        var path = createFlankingPath(pos, zOffset, halfGrid);
-                        npcEntity.getPathManager().setTransientPath(path);
-                        if (debug) {
-                            commandContext.sendMessage(Message.raw(
-                                    "  " + entry.name() + " at Z-offset " + zOffset
-                                            + " → flank factor " + (halfGrid > 0 ? zOffset / halfGrid : 0)));
-                        }
+                        var path = createWavePath(pos, rotation);
+                        double dx = pos.x - origin.x;
+                        double dz = pos.z - origin.z;
+                        double distSq = dx * dx + dz * dz;
+                        pendingMobs.add(new PendingMob(npcEntity, path, distSq));
                     }
                 } else if (debug) {
                     commandContext.sendMessage(Message.raw(
@@ -261,8 +292,36 @@ public class MobWaveCommand extends AbstractTargetPlayerCommand {
             }
         }
 
+        // Phase 2: Sort by distance from origin (closest first) and stagger paths
+        pendingMobs.sort(Comparator.comparingDouble(PendingMob::distanceFromOrigin));
+
+        // Estimated mob travel speed (blocks/sec): MaxSpeed * BodyMotionPath RelSpeed
+        // Most mobs have MaxSpeed ~6-8 and the role uses RelSpeed 0.18-0.25, so ~1.5 b/s
+        double estimatedSpeed = 1.5;
+
+        for (int i = 0; i < pendingMobs.size(); i++) {
+            PendingMob mob = pendingMobs.get(i);
+            long startDelaySec = i;
+            long travelTimeSec = (long) Math.ceil(mob.wavePath().totalDistance() / estimatedSpeed);
+
+            // Schedule path activation
+            WAVE_SCHEDULER.schedule(
+                    () -> mob.npcEntity().getPathManager().setTransientPath(mob.wavePath().path()),
+                    startDelaySec,
+                    TimeUnit.SECONDS
+            );
+
+            // Schedule path clear so the mob stops looping and switches to wander
+            WAVE_SCHEDULER.schedule(
+                    () -> mob.npcEntity().getPathManager().setTransientPath(null),
+                    startDelaySec + travelTimeSec,
+                    TimeUnit.SECONDS
+            );
+        }
+
         commandContext.sendMessage(Message.raw(
-                "Wave " + waveNumber + " started! " + totalMobs + " mobs spawned."));
+                "Wave " + waveNumber + " started! " + totalMobs
+                        + " mobs spawned, deploying one per second."));
     }
 
     @Override
@@ -287,7 +346,7 @@ public class MobWaveCommand extends AbstractTargetPlayerCommand {
             commandContext.sendMessage(Message.raw(message));
         }
 
-        var spawnOrigin = new Vector3d(0.0, 80.0, 0.0);
+        var spawnOrigin = new Vector3d(-0.5, 80.0, 0.5);
 
         commandContext.sendMessage(Message.raw("Get Ready to Fight! Starting wave " + wave));
         spawnWave(wave, spawnOrigin, store, commandContext, debug);

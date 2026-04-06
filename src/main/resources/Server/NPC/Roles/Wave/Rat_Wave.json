@@ -15,6 +15,7 @@
     "ChaseRelativeSpeed": 0.6,
     "WakingPeriod": [0, 24],
     "FollowPatrolPath": true,
-    "BreathesInWater": false
+    "BreathesInWater": true,
+    "DropList": ""
   }
 }
