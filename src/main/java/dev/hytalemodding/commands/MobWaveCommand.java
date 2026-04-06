@@ -22,7 +22,6 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.NPCPlugin;
 import com.hypixel.hytale.server.npc.entities.NPCEntity;
 import com.hypixel.hytale.builtin.path.path.TransientPath;
-import com.hypixel.hytale.builtin.path.waypoint.RelativeWaypointDefinition;
 import com.hypixel.hytale.builtin.adventure.npcobjectives.NPCObjectivesPlugin;
 import it.unimi.dsi.fastutil.Pair;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
@@ -30,10 +29,8 @@ import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -158,81 +155,86 @@ public class MobWaveCommand extends AbstractTargetPlayerCommand {
         this.debugArg = this.withFlagArg("debug", "Add debug logs");
     }
 
+    private static final int MAX_COLS = 3;
+    private static final double ROW_SPACING = 2.0;
+
     /**
-     * Computes the spawn position for a mob at the given grid index.
-     * Mobs are arranged in a square grid centered on the origin with 1-block spacing.
+     * Computes the spawn position for a mob at the given index.
+     * Mobs are arranged in rows of up to 3 wide (centered on origin along X),
+     * with each additional row placed 2 blocks behind the previous one (+Z).
      *
-     * @param origin   the center point of the spawn area
-     * @param index    the mob's sequential index in the grid
-     * @param gridSize the side length of the square grid
+     * @param origin the center point of the front row
+     * @param index  the mob's sequential index
      * @return the spawn position for this mob
      */
-    private static Vector3d computeSpawnPosition(Vector3d origin, int index, int gridSize) {
-        int row = index / gridSize;
-        int col = index % gridSize;
-        double halfGrid = (gridSize - 1) / 2.0;
+    private static Vector3d computeSpawnPosition(Vector3d origin, int index) {
+        int row = index / MAX_COLS;
+        int col = index % MAX_COLS;
+        double halfCols = (MAX_COLS - 1) / 2.0;
         return new Vector3d(
-                origin.x + (col - halfGrid),
+                origin.x + (col - halfCols),
                 origin.y,
-                origin.z + (row - halfGrid)
+                origin.z + (row * ROW_SPACING)
         );
     }
 
     private static final Random RANDOM = new Random();
 
     /**
-     * Creates a randomized path for a wave mob. All mobs march forward (-Z) for
-     * 23 blocks, then randomly branch:
-     *   1/3 chance: turn right and move to a central attack position (+X)
-     *   1/3 chance: turn left and move to a central attack position (-X)
-     *   1/3 chance: continue forward to the stairs, then branch again:
-     *       50% turn right and up the stairs (+X)
-     *       50% turn left and up the stairs (-X)
+     * Creates a randomized path using absolute coordinates. All mobs march
+     * forward (-Z) for 23 blocks, then randomly branch:
+     *   1/3 chance: turn right 8 blocks (+X)
+     *   1/3 chance: turn left 8 blocks (-X)
+     *   1/3 chance: continue forward 8 blocks, then branch again:
+     *       50% turn right 16 blocks (+X)
+     *       50% turn left 16 blocks (-X)
      *
-     * @param spawnPos       the mob's spawn position (path origin)
-     * @param forwardRotation the initial facing direction
-     * @return a path the mob will follow
+     * @param spawnPos the mob's spawn position (first waypoint)
+     * @param rotation the facing direction at each waypoint
+     * @return a WavePath with the built path and total distance
      */
-    private static WavePath createWavePath(Vector3d spawnPos, Vector3f forwardRotation) {
-        Queue<RelativeWaypointDefinition> waypoints = new LinkedList<>();
-        double totalDistance = 0;
+    // Fixed branch points — all mobs converge on these regardless of spawn position
+    private static final Vector3d BRANCH_1 = new Vector3d(-0.5, 80.0, -23.5);
+    private static final Vector3d BRANCH_2 = new Vector3d(-0.5, 80.0, -28.0);
 
-        final double initialDistance = 23.0;
+    private static WavePath createWavePath(Vector3d spawnPos, Vector3f rotation) {
+        TransientPath path = new TransientPath();
 
-        // All mobs march forward 23 blocks (-Z direction / North)
-        waypoints.add(new RelativeWaypointDefinition(0f, initialDistance));
-        totalDistance += initialDistance;
+        // Waypoint 0: start at spawn
+        path.addWaypoint(spawnPos, rotation);
+
+        // Waypoint 1: all mobs converge on the first branch point
+        double distToBranch1 = Math.sqrt(
+                Math.pow(BRANCH_1.x - spawnPos.x, 2)
+                + Math.pow(BRANCH_1.z - spawnPos.z, 2));
+        path.addWaypoint(BRANCH_1, rotation);
+
+        double totalDistance = distToBranch1;
 
         int branch = RANDOM.nextInt(3);
-        final double firstBranchDistance = 8.0;
         if (branch == 0) {
-            // Turn right toward +X (facing East)
-            waypoints.add(new RelativeWaypointDefinition(-90f, firstBranchDistance));
-            totalDistance += firstBranchDistance;
+            // Turn right 8 blocks (+X) from branch 1
+            totalDistance += 8.0;
+            path.addWaypoint(new Vector3d(BRANCH_1.x + 8.0, BRANCH_1.y, BRANCH_1.z), rotation);
         } else if (branch == 1) {
-            // Turn left toward -X (facing West)
-            waypoints.add(new RelativeWaypointDefinition(90f, firstBranchDistance));
-            totalDistance += firstBranchDistance;
+            // Turn left 8 blocks (-X) from branch 1
+            totalDistance += 8.0;
+            path.addWaypoint(new Vector3d(BRANCH_1.x - 8.0, BRANCH_1.y, BRANCH_1.z), rotation);
         } else {
+            // Continue forward to the second branch point
+            double distBranch1To2 = Math.abs(BRANCH_2.z - BRANCH_1.z);
+            totalDistance += distBranch1To2;
+            path.addWaypoint(BRANCH_2, rotation);
 
-            final double secondBranchForwardDistance = 8.0;
-            // Continue up the stairs
-            waypoints.add(new RelativeWaypointDefinition(0f, secondBranchForwardDistance));
-            totalDistance += secondBranchForwardDistance;
-            // Second branch: left or right
-
-            final double secondBranchTurnDistance = 16.0;
+            // Turn left or right 16 blocks from branch 2
             if (RANDOM.nextBoolean()) {
-                // Turn right toward +X (facing East)
-                waypoints.add(new RelativeWaypointDefinition(-90f, secondBranchTurnDistance));
+                path.addWaypoint(new Vector3d(BRANCH_2.x + 16.0, BRANCH_2.y, BRANCH_2.z), rotation);
             } else {
-                // Turn left toward -X (facing West)
-                waypoints.add(new RelativeWaypointDefinition(90f, secondBranchTurnDistance));
+                path.addWaypoint(new Vector3d(BRANCH_2.x - 16.0, BRANCH_2.y, BRANCH_2.z), rotation);
             }
-            totalDistance += secondBranchTurnDistance;
+            totalDistance += 16.0;
         }
 
-        var path = TransientPath.buildPath(spawnPos, forwardRotation, waypoints, 1.0);
         return new WavePath(path, totalDistance);
     }
 
@@ -254,8 +256,6 @@ public class MobWaveCommand extends AbstractTargetPlayerCommand {
             return;
         }
 
-        int totalMobs = entries.stream().mapToInt(MobEntry::count).sum();
-        int gridSize = (int) Math.ceil(Math.sqrt(totalMobs));
         var rotation = new Vector3f(0f, 0f, 0f);
 
         // Phase 1: Spawn all mobs and collect them (no paths yet)
@@ -267,7 +267,7 @@ public class MobWaveCommand extends AbstractTargetPlayerCommand {
                         "Spawning " + entry.count() + "x " + entry.name()));
             }
             for (int i = 0; i < entry.count(); i++) {
-                Vector3d pos = computeSpawnPosition(origin, mobIndex, gridSize);
+                Vector3d pos = computeSpawnPosition(origin, mobIndex);
 
                 Pair<Ref<EntityStore>, INonPlayerCharacter> result =
                         NPCPlugin.get().spawnNPC(store, entry.name(), null, pos, rotation);
@@ -320,7 +320,7 @@ public class MobWaveCommand extends AbstractTargetPlayerCommand {
         }
 
         commandContext.sendMessage(Message.raw(
-                "Wave " + waveNumber + " started! " + totalMobs
+                "Wave " + waveNumber + " started! " + pendingMobs.size()
                         + " mobs spawned, deploying one per second."));
     }
 

@@ -24,7 +24,7 @@
     },
     "ApplySeparation": {
       "Value": false,
-      "Description": "When set to false, NPCs wont try to avoid each other or player, it can lead to them stacking together, but can help to avoid jerky-like movemenet in enclosed space."
+      "Description": "When set to false, NPCs wont try to avoid each other or player, it can lead to them stacking together, but can help to avoid jerky-like movement in enclosed space."
     },
     "NameTranslationKey": {
       "Value": "server.npcRoles.Skeleton_Pirate_Captain.name",
@@ -32,7 +32,8 @@
     }
   },
   "Modify": {
-    "MaxHealth": 61,
+    "MaxHealth": 130,
+    "MaxSpeed": 20,
     "HearingRange": 8,
     "ViewSector": 270,
     "WakingPeriod": [
