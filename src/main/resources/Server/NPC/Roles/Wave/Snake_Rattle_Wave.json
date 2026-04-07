@@ -4,7 +4,8 @@
   "Modify": {
     "Appearance": "Snake_Rattle",
     "MaxHealth": 61,
-    "MaxSpeed": 8,
+    "MaxSpeed": 14,
+    "RunThreshold": 0.1,
     "ViewRange": 10,
     "HearingRange": 10,
     "AlertedRange": 15,
@@ -13,6 +14,7 @@
     "CombatBehaviorDistance": 3,
     "WakingPeriod": [0, 24],
     "FollowPatrolPath": true,
-    "BreathesInWater": false
+    "BreathesInWater": false,
+    "DropList": ""
   }
 }

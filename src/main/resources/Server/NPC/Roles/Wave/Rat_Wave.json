@@ -4,7 +4,8 @@
   "Modify": {
     "Appearance": "Rat",
     "MaxHealth": 21,
-    "MaxSpeed": 8,
+    "MaxSpeed": 14,
+    "RunThreshold": 0.1,
     "ViewRange": 8,
     "HearingRange": 10,
     "AlertedRange": 12,

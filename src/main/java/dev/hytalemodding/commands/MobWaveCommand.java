@@ -296,8 +296,8 @@ public class MobWaveCommand extends AbstractTargetPlayerCommand {
         pendingMobs.sort(Comparator.comparingDouble(PendingMob::distanceFromOrigin));
 
         // Estimated mob travel speed (blocks/sec): MaxSpeed * BodyMotionPath RelSpeed
-        // Most mobs have MaxSpeed ~6-8 and the role uses RelSpeed 0.18-0.25, so ~1.5 b/s
-        double estimatedSpeed = 1.5;
+        // Wave mobs have MaxSpeed 14-20 and the role uses RelSpeed 0.18-0.25, so ~3.0 b/s
+        double estimatedSpeed = 3.0;
 
         for (int i = 0; i < pendingMobs.size(); i++) {
             PendingMob mob = pendingMobs.get(i);

@@ -34,13 +34,14 @@
   "Modify": {
     "MaxHealth": 130,
     "MaxSpeed": 20,
+    "RunThreshold": 0.1,
     "HearingRange": 8,
     "ViewSector": 270,
     "WakingPeriod": [
       0,
       24
     ],
-    "DropList": "Drop_Skeleton_Pirate_Captain",
+    "DropList": "",
     "Appearance": "Skeleton_Pirate_Captain",
     "Weapons": [
       "Weapon_Sword_Cutlass"
