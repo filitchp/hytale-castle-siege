@@ -1,7 +1,7 @@
 {
     "Group": "HytaleModding",
     "Name": "CastleDefense",
-    "Version": "0.0.1",
+    "Version": "0.0.2",
     "Description": "Description of your plugin",
     "Authors": [
         {
@@ -15,6 +15,6 @@
     "IncludesAssetPack": false,
     "Dependencies": {},
     "OptionalDependencies": {},
-    "ServerVersion": "2026.*",
+    "ServerVersion": "2026.03.26-89796e57b",
     "Main": "dev.hytalemodding.CastleDefense"
 }
