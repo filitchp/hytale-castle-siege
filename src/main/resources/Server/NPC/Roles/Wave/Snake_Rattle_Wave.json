@@ -9,12 +9,45 @@
     "ViewRange": 10,
     "HearingRange": 10,
     "AlertedRange": 15,
-    "Attack": "Root_NPC_Rat_Attack",
-    "AttackDistance": 2,
-    "CombatBehaviorDistance": 3,
+    "Attack": "Root_NPC_Snake_Attack",
+    "AttackDistance": 2.5,
+    "CombatBehaviorDistance": 4.5,
+    "CombatBackOffAfterAttack": true,
+    "ChaseRelativeSpeed": 0.8,
     "WakingPeriod": [0, 24],
     "FollowPatrolPath": true,
     "BreathesInWater": false,
-    "DropList": ""
+    "DropList": "",
+    "Weapons": [],
+    "OffHand": [],
+    "_InteractionVars": {
+      "Melee_Start": {
+        "Interactions": [
+          {
+            "Parent": "Snake_Bite",
+            "Effects": {
+              "ItemPlayerAnimationsId": "Snake_Marsh_Default",
+              "ItemAnimationId": "Bite"
+            },
+            "RunTime": 0.25
+          }
+        ]
+      },
+      "Bite_Damage": {
+        "Interactions": [
+          {
+            "Parent": "Snake_Bite_Damage",
+            "DamageCalculator": {
+              "Type": "Absolute",
+              "BaseDamage": { "Physical": 23 },
+              "RandomPercentageModifier": 0.1
+            },
+            "DamageEffects": {
+              "Knockback": { "Force": 1 }
+            }
+          }
+        ]
+      }
+    }
   }
 }

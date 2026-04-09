@@ -6,9 +6,9 @@
     "MaxHealth": 21,
     "MaxSpeed": 14,
     "RunThreshold": 0.1,
-    "ViewRange": 8,
-    "HearingRange": 10,
-    "AlertedRange": 12,
+    "ViewRange": 6,
+    "HearingRange": 7,
+    "AlertedRange": 8,
     "Attack": "Root_NPC_Rat_Attack",
     "AttackDistance": 2,
     "CombatBehaviorDistance": 3,
@@ -17,7 +17,38 @@
     "WakingPeriod": [0, 24],
     "FollowPatrolPath": true,
     "BreathesInWater": true,
-    "DropList": ""
+    "DropList": "",
+    "Weapons": [],
+    "OffHand": [],
+    "_InteractionVars": {
+      "Melee_Start": {
+        "Interactions": [
+          {
+            "Parent": "Rat_Bite",
+            "Effects": {
+              "ItemPlayerAnimationsId": "Rat_Default",
+              "ItemAnimationId": "Bite"
+            },
+            "RunTime": 0.117
+          }
+        ]
+      },
+      "Bite_Damage": {
+        "Interactions": [
+          {
+            "Parent": "Rat_Bite_Damage",
+            "DamageCalculator": {
+              "Type": "Absolute",
+              "BaseDamage": { "Physical": 9 },
+              "RandomPercentageModifier": 0.1
+            },
+            "DamageEffects": {
+              "Knockback": { "Force": 0.5 }
+            }
+          }
+        ]
+      }
+    }
   },
   "Parameters": {
     "WanderRadius": {
