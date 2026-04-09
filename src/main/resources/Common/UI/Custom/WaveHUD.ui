@@ -1,0 +1,24 @@
+$Common = "Common.ui";
+
+Group {
+  LayoutMode: Top;
+
+  Group #WavePanel {
+    Anchor: (Top: 10, Width: 250, Height: 80);
+    LayoutMode: Center;
+
+    Label #WaveLabel {
+      Style: (FontSize: 24, Alignment: Center);
+      Anchor: (Top: 10);
+      Text: "Wave 0 / 20";
+      Padding: (Full: 5);
+    }
+
+    Label #WaveStatus {
+      Style: (FontSize: 16, Alignment: Center);
+      Anchor: (Top: 5);
+      Text: "Type /startwave to begin";
+      Padding: (Full: 5);
+    }
+  }
+}

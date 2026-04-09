@@ -6,6 +6,8 @@ import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import dev.hytalemodding.commands.HealCommand;
 import dev.hytalemodding.commands.MobWaveCommand;
+import dev.hytalemodding.commands.ShowWaveHudCommand;
+import dev.hytalemodding.commands.StartWaveCommand;
 import dev.hytalemodding.events.WelcomeEvent;
 import dev.hytalemodding.wave.TriggerWaveInteraction;
 
@@ -21,6 +23,8 @@ public class CastleDefense extends JavaPlugin {
     protected void setup() {
         this.getCommandRegistry().registerCommand(new MobWaveCommand());
         this.getCommandRegistry().registerCommand(new HealCommand());
+        this.getCommandRegistry().registerCommand(new StartWaveCommand());
+        this.getCommandRegistry().registerCommand(new ShowWaveHudCommand());
 
         this.getEventRegistry().registerGlobal(PlayerReadyEvent.class, WelcomeEvent::onPlayerReady);
 
