@@ -1,0 +1,36 @@
+$Common = "Common.ui";
+
+Group {
+  LayoutMode: Center;
+
+  Group #WavePanel {
+    Anchor: (Width: 400, Height: 300);
+    LayoutMode: Top;
+
+    Label #Title {
+      Style: (FontSize: 32, Alignment: Center);
+      Anchor: (Top: 30);
+      Text: "Castle Defense";
+      Padding: (Full: 10);
+    }
+
+    Label #WaveLabel {
+      Style: (FontSize: 22, Alignment: Center);
+      Anchor: (Top: 10);
+      Text: "Wave 0 / 20";
+      Padding: (Full: 5);
+    }
+
+    Label #KillLabel {
+      Style: (FontSize: 18, Alignment: Center);
+      Anchor: (Top: 5);
+      Text: "Mobs Killed: 0";
+      Padding: (Full: 5);
+    }
+
+    $Common.@TextButton #StartWaveBtn {
+      @Anchor = (Width: 250, Top: 20);
+      @Text = "Start Next Wave";
+    }
+  }
+}

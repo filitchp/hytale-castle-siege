@@ -30,6 +30,7 @@ public class WaveManager {
     record PendingMob(NPCEntity npcEntity, WavePath wavePath, double distanceFromOrigin) {}
 
     private static final AtomicInteger currentWave = new AtomicInteger(0);
+    private static final AtomicInteger totalKills = new AtomicInteger(0);
 
     static final ScheduledExecutorService WAVE_SCHEDULER =
             Executors.newSingleThreadScheduledExecutor(r -> {
@@ -146,6 +147,14 @@ public class WaveManager {
 
     public static int getMaxWave() {
         return 20;
+    }
+
+    public static int getTotalKills() {
+        return totalKills.get();
+    }
+
+    public static void incrementKills() {
+        totalKills.incrementAndGet();
     }
 
     public static int spawnNextWave(Store<EntityStore> store, Consumer<String> messageSender) {

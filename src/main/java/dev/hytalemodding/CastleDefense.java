@@ -1,6 +1,6 @@
 package dev.hytalemodding;
 
-import com.hypixel.hytale.server.core.event.events.player.PlayerReadyEvent;
+import com.hypixel.hytale.server.core.event.events.player.*;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Interaction;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
@@ -8,7 +8,10 @@ import dev.hytalemodding.commands.HealCommand;
 import dev.hytalemodding.commands.MobWaveCommand;
 import dev.hytalemodding.commands.ShowWaveHudCommand;
 import dev.hytalemodding.commands.StartWaveCommand;
+import dev.hytalemodding.events.InputListener;
 import dev.hytalemodding.events.WelcomeEvent;
+import dev.hytalemodding.systems.BlockBreakEventSystem;
+import dev.hytalemodding.wave.MobDeathTracker;
 import dev.hytalemodding.wave.TriggerWaveInteraction;
 
 import javax.annotation.Nonnull;
@@ -26,7 +29,23 @@ public class CastleDefense extends JavaPlugin {
         this.getCommandRegistry().registerCommand(new StartWaveCommand());
         this.getCommandRegistry().registerCommand(new ShowWaveHudCommand());
 
+        this.getEventRegistry().registerGlobal(PlayerMouseButtonEvent.class, InputListener::onClick);
         this.getEventRegistry().registerGlobal(PlayerReadyEvent.class, WelcomeEvent::onPlayerReady);
+        this.getEventRegistry().registerGlobal(PlayerInteractEvent.class, InputListener::onInteract);
+
+
+
+        // Receive all keyed events regardless of key
+        getEventRegistry().registerGlobal(
+                PlayerChatEvent.class,
+                InputListener::onPlayerChat
+        );
+
+        this.getEntityStoreRegistry().registerSystem(new MobDeathTracker());
+
+
+        // Initialize Event Systems
+        this.getEntityStoreRegistry().registerSystem(new BlockBreakEventSystem());
 
         this.getCodecRegistry(Interaction.CODEC)
                 .register("TriggerWave", TriggerWaveInteraction.class, TriggerWaveInteraction.CODEC);
