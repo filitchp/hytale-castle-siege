@@ -1,0 +1,38 @@
+{
+  "TranslationProperties": {
+    "Name": "server.items.CastleDefense_WaveHammer.name"
+  },
+  "Categories": [
+    "Items.Tools"
+  ],
+  "Icon": "Icons/ItemsGenerated/Tool_Hammer_Iron.png",
+  "Quality": "Uncommon",
+  "ItemLevel": 20,
+  "MaxStack": 1,
+  "Model": "Items/Tools/Hammer/Iron.blockymodel",
+  "Texture": "Items/Tools/Hammer/Iron_Texture.png",
+  "PlayerAnimationsId": "Pickaxe",
+  "Interactions": {
+    "Primary": "Root_OpenWaveUI",
+    "Secondary": "Root_OpenWaveUI"
+  },
+  "MaxDurability": 500,
+  "IconProperties": {
+    "Scale": 0.45,
+    "Translation": [
+      20.4,
+      -27
+    ],
+    "Rotation": [
+      45,
+      300,
+      0
+    ]
+  },
+  "Tags": {
+    "Type": [
+      "Tool"
+    ]
+  },
+  "ItemSoundSetId": "ISS_Weapons_Wood"
+}
