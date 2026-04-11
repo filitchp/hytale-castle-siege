@@ -4,7 +4,7 @@ Group {
   LayoutMode: Center;
 
   Group #WavePanel {
-    Anchor: (Width: 400, Height: 300);
+    Anchor: (Width: 400, Height: 380);
     LayoutMode: Top;
 
     Label #Title {
@@ -21,15 +21,36 @@ Group {
       Padding: (Full: 5);
     }
 
-    Label #KillLabel {
+    Label #WaveKillLabel {
+      Style: (FontSize: 18, Alignment: Center);
+      Anchor: (Top: 5);
+      Text: "Wave Kills: 0 / 0";
+      Padding: (Full: 5);
+    }
+
+    Label #PlayerKillLabel {
+      Style: (FontSize: 18, Alignment: Center);
+      Anchor: (Top: 5);
+      Text: "Your Kills: 0";
+      Padding: (Full: 5);
+    }
+
+    Label #TotalKillLabel {
       Style: (FontSize: 18, Alignment: Center);
       Anchor: (Top: 5);
       Text: "Mobs Killed: 0";
       Padding: (Full: 5);
     }
 
+    Label #StatusLabel {
+      Style: (FontSize: 16, Alignment: Center);
+      Anchor: (Top: 10);
+      Text: "";
+      Padding: (Full: 5);
+    }
+
     $Common.@TextButton #StartWaveBtn {
-      @Anchor = (Width: 250, Top: 20);
+      @Anchor = (Width: 250, Top: 10);
       @Text = "Start Next Wave";
     }
   }

@@ -1,7 +1,5 @@
 package dev.hytalemodding.ui;
 
-import com.hypixel.hytale.codec.Codec;
-import com.hypixel.hytale.codec.KeyedCodec;
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
@@ -27,19 +25,7 @@ public class WaveUI extends InteractiveCustomUIPage<WaveUI.Data> {
     public void build(@Nonnull Ref<EntityStore> ref, @Nonnull UICommandBuilder uiCommandBuilder,
                       @Nonnull UIEventBuilder uiEventBuilder, @Nonnull Store<EntityStore> store) {
         uiCommandBuilder.append("WaveUI.ui");
-
-        int current = WaveManager.getCurrentWave();
-        int max = WaveManager.getMaxWave();
-        int kills = WaveManager.getTotalKills();
-
-        uiCommandBuilder.set("#WaveLabel.TextSpans", Message.raw("Wave " + current + " / " + max));
-        uiCommandBuilder.set("#KillLabel.TextSpans", Message.raw("Mobs Killed: " + kills));
-
-        if (current >= max) {
-            uiCommandBuilder.set("#StartWaveBtn.Text", Message.raw("All Waves Complete!"));
-            uiCommandBuilder.set("#StartWaveBtn.Disabled", true);
-        }
-
+        applyLabels(uiCommandBuilder);
         uiEventBuilder.addEventBinding(CustomUIEventBindingType.Activating, "#StartWaveBtn");
     }
 
@@ -47,23 +33,37 @@ public class WaveUI extends InteractiveCustomUIPage<WaveUI.Data> {
     public void handleDataEvent(@Nonnull Ref<EntityStore> ref, @Nonnull Store<EntityStore> store, Data data) {
         super.handleDataEvent(ref, store, data);
 
-        int wave = WaveManager.spawnNextWave(store,
+        WaveManager.spawnNextWave(store,
                 msg -> playerRef.sendMessage(Message.raw(msg)));
 
         UICommandBuilder builder = new UICommandBuilder();
+        applyLabels(builder);
+        sendUpdate(builder);
+    }
+
+    private void applyLabels(UICommandBuilder builder) {
         int current = WaveManager.getCurrentWave();
         int max = WaveManager.getMaxWave();
-        int kills = WaveManager.getTotalKills();
+        int waveKills = WaveManager.getCurrentWaveKills();
+        int waveTotal = WaveManager.getCurrentWaveTotalMobs();
+        int totalKills = WaveManager.getTotalKills();
+        int myKills = WaveManager.getPlayerKills(playerRef.getUuid());
 
         builder.set("#WaveLabel.TextSpans", Message.raw("Wave " + current + " / " + max));
-        builder.set("#KillLabel.TextSpans", Message.raw("Mobs Killed: " + kills));
+        builder.set("#WaveKillLabel.TextSpans",
+                Message.raw("Wave Kills: " + waveKills + " / " + waveTotal));
+        builder.set("#PlayerKillLabel.TextSpans", Message.raw("Your Kills: " + myKills));
+        builder.set("#TotalKillLabel.TextSpans", Message.raw("Mobs Killed: " + totalKills));
 
-        if (wave == -1) {
-            builder.set("#StartWaveBtn.Text", Message.raw("All Waves Complete!"));
-            builder.set("#StartWaveBtn.Disabled", true);
+        String status;
+        if (current >= max && !WaveManager.isWaveInProgress()) {
+            status = "All waves complete!";
+        } else if (WaveManager.isWaveInProgress()) {
+            status = "Wave in progress — clear it to continue";
+        } else {
+            status = "Click to start the next wave";
         }
-
-        sendUpdate(builder);
+        builder.set("#StatusLabel.TextSpans", Message.raw(status));
     }
 
     public static class Data {

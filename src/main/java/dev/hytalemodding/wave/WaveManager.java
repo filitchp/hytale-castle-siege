@@ -17,6 +17,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -31,6 +34,15 @@ public class WaveManager {
 
     private static final AtomicInteger currentWave = new AtomicInteger(0);
     private static final AtomicInteger totalKills = new AtomicInteger(0);
+
+    // Set of entity refs for mobs spawned in the current wave that are still alive.
+    private static final Set<Ref<EntityStore>> currentWaveMobs = ConcurrentHashMap.newKeySet();
+    // Total mobs spawned in the current wave (denominator for "X / Y killed" in UI).
+    private static final AtomicInteger currentWaveTotalMobs = new AtomicInteger(0);
+    // Mobs killed in the current wave (across all players).
+    private static final AtomicInteger currentWaveKills = new AtomicInteger(0);
+    // Per-player kill counters keyed by player UUID (lifetime across all waves).
+    private static final ConcurrentHashMap<UUID, AtomicInteger> playerKills = new ConcurrentHashMap<>();
 
     static final ScheduledExecutorService WAVE_SCHEDULER =
             Executors.newSingleThreadScheduledExecutor(r -> {
@@ -153,16 +165,60 @@ public class WaveManager {
         return totalKills.get();
     }
 
-    public static void incrementKills() {
+    public static int getCurrentWaveKills() {
+        return currentWaveKills.get();
+    }
+
+    public static int getCurrentWaveTotalMobs() {
+        return currentWaveTotalMobs.get();
+    }
+
+    public static boolean isWaveInProgress() {
+        return !currentWaveMobs.isEmpty();
+    }
+
+    public static int getPlayerKills(UUID playerUuid) {
+        AtomicInteger counter = playerKills.get(playerUuid);
+        return counter == null ? 0 : counter.get();
+    }
+
+    /**
+     * Called from MobDeathTracker when a tracked wave mob dies.
+     * Removes the mob from the alive set, bumps wave+lifetime counters,
+     * and attributes the kill to the player UUID if provided.
+     */
+    public static void recordMobDeath(Ref<EntityStore> mobRef, UUID killerUuid) {
+        if (!currentWaveMobs.remove(mobRef)) {
+            // Not a tracked wave mob — ignore (still count toward lifetime totals).
+            totalKills.incrementAndGet();
+            if (killerUuid != null) {
+                playerKills.computeIfAbsent(killerUuid, k -> new AtomicInteger(0)).incrementAndGet();
+            }
+            return;
+        }
         totalKills.incrementAndGet();
+        currentWaveKills.incrementAndGet();
+        if (killerUuid != null) {
+            playerKills.computeIfAbsent(killerUuid, k -> new AtomicInteger(0)).incrementAndGet();
+        }
     }
 
     public static int spawnNextWave(Store<EntityStore> store, Consumer<String> messageSender) {
+        if (isWaveInProgress()) {
+            int remaining = currentWaveMobs.size();
+            messageSender.accept("Cannot advance: " + remaining + " mob(s) from the current wave are still alive.");
+            return -2;
+        }
+
         int wave = currentWave.incrementAndGet();
         if (wave > getMaxWave()) {
             currentWave.set(getMaxWave());
             messageSender.accept("All 20 waves completed!");
             return -1;
+        }
+        if (wave == 1) {
+            playerKills.clear();
+            totalKills.set(0);
         }
         messageSender.accept("Get Ready to Fight! Starting wave " + wave);
         spawnWave(wave, store, messageSender, false);
@@ -176,6 +232,11 @@ public class WaveManager {
             messageSender.accept("Unknown wave number: " + waveNumber + ". Valid range is 1-20.");
             return;
         }
+
+        // Reset wave-scoped tracking.
+        currentWaveMobs.clear();
+        currentWaveKills.set(0);
+        currentWaveTotalMobs.set(0);
 
         var rotation = new Vector3f(0f, 0f, 0f);
 
@@ -203,6 +264,10 @@ public class WaveManager {
                     NPCEntity npcEntity = store.getComponent(result.first(), NPCEntity.getComponentType());
 
                     if (npcEntity != null) {
+                        // Track this mob as part of the current wave.
+                        currentWaveMobs.add(result.first());
+                        currentWaveTotalMobs.incrementAndGet();
+
                         var path = createMobPath(pos, rotation);
                         double dx = pos.x - SPAWN_ORIGIN.x;
                         double dz = pos.z - SPAWN_ORIGIN.z;
