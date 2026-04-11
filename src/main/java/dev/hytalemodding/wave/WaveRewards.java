@@ -32,7 +32,7 @@ public final class WaveRewards {
 
     public static final Map<Integer, WaveRewardSet> WAVE_REWARDS = Map.ofEntries(
             Map.entry(1, WaveRewardSet.startOnly(
-                    new RewardItem("Woad_Oak_Trunk", 100),
+                    new RewardItem("Wood_Oak_Trunk", 100),
                     new RewardItem("Weapon_Axe_Crude", 1)
             )),
             Map.entry(2, WaveRewardSet.startOnly(
