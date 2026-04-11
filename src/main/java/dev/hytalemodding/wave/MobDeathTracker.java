@@ -31,7 +31,7 @@ public class MobDeathTracker extends DeathSystems.OnDeathSystem {
         }
 
         UUID killerUuid = resolveKillerUuid(deathComponent, store);
-        WaveManager.recordMobDeath(ref, killerUuid);
+        WaveManager.recordMobDeath(ref, killerUuid, store);
     }
 
     private static UUID resolveKillerUuid(DeathComponent deathComponent, Store<EntityStore> store) {

@@ -185,9 +185,11 @@ public class WaveManager {
     /**
      * Called from MobDeathTracker when a tracked wave mob dies.
      * Removes the mob from the alive set, bumps wave+lifetime counters,
-     * and attributes the kill to the player UUID if provided.
+     * attributes the kill to the player UUID if provided, and hands out
+     * end-of-wave rewards when the last tracked mob is cleared.
      */
-    public static void recordMobDeath(Ref<EntityStore> mobRef, UUID killerUuid) {
+    public static void recordMobDeath(Ref<EntityStore> mobRef, UUID killerUuid,
+                                      Store<EntityStore> store) {
         if (!currentWaveMobs.remove(mobRef)) {
             // Not a tracked wave mob — ignore (still count toward lifetime totals).
             totalKills.incrementAndGet();
@@ -200,6 +202,11 @@ public class WaveManager {
         currentWaveKills.incrementAndGet();
         if (killerUuid != null) {
             playerKills.computeIfAbsent(killerUuid, k -> new AtomicInteger(0)).incrementAndGet();
+        }
+
+        // Last mob in the wave just died — hand out end-of-wave rewards.
+        if (currentWaveMobs.isEmpty()) {
+            WaveRewards.awardWaveEnd(currentWave.get(), store);
         }
     }
 
@@ -237,6 +244,9 @@ public class WaveManager {
         currentWaveMobs.clear();
         currentWaveKills.set(0);
         currentWaveTotalMobs.set(0);
+
+        // Hand out start-of-wave rewards before any mobs spawn.
+        WaveRewards.awardWaveStart(waveNumber, store);
 
         var rotation = new Vector3f(0f, 0f, 0f);
 
