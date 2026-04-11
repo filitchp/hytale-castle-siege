@@ -11,7 +11,6 @@ import dev.hytalemodding.commands.StartWaveCommand;
 import dev.hytalemodding.events.InputListener;
 import dev.hytalemodding.events.WelcomeEvent;
 import dev.hytalemodding.systems.BlockBreakEventSystem;
-import dev.hytalemodding.systems.PreventHammerDropSystem;
 import dev.hytalemodding.wave.MobDeathTracker;
 import dev.hytalemodding.wave.OpenWaveUIInteraction;
 import dev.hytalemodding.wave.TriggerWaveInteraction;
@@ -46,7 +45,6 @@ public class CastleDefense extends JavaPlugin {
 
         // Initialize Event Systems
         this.getEntityStoreRegistry().registerSystem(new BlockBreakEventSystem());
-        this.getEntityStoreRegistry().registerSystem(new PreventHammerDropSystem());
 
         this.getCodecRegistry(Interaction.CODEC)
                 .register("TriggerWave", TriggerWaveInteraction.class, TriggerWaveInteraction.CODEC);
