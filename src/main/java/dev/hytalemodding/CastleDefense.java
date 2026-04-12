@@ -4,6 +4,7 @@ import com.hypixel.hytale.server.core.event.events.player.*;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Interaction;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
+import dev.hytalemodding.commands.DebugPathsCommand;
 import dev.hytalemodding.commands.HealCommand;
 import dev.hytalemodding.commands.MobWaveCommand;
 import dev.hytalemodding.commands.ShowWaveHudCommand;
@@ -29,10 +30,9 @@ public class CastleDefense extends JavaPlugin {
         this.getCommandRegistry().registerCommand(new HealCommand());
         this.getCommandRegistry().registerCommand(new StartWaveCommand());
         this.getCommandRegistry().registerCommand(new ShowWaveHudCommand());
+        this.getCommandRegistry().registerCommand(new DebugPathsCommand());
 
         this.getEventRegistry().registerGlobal(PlayerReadyEvent.class, WelcomeEvent::onPlayerReady);
-
-
 
         // Receive all keyed events regardless of key
         getEventRegistry().registerGlobal(

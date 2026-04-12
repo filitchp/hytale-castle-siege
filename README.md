@@ -1,4 +1,16 @@
-# Hytale Plugin Template
+# Hytale Castle Siege Mini Game
+
+### External Guides
+
+#### Player Interaction
+- https://www.youtube.com/watch?v=SITX2Mgdqqc
+- https://github.com/OwnerAli/Hytale-Template/tree/feature/interactive
+
+#### NPCs
+- https://hytalemodding.dev/en/docs/official-documentation/npc/9-inter-npc-interaction
+- https://hytale.game/en/mastering-npc-commands/
+- 
+## Original Getting Started Content
 
 A ready-to-use starting point for creating Hytale server plugins with Java, _or Kotlin_. If you've
 been using the Asset Editor and want to start writing server-side logic — custom commands, event
@@ -11,8 +23,8 @@ handling, gameplay systems — this is the simplest place to begin.
    to use the latest 25 from JetBrains or similar.
 3. Open the project in your favorite IDE, we
    recommend [IntelliJ IDEA](https://www.jetbrains.com/idea/download).
-4. Optionally, run `./gradlew` if your IDE does not automtically synchronizes.
-5. Run the devserver with the Run Configuration created, or `./gradlew devServer`.
+4. Optionally, run `./gradlew` if your IDE does not automatically synchronize.
+5. Run the `devserver` with the Run Configuration created, or `./gradlew devServer`.
 
 > On Windows, use `.\gradlew.bat` instead of `./gradlew`, this script is here to run the
 > Gradle without you needing to install the tooling itself, only the Java is required.
@@ -50,6 +62,4 @@ For in-depth configuration, you can visit the [ScaffoldIt Plugin Docs](https://s
 - [ScaffoldIt Plugin Docs](https://scaffoldit.dev)
 
 ## License
-
-Add your own after copying the template, though we recommend using MIT, BSD, or Apache to keep
-the modding community open!
+MIT

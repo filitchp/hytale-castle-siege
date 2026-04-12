@@ -7,6 +7,7 @@ import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -33,10 +34,27 @@ public final class WaveRewards {
     public static final Map<Integer, WaveRewardSet> WAVE_REWARDS = Map.ofEntries(
             Map.entry(1, WaveRewardSet.startOnly(
                     new RewardItem("Wood_Oak_Trunk", 100),
-                    new RewardItem("Weapon_Axe_Crude", 1)
+                    new RewardItem("Ingredient_Fibre", 50)
             )),
             Map.entry(2, WaveRewardSet.startOnly(
                     new RewardItem("Ore_Copper", 10)
+            )),
+            Map.entry(3, WaveRewardSet.of(
+                    Collections.singletonList(new RewardItem("Ore_Copper", 15)), // Start of round
+                    Collections.singletonList(new RewardItem("Potion_Health", 2))  // End of round
+            )),
+            Map.entry(4, WaveRewardSet.startOnly(
+                    new RewardItem("Ore_Copper", 25)
+            )),
+            Map.entry(5, WaveRewardSet.startOnly(
+                    new RewardItem("Ore_Iron", 10)
+            )),
+            Map.entry(6, WaveRewardSet.of(
+                    Collections.singletonList(new RewardItem("Ore_Iron", 15)), // Start of round
+                    Collections.singletonList(new RewardItem("Potion_Health_Greater", 2))  // End of round
+            )),
+            Map.entry(7, WaveRewardSet.startOnly(
+                    new RewardItem("Ore_Iron", 25)
             ))
     );
 
