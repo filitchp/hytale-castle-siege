@@ -2,6 +2,9 @@
 
 ### External Guides
 
+### General
+- https://britakee-studios.gitbook.io/hytale-modding-documentation
+
 #### Player Interaction
 - https://www.youtube.com/watch?v=SITX2Mgdqqc
 - https://github.com/OwnerAli/Hytale-Template/tree/feature/interactive

@@ -4,9 +4,11 @@ import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.math.vector.Vector3d;
 import com.hypixel.hytale.math.vector.Vector3f;
+import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.universe.world.npc.INonPlayerCharacter;
 import com.hypixel.hytale.server.core.universe.world.path.IPath;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import com.hypixel.hytale.server.core.util.EventTitleUtil;
 import com.hypixel.hytale.server.npc.NPCPlugin;
 import com.hypixel.hytale.server.npc.entities.NPCEntity;
 import com.hypixel.hytale.builtin.path.path.TransientPath;
@@ -204,9 +206,20 @@ public class WaveManager {
             playerKills.computeIfAbsent(killerUuid, k -> new AtomicInteger(0)).incrementAndGet();
         }
 
-        // Last mob in the wave just died — hand out end-of-wave rewards.
+        // Last mob in the wave just died — hand out end-of-wave rewards and show title.
         if (currentWaveMobs.isEmpty()) {
-            WaveRewards.awardWaveEnd(currentWave.get(), store);
+            int wave = currentWave.get();
+            WaveRewards.awardWaveEnd(wave, store);
+
+            EventTitleUtil.showEventTitleToWorld(
+                    Message.raw("Wave " + wave + " / " + getMaxWave() + " Defeated!"),
+                    Message.raw(""),
+                    true,
+                    EventTitleUtil.DEFAULT_ZONE,
+                    EventTitleUtil.DEFAULT_DURATION,
+                    EventTitleUtil.DEFAULT_FADE_DURATION,
+                    EventTitleUtil.DEFAULT_FADE_DURATION,
+                    store);
         }
     }
 
@@ -247,6 +260,17 @@ public class WaveManager {
 
         // Hand out start-of-wave rewards before any mobs spawn.
         WaveRewards.awardWaveStart(waveNumber, store);
+
+        // Show title to all players in the world.
+        EventTitleUtil.showEventTitleToWorld(
+                Message.raw("Starting Wave " + waveNumber + " / " + getMaxWave()),
+                Message.raw(""),
+                true,
+                EventTitleUtil.DEFAULT_ZONE,
+                EventTitleUtil.DEFAULT_DURATION,
+                EventTitleUtil.DEFAULT_FADE_DURATION,
+                EventTitleUtil.DEFAULT_FADE_DURATION,
+                store);
 
         var rotation = new Vector3f(0f, 0f, 0f);
 
