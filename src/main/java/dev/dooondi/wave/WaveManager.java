@@ -45,6 +45,8 @@ public class WaveManager {
     private static final AtomicInteger currentWaveKills = new AtomicInteger(0);
     // Per-player kill counters keyed by player UUID (lifetime across all waves).
     private static final ConcurrentHashMap<UUID, AtomicInteger> playerKills = new ConcurrentHashMap<>();
+    // Per-player death counters keyed by player UUID (lifetime across all waves).
+    private static final ConcurrentHashMap<UUID, AtomicInteger> playerDeaths = new ConcurrentHashMap<>();
 
     static final ScheduledExecutorService WAVE_SCHEDULER =
             Executors.newSingleThreadScheduledExecutor(r -> {
@@ -152,7 +154,7 @@ public class WaveManager {
     private static final double ROW_SPACING = 2.0;
     private static final Random RANDOM = new Random();
     private static final Vector3d SPAWN_ORIGIN = new Vector3d(-0.5, 80.0, 0.5);
-    private static final Vector3d BRANCH_1 = new Vector3d(-0.5, 80.0, -23.5);
+    private static final Vector3d BRANCH_1 = new Vector3d(-0.5, 100.0, -23.5);
     private static final Vector3d BRANCH_2 = new Vector3d(-0.5, 80.0, -28.0);
 
     public static int getCurrentWave() {
@@ -182,6 +184,15 @@ public class WaveManager {
     public static int getPlayerKills(UUID playerUuid) {
         AtomicInteger counter = playerKills.get(playerUuid);
         return counter == null ? 0 : counter.get();
+    }
+
+    public static int getPlayerDeaths(UUID playerUuid) {
+        AtomicInteger counter = playerDeaths.get(playerUuid);
+        return counter == null ? 0 : counter.get();
+    }
+
+    public static void recordPlayerDeath(UUID playerUuid) {
+        playerDeaths.computeIfAbsent(playerUuid, k -> new AtomicInteger(0)).incrementAndGet();
     }
 
     /**
@@ -238,6 +249,7 @@ public class WaveManager {
         }
         if (wave == 1) {
             playerKills.clear();
+            playerDeaths.clear();
             totalKills.set(0);
         }
         messageSender.accept("Get Ready to Fight! Starting wave " + wave);

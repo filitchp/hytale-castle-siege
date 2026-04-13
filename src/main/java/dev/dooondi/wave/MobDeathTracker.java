@@ -7,6 +7,7 @@ import com.hypixel.hytale.component.query.Query;
 import com.hypixel.hytale.server.core.modules.entity.damage.Damage;
 import com.hypixel.hytale.server.core.modules.entity.damage.DeathComponent;
 import com.hypixel.hytale.server.core.modules.entity.damage.DeathSystems;
+import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.npc.entities.NPCEntity;
@@ -24,7 +25,14 @@ public class MobDeathTracker extends DeathSystems.OnDeathSystem {
     public void onComponentAdded(Ref<EntityStore> ref, DeathComponent deathComponent,
                                  Store<EntityStore> store,
                                  CommandBuffer<EntityStore> commandBuffer) {
-        // Only count NPC deaths, not player deaths.
+        // Track player deaths.
+        PlayerRef playerRef = store.getComponent(ref, PlayerRef.getComponentType());
+        if (playerRef != null) {
+            WaveManager.recordPlayerDeath(playerRef.getUuid());
+            return;
+        }
+
+        // Only count NPC deaths for wave tracking.
         NPCEntity npc = store.getComponent(ref, NPCEntity.getComponentType());
         if (npc == null) {
             return;

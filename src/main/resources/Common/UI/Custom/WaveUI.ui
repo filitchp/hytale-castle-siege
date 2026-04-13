@@ -35,6 +35,13 @@ Group {
       Padding: (Full: 5);
     }
 
+    Label #DeathLabel {
+      Style: (FontSize: 18, Alignment: Center);
+      Anchor: (Top: 5);
+      Text: "Your Deaths: 0";
+      Padding: (Full: 5);
+    }
+
     Label #TotalKillLabel {
       Style: (FontSize: 18, Alignment: Center);
       Anchor: (Top: 5);
