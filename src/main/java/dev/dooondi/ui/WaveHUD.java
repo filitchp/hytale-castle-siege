@@ -1,4 +1,4 @@
-package dev.hytalemodding.ui;
+package dev.dooondi.ui;
 
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.entity.entities.player.hud.CustomUIHud;

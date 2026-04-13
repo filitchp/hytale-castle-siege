@@ -1,6 +1,6 @@
 {
   "TranslationProperties": {
-    "Name": "server.items.CastleDefense_WaveHammer.name"
+    "Name": "server.items.CastleSiege_WaveHammer.name"
   },
   "Categories": [
     "Items.Tools"

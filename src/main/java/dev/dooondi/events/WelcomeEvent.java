@@ -1,4 +1,4 @@
-package dev.hytalemodding.events;
+package dev.dooondi.events;
 
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
@@ -19,7 +19,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class WelcomeEvent {
 
-    public static final String HAMMER_ID = "CastleDefense_WaveHammer";
+    public static final String HAMMER_ID = "CastleSiege_WaveHammer";
 
     public static void onPlayerReady(PlayerReadyEvent event) {
         Player player = event.getPlayer();

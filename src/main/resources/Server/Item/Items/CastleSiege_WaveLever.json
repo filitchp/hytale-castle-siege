@@ -1,6 +1,6 @@
 {
   "TranslationProperties": {
-    "Name": "server.items.CastleDefense_WaveLever.name"
+    "Name": "server.items.CastleSiege_WaveLever.name"
   },
   "Icon": "Icons/ItemsGenerated/Deco_Lever.png",
   "Categories": [

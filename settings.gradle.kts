@@ -1,4 +1,4 @@
-rootProject.name = "dev.hytalemodding"
+rootProject.name = "dev.dooondi"
 
 plugins {
     // See documentation on https://scaffoldit.dev
@@ -21,8 +21,8 @@ hytale {
     }
 
     manifest {
-        Group = "HytaleModding"
-        Name = "CastleDefense"
-        Main = "dev.hytalemodding.CastleDefense"
+        Group = "Doondi"
+        Name = "CastleSiege"
+        Main = "dev.dooondi.CastleSiege"
     }
 }

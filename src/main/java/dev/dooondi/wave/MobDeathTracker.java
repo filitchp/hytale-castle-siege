@@ -1,4 +1,4 @@
-package dev.hytalemodding.wave;
+package dev.dooondi.wave;
 
 import com.hypixel.hytale.component.CommandBuffer;
 import com.hypixel.hytale.component.Ref;

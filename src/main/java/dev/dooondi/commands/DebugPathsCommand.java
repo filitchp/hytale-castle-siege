@@ -1,4 +1,4 @@
-package dev.hytalemodding.commands;
+package dev.dooondi.commands;
 
 import com.hypixel.hytale.builtin.path.WorldPathData;
 import com.hypixel.hytale.builtin.path.path.IPrefabPath;
@@ -35,7 +35,7 @@ public class DebugPathsCommand extends AbstractTargetPlayerCommand {
 
         WorldPathData pathData = store.getResource(WorldPathData.getResourceType());
         if (pathData == null) {
-            String msg = "[CastleDefense] No WorldPathData resource on store for world " + world.getName();
+            String msg = "[CastleSiege] No WorldPathData resource on store for world " + world.getName();
             System.out.println(msg);
             commandContext.sendMessage(Message.raw(msg));
             return;
@@ -43,13 +43,13 @@ public class DebugPathsCommand extends AbstractTargetPlayerCommand {
 
         List<IPrefabPath> paths = pathData.getAllPrefabPaths();
 
-        System.out.println("[CastleDefense] ===== Saved prefab paths in world '"
+        System.out.println("[CastleSiege] ===== Saved prefab paths in world '"
                 + world.getName() + "' =====");
-        System.out.println("[CastleDefense] Total paths: " + paths.size());
+        System.out.println("[CastleSiege] Total paths: " + paths.size());
 
         for (IPrefabPath path : paths) {
             String line = String.format(
-                    "[CastleDefense]   %d.%s (%s) [ Length: %d, Loaded nodes: %d ]",
+                    "[CastleSiege]   %d.%s (%s) [ Length: %d, Loaded nodes: %d ]",
                     path.getWorldGenId(),
                     path.getId(),
                     path.getName(),
@@ -58,7 +58,7 @@ public class DebugPathsCommand extends AbstractTargetPlayerCommand {
             );
             System.out.println(line);
         }
-        System.out.println("[CastleDefense] ===== end of path list =====");
+        System.out.println("[CastleSiege] ===== end of path list =====");
 
         commandContext.sendMessage(Message.raw("Printed " + paths.size()
                 + " path(s) to the server console."));

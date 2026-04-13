@@ -1,4 +1,4 @@
-package dev.hytalemodding.commands;
+package dev.dooondi.commands;
 
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;

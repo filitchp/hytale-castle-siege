@@ -10,7 +10,7 @@ Group {
     Label #Title {
       Style: (FontSize: 32, Alignment: Center);
       Anchor: (Top: 30);
-      Text: "Castle Defense";
+      Text: "Castle Siege";
       Padding: (Full: 10);
     }
 

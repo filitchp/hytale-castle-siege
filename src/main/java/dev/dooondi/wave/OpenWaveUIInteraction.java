@@ -1,20 +1,21 @@
-package dev.hytalemodding.wave;
+package dev.dooondi.wave;
 
 import com.hypixel.hytale.codec.builder.BuilderCodec;
 import com.hypixel.hytale.protocol.InteractionType;
-import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.entity.InteractionContext;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.CooldownHandler;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.SimpleInstantInteraction;
+import com.hypixel.hytale.server.core.universe.PlayerRef;
+import dev.dooondi.ui.WaveUI;
 
-public class TriggerWaveInteraction extends SimpleInstantInteraction {
+public class OpenWaveUIInteraction extends SimpleInstantInteraction {
 
-    public static final BuilderCodec<TriggerWaveInteraction> CODEC =
-            BuilderCodec.builder(TriggerWaveInteraction.class, TriggerWaveInteraction::new,
+    public static final BuilderCodec<OpenWaveUIInteraction> CODEC =
+            BuilderCodec.builder(OpenWaveUIInteraction.class, OpenWaveUIInteraction::new,
                     SimpleInstantInteraction.CODEC).build();
 
-    public TriggerWaveInteraction() {
+    public OpenWaveUIInteraction() {
         super();
     }
 
@@ -23,14 +24,15 @@ public class TriggerWaveInteraction extends SimpleInstantInteraction {
                             CooldownHandler cooldownHandler) {
         Player player = context.getCommandBuffer()
                 .getComponent(context.getEntity(), Player.getComponentType());
+        if (player == null) return;
 
-        if (player == null) {
-            return;
-        }
+        PlayerRef playerRef = context.getCommandBuffer()
+                .getComponent(context.getEntity(), PlayerRef.getComponentType());
+        if (playerRef == null) return;
 
-        // Use CommandBuffer.run to defer store writes until the store is ready
+        // Defer store-touching work until the store is no longer processing.
         context.getCommandBuffer().run(store ->
-                WaveManager.spawnNextWave(store, msg -> player.sendMessage(Message.raw(msg)))
+                player.getPageManager().openCustomPage(context.getEntity(), store, new WaveUI(playerRef))
         );
     }
 }

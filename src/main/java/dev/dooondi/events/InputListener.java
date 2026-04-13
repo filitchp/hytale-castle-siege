@@ -1,4 +1,4 @@
-package dev.hytalemodding.events;
+package dev.dooondi.events;
 
 import com.hypixel.hytale.server.core.event.events.player.PlayerChatEvent;
 

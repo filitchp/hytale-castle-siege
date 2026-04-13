@@ -1,27 +1,27 @@
-package dev.hytalemodding;
+package dev.dooondi;
 
 import com.hypixel.hytale.server.core.event.events.player.*;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Interaction;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
-import dev.hytalemodding.commands.DebugPathsCommand;
-import dev.hytalemodding.commands.HealCommand;
-import dev.hytalemodding.commands.MobWaveCommand;
-import dev.hytalemodding.commands.ShowWaveHudCommand;
-import dev.hytalemodding.commands.StartWaveCommand;
-import dev.hytalemodding.events.InputListener;
-import dev.hytalemodding.events.WelcomeEvent;
-import dev.hytalemodding.systems.BlockBreakEventSystem;
-import dev.hytalemodding.systems.BlockPlaceEventSystem;
-import dev.hytalemodding.wave.MobDeathTracker;
-import dev.hytalemodding.wave.OpenWaveUIInteraction;
-import dev.hytalemodding.wave.TriggerWaveInteraction;
+import dev.dooondi.commands.DebugPathsCommand;
+import dev.dooondi.commands.HealCommand;
+import dev.dooondi.commands.MobWaveCommand;
+import dev.dooondi.commands.ShowWaveHudCommand;
+import dev.dooondi.commands.StartWaveCommand;
+import dev.dooondi.events.InputListener;
+import dev.dooondi.events.WelcomeEvent;
+import dev.dooondi.systems.BlockBreakEventSystem;
+import dev.dooondi.systems.BlockPlaceEventSystem;
+import dev.dooondi.wave.MobDeathTracker;
+import dev.dooondi.wave.OpenWaveUIInteraction;
+import dev.dooondi.wave.TriggerWaveInteraction;
 
 import javax.annotation.Nonnull;
 
-public class CastleDefense extends JavaPlugin {
+public class CastleSiege extends JavaPlugin {
 
-    public CastleDefense(@Nonnull JavaPluginInit init) {
+    public CastleSiege(@Nonnull JavaPluginInit init) {
         super(init);
     }
 

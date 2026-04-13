@@ -1,4 +1,4 @@
-package dev.hytalemodding.systems;
+package dev.dooondi.systems;
 
 import com.hypixel.hytale.component.ArchetypeChunk;
 import com.hypixel.hytale.component.CommandBuffer;
@@ -9,16 +9,16 @@ import com.hypixel.hytale.component.system.EntityEventSystem;
 import com.hypixel.hytale.protocol.GameMode;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.entity.entities.Player;
-import com.hypixel.hytale.server.core.event.events.ecs.PlaceBlockEvent;
+import com.hypixel.hytale.server.core.event.events.ecs.BreakBlockEvent;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 
 import java.awt.Color;
 
-public class BlockPlaceEventSystem extends EntityEventSystem<EntityStore, PlaceBlockEvent> {
+public class BlockBreakEventSystem extends EntityEventSystem<EntityStore, BreakBlockEvent> {
 
-    public BlockPlaceEventSystem() {
-        super(PlaceBlockEvent.class);
+    public BlockBreakEventSystem() {
+        super(BreakBlockEvent.class);
     }
 
     @Override
@@ -26,17 +26,18 @@ public class BlockPlaceEventSystem extends EntityEventSystem<EntityStore, PlaceB
                        @NonNullDecl ArchetypeChunk<EntityStore> archetypeChunk,
                        @NonNullDecl Store<EntityStore> store,
                        @NonNullDecl CommandBuffer<EntityStore> commandBuffer,
-                       @NonNullDecl PlaceBlockEvent event) {
+                       @NonNullDecl BreakBlockEvent event) {
         Ref<EntityStore> entityStoreRef = archetypeChunk.getReferenceTo(index);
         Player player = store.getComponent(entityStoreRef, Player.getComponentType());
         if (player == null) return;
 
         if (player.getGameMode() == GameMode.Creative) {
+            // Creative players bypass the restriction.
             return;
         }
 
         event.setCancelled(true);
-        player.sendMessage(Message.raw("You can't place this block in the minigame.")
+        player.sendMessage(Message.raw("You can't break this block in the minigame.")
                 .color(Color.RED).bold(true));
     }
 
