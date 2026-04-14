@@ -14,8 +14,6 @@ import com.hypixel.hytale.server.npc.entities.NPCEntity;
 import com.hypixel.hytale.builtin.path.path.TransientPath;
 import it.unimi.dsi.fastutil.Pair;
 
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -32,8 +30,6 @@ public class WaveManager {
 
     public record MobEntry(String name, int count) {}
     record WavePath(IPath<?> path, double totalDistance) {}
-    record PendingMob(NPCEntity npcEntity, WavePath wavePath, double distanceFromOrigin) {}
-
     private static final AtomicInteger currentWave = new AtomicInteger(0);
     private static final AtomicInteger totalKills = new AtomicInteger(0);
 
@@ -150,11 +146,11 @@ public class WaveManager {
             ))
     );
 
-    private static final int MAX_COLS = 3;
-    private static final double ROW_SPACING = 2.0;
+    private static final int MAX_COLS = 1;
+    private static final double ROW_SPACING = 16.0;
     private static final Random RANDOM = new Random();
     private static final Vector3d SPAWN_ORIGIN = new Vector3d(-0.5, 80.0, 0.5);
-    private static final Vector3d BRANCH_1 = new Vector3d(-0.5, 100.0, -23.5);
+    private static final Vector3d BRANCH_1 = new Vector3d(-0.5, 80.0, -28.0);
     private static final Vector3d BRANCH_2 = new Vector3d(-0.5, 80.0, -28.0);
 
     public static int getCurrentWave() {
@@ -286,79 +282,47 @@ public class WaveManager {
 
         var rotation = new Vector3f(0f, 0f, 0f);
 
-        List<PendingMob> pendingMobs = new ArrayList<>();
+        // Spawn all mobs and send them on their patrol path immediately.
+        int spawnCount = 0;
         int mobIndex = 0;
         for (MobEntry entry : entries) {
             for (int i = 0; i < entry.count(); i++) {
                 Vector3d pos = computeSpawnPosition(SPAWN_ORIGIN, mobIndex);
 
                 if (debug) {
-                    var entity_count = i+1;
-                    messageSender.accept("Spawning '" + entry.name() + "' " + entity_count + "/" + entry.count());
+                    messageSender.accept("Spawning '" + entry.name() + "' at ("
+                            + pos.x + ", " + pos.y + ", " + pos.z + ")");
                 }
 
                 Pair<Ref<EntityStore>, INonPlayerCharacter> result =
                         NPCPlugin.get().spawnNPC(store, entry.name(), null, pos, rotation);
 
                 if (result != null) {
-
-                    if (debug) {
-                        // DEBUG
-                        messageSender.accept("Got entity from entity store: " + entry.name());
-                    }
-
                     NPCEntity npcEntity = store.getComponent(result.first(), NPCEntity.getComponentType());
 
                     if (npcEntity != null) {
-                        // Track this mob as part of the current wave.
                         currentWaveMobs.add(result.first());
                         currentWaveTotalMobs.incrementAndGet();
+                        spawnCount++;
 
-                        var path = createMobPath(pos, rotation);
-                        double dx = pos.x - SPAWN_ORIGIN.x;
-                        double dz = pos.z - SPAWN_ORIGIN.z;
-                        double distSq = dx * dx + dz * dz;
-                        pendingMobs.add(new PendingMob(npcEntity, path, distSq));
-                    }
-                } else {
+                        var wavePath = createMobPath(pos, rotation, mobIndex);
 
-                    if (debug) {
-                        // DEBUG
-                        messageSender.accept("Failed to spawn " + entry.name() + " at ("
-                                + pos.x + ", " + pos.y + ", " + pos.z + ")");
+                        // Defer path activation briefly so the entity finishes initializing.
+                        WAVE_SCHEDULER.schedule(
+                                () -> npcEntity.getPathManager().setTransientPath(wavePath.path()),
+                                500, TimeUnit.MILLISECONDS
+                        );
                     }
+                } else if (debug) {
+                    messageSender.accept("Failed to spawn " + entry.name() + " at ("
+                            + pos.x + ", " + pos.y + ", " + pos.z + ")");
                 }
 
                 mobIndex++;
             }
         }
 
-        pendingMobs.sort(Comparator.comparingDouble(PendingMob::distanceFromOrigin));
-
-        // Estimated mob travel speed (blocks/sec): MaxSpeed * BodyMotionPath RelSpeed
-        // Wave mobs have MaxSpeed 14-20 and the role uses RelSpeed 0.18-0.25, so ~3.0 b/s
-        double estimatedSpeed = 3.0;
-
-        for (int i = 0; i < pendingMobs.size(); i++) {
-            PendingMob mob = pendingMobs.get(i);
-            long startDelaySec = i;
-            long travelTimeSec = (long) Math.ceil(mob.wavePath().totalDistance() / estimatedSpeed);
-
-            WAVE_SCHEDULER.schedule(
-                    () -> mob.npcEntity().getPathManager().setTransientPath(mob.wavePath().path()),
-                    startDelaySec,
-                    TimeUnit.SECONDS
-            );
-
-            WAVE_SCHEDULER.schedule(
-                    () -> mob.npcEntity().getPathManager().setTransientPath(null),
-                    startDelaySec + travelTimeSec,
-                    TimeUnit.SECONDS
-            );
-        }
-
-        messageSender.accept("Wave " + waveNumber + " started! " + pendingMobs.size()
-                + " mobs spawned, deploying one per second.");
+        messageSender.accept("Wave " + waveNumber + " started! " + spawnCount + " mobs spawned.");
     }
 
     static Vector3d computeSpawnPosition(Vector3d origin, int index) {
@@ -372,39 +336,56 @@ public class WaveManager {
         );
     }
 
-    static WavePath createMobPath(Vector3d spawnPos, Vector3f rotation) {
+    static WavePath createMobPath(Vector3d spawnPos, Vector3f rotation, int mobIndex) {
         TransientPath path = new TransientPath();
 
-        path.addWaypoint(spawnPos, rotation);
+//        var startPosition = new Vector3d(0.0, 0.0, 0.0);
+        var startPosition = spawnPos;
 
-        double distToBranch1 = Math.sqrt(
-                Math.pow(BRANCH_1.x - spawnPos.x, 2)
-                + Math.pow(BRANCH_1.z - spawnPos.z, 2));
-        path.addWaypoint(BRANCH_1, rotation);
+        int row = mobIndex / MAX_COLS;
 
-        double totalDistance = distToBranch1;
+        path.addWaypoint(startPosition, rotation);
 
-        int branch = RANDOM.nextInt(3);
-        if (branch == 0) {
-            totalDistance += 8.0;
-            path.addWaypoint(new Vector3d(BRANCH_1.x + 8.0, BRANCH_1.y, BRANCH_1.z), rotation);
-        } else if (branch == 1) {
-            totalDistance += 8.0;
-            path.addWaypoint(new Vector3d(BRANCH_1.x - 8.0, BRANCH_1.y, BRANCH_1.z), rotation);
-        } else {
-            double distBranch1To2 = Math.abs(BRANCH_2.z - BRANCH_1.z);
-            totalDistance += distBranch1To2;
-            path.addWaypoint(BRANCH_2, rotation);
-            var nextBlocks = 20.0;
+//        var destPosition = new Vector3d(0.0, 0.0, +28.0 + (row * ROW_SPACING));
+//        var destPosition = ;
 
-            if (RANDOM.nextBoolean()) {
-                path.addWaypoint(new Vector3d(BRANCH_2.x + nextBlocks, BRANCH_2.y, BRANCH_2.z), rotation);
-            } else {
-                path.addWaypoint(new Vector3d(BRANCH_2.x - nextBlocks, BRANCH_2.y, BRANCH_2.z), rotation);
-            }
-            totalDistance += nextBlocks;
+        path.addWaypoint(
+                new Vector3d(startPosition.x, startPosition.y, startPosition.z - 8.0),
+                rotation
+        );
+
+        path.addWaypoint(
+                new Vector3d(startPosition.x, startPosition.y, startPosition.z - 16.0),
+                rotation
+        );
+
+        path.addWaypoint(
+                new Vector3d(startPosition.x, startPosition.y, startPosition.z - 24.0),
+                rotation
+        );
+
+        path.addWaypoint(
+                new Vector3d(startPosition.x, startPosition.y, startPosition.z - 32.0),
+                rotation
+        );
+
+        for (int i = 0; i < row; i++) {
+            path.addWaypoint(
+                    new Vector3d(startPosition.x, startPosition.y, startPosition.z - 32.0 - i * 8.0),
+                    rotation
+            );
         }
 
-        return new WavePath(path, totalDistance);
+//        double distance = Math.sqrt(
+//                Math.pow(destPosition.x - startPosition.x, 2) +
+//                Math.pow(destPosition.y - startPosition.y, 2) +
+//                Math.pow(destPosition.z - startPosition.z, 2)
+//        );
+//
+//        System.out.println("Start: " + startPosition.x + ", " + startPosition.y + ", " + startPosition.z);
+//        System.out.println("End: " + destPosition.x + ", " + destPosition.y + ", " + destPosition.z);
+//        System.out.println("Dist: " + distance);
+
+        return new WavePath(path, 0.0);
     }
 }

@@ -4,9 +4,9 @@ import com.hypixel.hytale.server.core.event.events.player.*;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Interaction;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
-import dev.dooondi.commands.DebugPathsCommand;
 import dev.dooondi.commands.HealCommand;
 import dev.dooondi.commands.MobWaveCommand;
+import dev.dooondi.commands.PrefabPathCommand;
 import dev.dooondi.commands.ShowWaveHudCommand;
 import dev.dooondi.commands.StartWaveCommand;
 import dev.dooondi.events.InputListener;
@@ -31,7 +31,7 @@ public class CastleSiege extends JavaPlugin {
         this.getCommandRegistry().registerCommand(new HealCommand());
         this.getCommandRegistry().registerCommand(new StartWaveCommand());
         this.getCommandRegistry().registerCommand(new ShowWaveHudCommand());
-        this.getCommandRegistry().registerCommand(new DebugPathsCommand());
+        this.getCommandRegistry().registerCommand(new PrefabPathCommand());
 
         this.getEventRegistry().registerGlobal(PlayerReadyEvent.class, WelcomeEvent::onPlayerReady);
 
