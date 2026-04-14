@@ -6,19 +6,19 @@ import com.hypixel.hytale.math.vector.Vector3d;
 import com.hypixel.hytale.math.vector.Vector3f;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.universe.world.npc.INonPlayerCharacter;
-import com.hypixel.hytale.server.core.universe.world.path.IPath;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.core.util.EventTitleUtil;
 import com.hypixel.hytale.server.npc.NPCPlugin;
 import com.hypixel.hytale.server.npc.entities.NPCEntity;
-import com.hypixel.hytale.builtin.path.path.TransientPath;
+import com.hypixel.hytale.builtin.path.WorldPathData;
+import com.hypixel.hytale.builtin.path.path.IPrefabPath;
 import it.unimi.dsi.fastutil.Pair;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
+
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -29,7 +29,9 @@ import java.util.function.Consumer;
 public class WaveManager {
 
     public record MobEntry(String name, int count) {}
-    record WavePath(IPath<?> path, double totalDistance) {}
+
+    private static final UUID COURTYARD_LOOP_UUID = UUID.fromString("afd6f331-9e8c-47a7-98c6-98ec9b99e312");
+
     private static final AtomicInteger currentWave = new AtomicInteger(0);
     private static final AtomicInteger totalKills = new AtomicInteger(0);
 
@@ -147,11 +149,8 @@ public class WaveManager {
     );
 
     private static final int MAX_COLS = 1;
-    private static final double ROW_SPACING = 16.0;
-    private static final Random RANDOM = new Random();
+    private static final double ROW_SPACING = 8.0;
     private static final Vector3d SPAWN_ORIGIN = new Vector3d(-0.5, 80.0, 0.5);
-    private static final Vector3d BRANCH_1 = new Vector3d(-0.5, 80.0, -28.0);
-    private static final Vector3d BRANCH_2 = new Vector3d(-0.5, 80.0, -28.0);
 
     public static int getCurrentWave() {
         return currentWave.get();
@@ -282,7 +281,23 @@ public class WaveManager {
 
         var rotation = new Vector3f(0f, 0f, 0f);
 
-        // Spawn all mobs and send them on their patrol path immediately.
+        // Look up the prefab path for wave mobs.
+        WorldPathData pathData = store.getResource(WorldPathData.getResourceType());
+        IPrefabPath prefabPath = null;
+        if (pathData != null) {
+            for (IPrefabPath p : pathData.getAllPrefabPaths()) {
+                if (p.getId().equals(COURTYARD_LOOP_UUID)) {
+                    prefabPath = p;
+                    break;
+                }
+            }
+        }
+        if (prefabPath == null) {
+            messageSender.accept("ERROR: Wave prefab path not found: " + COURTYARD_LOOP_UUID);
+            return;
+        }
+
+        // Spawn all mobs and send them on the prefab path immediately.
         int spawnCount = 0;
         int mobIndex = 0;
         for (MobEntry entry : entries) {
@@ -305,11 +320,9 @@ public class WaveManager {
                         currentWaveTotalMobs.incrementAndGet();
                         spawnCount++;
 
-                        var wavePath = createMobPath(pos, rotation, mobIndex);
-
-                        // Defer path activation briefly so the entity finishes initializing.
+                        IPrefabPath pathRef = prefabPath;
                         WAVE_SCHEDULER.schedule(
-                                () -> npcEntity.getPathManager().setTransientPath(wavePath.path()),
+                                () -> npcEntity.getPathManager().setPrefabPath(COURTYARD_LOOP_UUID, pathRef),
                                 500, TimeUnit.MILLISECONDS
                         );
                     }
@@ -336,56 +349,4 @@ public class WaveManager {
         );
     }
 
-    static WavePath createMobPath(Vector3d spawnPos, Vector3f rotation, int mobIndex) {
-        TransientPath path = new TransientPath();
-
-//        var startPosition = new Vector3d(0.0, 0.0, 0.0);
-        var startPosition = spawnPos;
-
-        int row = mobIndex / MAX_COLS;
-
-        path.addWaypoint(startPosition, rotation);
-
-//        var destPosition = new Vector3d(0.0, 0.0, +28.0 + (row * ROW_SPACING));
-//        var destPosition = ;
-
-        path.addWaypoint(
-                new Vector3d(startPosition.x, startPosition.y, startPosition.z - 8.0),
-                rotation
-        );
-
-        path.addWaypoint(
-                new Vector3d(startPosition.x, startPosition.y, startPosition.z - 16.0),
-                rotation
-        );
-
-        path.addWaypoint(
-                new Vector3d(startPosition.x, startPosition.y, startPosition.z - 24.0),
-                rotation
-        );
-
-        path.addWaypoint(
-                new Vector3d(startPosition.x, startPosition.y, startPosition.z - 32.0),
-                rotation
-        );
-
-        for (int i = 0; i < row; i++) {
-            path.addWaypoint(
-                    new Vector3d(startPosition.x, startPosition.y, startPosition.z - 32.0 - i * 8.0),
-                    rotation
-            );
-        }
-
-//        double distance = Math.sqrt(
-//                Math.pow(destPosition.x - startPosition.x, 2) +
-//                Math.pow(destPosition.y - startPosition.y, 2) +
-//                Math.pow(destPosition.z - startPosition.z, 2)
-//        );
-//
-//        System.out.println("Start: " + startPosition.x + ", " + startPosition.y + ", " + startPosition.z);
-//        System.out.println("End: " + destPosition.x + ", " + destPosition.y + ", " + destPosition.z);
-//        System.out.println("Dist: " + distance);
-
-        return new WavePath(path, 0.0);
-    }
 }

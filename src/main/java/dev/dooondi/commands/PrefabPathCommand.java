@@ -2,8 +2,10 @@ package dev.dooondi.commands;
 
 import com.hypixel.hytale.builtin.path.WorldPathData;
 import com.hypixel.hytale.builtin.path.path.IPrefabPath;
+import com.hypixel.hytale.builtin.path.waypoint.IPrefabPathWaypoint;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
+import com.hypixel.hytale.math.vector.Vector3d;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.command.system.CommandContext;
 import com.hypixel.hytale.server.core.command.system.arguments.system.OptionalArg;
@@ -49,7 +51,7 @@ public class PrefabPathCommand extends AbstractTargetPlayerCommand {
         }
 
         if ("debug".equalsIgnoreCase(action)) {
-            executeDebug(commandContext, world, pathData);
+            executeDebug(commandContext, world, pathData, store);
         } else if ("delete".equalsIgnoreCase(action)) {
             executeDelete(commandContext, pathData);
         } else {
@@ -57,7 +59,8 @@ public class PrefabPathCommand extends AbstractTargetPlayerCommand {
         }
     }
 
-    private void executeDebug(CommandContext commandContext, World world, WorldPathData pathData) {
+    private void executeDebug(CommandContext commandContext, World world,
+                              WorldPathData pathData, Store<EntityStore> store) {
         List<IPrefabPath> paths = pathData.getAllPrefabPaths();
 
         System.out.println("[CastleSiege] ===== Saved prefab paths in world '"
@@ -65,7 +68,7 @@ public class PrefabPathCommand extends AbstractTargetPlayerCommand {
         System.out.println("[CastleSiege] Total paths: " + paths.size());
 
         for (IPrefabPath path : paths) {
-            String line = String.format(
+            String header = String.format(
                     "[CastleSiege]   World ID=%d UUID=%s name=%s [ Length: %d, Loaded nodes: %d ]",
                     path.getWorldGenId(),
                     path.getId(),
@@ -73,7 +76,15 @@ public class PrefabPathCommand extends AbstractTargetPlayerCommand {
                     path.length(),
                     path.loadedWaypointCount()
             );
-            System.out.println(line);
+            System.out.println(header);
+
+            List<IPrefabPathWaypoint> waypoints = path.getPathWaypoints();
+            for (int i = 0; i < waypoints.size(); i++) {
+                IPrefabPathWaypoint wp = waypoints.get(i);
+                Vector3d pos = wp.getWaypointPosition(store);
+                System.out.printf("[CastleSiege]     Waypoint %d: (%.2f, %.2f, %.2f)%n",
+                        i, pos.x, pos.y, pos.z);
+            }
         }
         System.out.println("[CastleSiege] ===== end of path list =====");
 
