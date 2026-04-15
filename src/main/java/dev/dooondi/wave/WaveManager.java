@@ -5,9 +5,11 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.math.vector.Vector3d;
 import com.hypixel.hytale.math.vector.Vector3f;
 import com.hypixel.hytale.server.core.Message;
+import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.npc.INonPlayerCharacter;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.server.core.util.EventTitleUtil;
+import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
 import com.hypixel.hytale.server.npc.NPCPlugin;
 import com.hypixel.hytale.server.npc.entities.NPCEntity;
 import com.hypixel.hytale.builtin.path.WorldPathData;
@@ -22,6 +24,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
@@ -31,6 +34,7 @@ public class WaveManager {
     public record MobEntry(String name, int count) {}
 
     private static final UUID COURTYARD_LOOP_UUID = UUID.fromString("afd6f331-9e8c-47a7-98c6-98ec9b99e312");
+    private static final double Z_THRESHOLD = -20.0;
 
     private static final AtomicInteger currentWave = new AtomicInteger(0);
     private static final AtomicInteger totalKills = new AtomicInteger(0);
@@ -45,6 +49,9 @@ public class WaveManager {
     private static final ConcurrentHashMap<UUID, AtomicInteger> playerKills = new ConcurrentHashMap<>();
     // Per-player death counters keyed by player UUID (lifetime across all waves).
     private static final ConcurrentHashMap<UUID, AtomicInteger> playerDeaths = new ConcurrentHashMap<>();
+    // Mobs that have already crossed the Z threshold (prevents duplicate messages).
+    private static final Set<Ref<EntityStore>> crossedZThreshold = ConcurrentHashMap.newKeySet();
+    private static volatile ScheduledFuture<?> positionTrackingTask;
 
     static final ScheduledExecutorService WAVE_SCHEDULER =
             Executors.newSingleThreadScheduledExecutor(r -> {
@@ -148,7 +155,7 @@ public class WaveManager {
             ))
     );
 
-    private static final int MAX_COLS = 1;
+    private static final int MAX_COLS = 2;
     private static final double ROW_SPACING = 8.0;
     private static final Vector3d SPAWN_ORIGIN = new Vector3d(-0.5, 80.0, 0.5);
 
@@ -264,6 +271,7 @@ public class WaveManager {
         currentWaveMobs.clear();
         currentWaveKills.set(0);
         currentWaveTotalMobs.set(0);
+        crossedZThreshold.clear();
 
         // Hand out start-of-wave rewards before any mobs spawn.
         WaveRewards.awardWaveStart(waveNumber, store);
@@ -300,6 +308,7 @@ public class WaveManager {
         // Spawn all mobs and send them on the prefab path immediately.
         int spawnCount = 0;
         int mobIndex = 0;
+        World world = null;
         for (MobEntry entry : entries) {
             for (int i = 0; i < entry.count(); i++) {
                 Vector3d pos = computeSpawnPosition(SPAWN_ORIGIN, mobIndex);
@@ -319,6 +328,9 @@ public class WaveManager {
                         currentWaveMobs.add(result.first());
                         currentWaveTotalMobs.incrementAndGet();
                         spawnCount++;
+                        if (world == null) {
+                            world = npcEntity.getWorld();
+                        }
 
                         IPrefabPath pathRef = prefabPath;
                         WAVE_SCHEDULER.schedule(
@@ -336,6 +348,41 @@ public class WaveManager {
         }
 
         messageSender.accept("Wave " + waveNumber + " started! " + spawnCount + " mobs spawned.");
+
+        if (world != null) {
+            startPositionTracking(store, world);
+        }
+    }
+
+    private static void startPositionTracking(Store<EntityStore> store, World world) {
+        ScheduledFuture<?> prev = positionTrackingTask;
+        if (prev != null) {
+            prev.cancel(false);
+        }
+        positionTrackingTask = WAVE_SCHEDULER.scheduleAtFixedRate(() -> {
+            // Enqueue the store read onto the world thread.
+            world.execute(() -> {
+                try {
+                    for (Ref<EntityStore> mobRef : currentWaveMobs) {
+                        if (crossedZThreshold.contains(mobRef)) {
+                            continue;
+                        }
+                        TransformComponent transform = store.getComponent(mobRef, TransformComponent.getComponentType());
+                        if (transform == null) {
+                            continue;
+                        }
+                        Vector3d pos = transform.getPosition();
+                        if (pos.z <= Z_THRESHOLD) {
+                            crossedZThreshold.add(mobRef);
+                            System.out.printf("[CastleSiege] Mob %s crossed Z threshold: z=%.2f at (%.2f, %.2f, %.2f)%n",
+                                    mobRef, Z_THRESHOLD, pos.x, pos.y, pos.z);
+                        }
+                    }
+                } catch (Exception e) {
+                    System.err.println("[CastleSiege] Position tracking error: " + e.getMessage());
+                }
+            });
+        }, 1, 1, TimeUnit.SECONDS);
     }
 
     static Vector3d computeSpawnPosition(Vector3d origin, int index) {
@@ -343,7 +390,7 @@ public class WaveManager {
         int col = index % MAX_COLS;
         double halfCols = (MAX_COLS - 1) / 2.0;
         return new Vector3d(
-                origin.x + (col - halfCols),
+                origin.x + 2*(col - halfCols),
                 origin.y,
                 origin.z + (row * ROW_SPACING)
         );

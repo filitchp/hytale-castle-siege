@@ -1,6 +1,7 @@
 package dev.dooondi.commands;
 
 import com.hypixel.hytale.builtin.path.WorldPathData;
+import com.hypixel.hytale.builtin.path.commands.PrefabPathHelper;
 import com.hypixel.hytale.builtin.path.path.IPrefabPath;
 import com.hypixel.hytale.builtin.path.waypoint.IPrefabPathWaypoint;
 import com.hypixel.hytale.component.Ref;
@@ -65,10 +66,14 @@ public class PrefabPathCommand extends AbstractTargetPlayerCommand {
             executeEdit(commandContext, playerRef, pathData);
         } else if ("show".equalsIgnoreCase(action)) {
             executeShow(commandContext, playerRef, pathData, store);
+        } else if ("add".equalsIgnoreCase(action)) {
+            executeAdd(commandContext, ref1, playerRef, pathData, store);
+        } else if ("delnode".equalsIgnoreCase(action)) {
+            executeDelNode(commandContext, playerRef, pathData, store);
         } else if ("delete".equalsIgnoreCase(action)) {
             executeDelete(commandContext, pathData);
         } else {
-            commandContext.sendMessage(Message.raw("Unknown action: " + action + ". Supported: debug, edit, show, delete"));
+            commandContext.sendMessage(Message.raw("Unknown action: " + action + ". Supported: debug, edit, show, add, delnode, delete"));
         }
     }
 
@@ -157,6 +162,75 @@ public class PrefabPathCommand extends AbstractTargetPlayerCommand {
         selectedPaths.put(playerRef.getUuid(), pathUuid);
         commandContext.sendMessage(Message.raw("Selected path " + target.getWorldGenId()
                 + "." + pathUuid + " (" + target.getName() + ") for editing."));
+    }
+
+    private void executeAdd(CommandContext commandContext, Ref<EntityStore> playerEntityRef,
+                            PlayerRef playerRef, WorldPathData pathData, Store<EntityStore> store) {
+        UUID pathUuid = selectedPaths.get(playerRef.getUuid());
+        if (pathUuid == null) {
+            commandContext.sendMessage(Message.raw("No path selected. Use /prefabpath edit <UUID> first."));
+            return;
+        }
+
+        IPrefabPath target = findPath(pathUuid, pathData);
+        if (target == null) {
+            commandContext.sendMessage(Message.raw("Selected path no longer exists: " + pathUuid));
+            selectedPaths.remove(playerRef.getUuid());
+            return;
+        }
+
+        Vector3d playerPos = playerRef.getTransform().getPosition();
+        // index -1 appends at end; pauseTime 0, observationAngle 0
+        PrefabPathHelper.addMarker(store, playerEntityRef, pathUuid, target.getName(),
+                0.0, 0f, (short) -1, target.getWorldGenId());
+
+        commandContext.sendMessage(Message.raw(String.format(
+                "Added waypoint at (%.1f, %.1f, %.1f) to path %s",
+                playerPos.x, playerPos.y, playerPos.z, pathUuid)));
+    }
+
+    private void executeDelNode(CommandContext commandContext, PlayerRef playerRef,
+                                WorldPathData pathData, Store<EntityStore> store) {
+        UUID pathUuid = selectedPaths.get(playerRef.getUuid());
+        if (pathUuid == null) {
+            commandContext.sendMessage(Message.raw("No path selected. Use /prefabpath edit <UUID> first."));
+            return;
+        }
+
+        IPrefabPath target = findPath(pathUuid, pathData);
+        if (target == null) {
+            commandContext.sendMessage(Message.raw("Selected path no longer exists: " + pathUuid));
+            selectedPaths.remove(playerRef.getUuid());
+            return;
+        }
+
+        List<IPrefabPathWaypoint> waypoints = target.getPathWaypoints();
+        if (waypoints.isEmpty()) {
+            commandContext.sendMessage(Message.raw("Path has no waypoints to delete."));
+            return;
+        }
+
+        Vector3d playerPos = playerRef.getTransform().getPosition();
+        IPrefabPathWaypoint closest = null;
+        double closestDist = Double.MAX_VALUE;
+        for (IPrefabPathWaypoint wp : waypoints) {
+            Vector3d wpPos = wp.getWaypointPosition(store);
+            double dist = Math.pow(wpPos.x - playerPos.x, 2)
+                    + Math.pow(wpPos.y - playerPos.y, 2)
+                    + Math.pow(wpPos.z - playerPos.z, 2);
+            if (dist < closestDist) {
+                closestDist = dist;
+                closest = wp;
+            }
+        }
+
+        Vector3d closestPos = closest.getWaypointPosition(store);
+        int order = closest.getOrder();
+        pathData.removePrefabPathWaypoint(target.getWorldGenId(), pathUuid, order);
+
+        commandContext.sendMessage(Message.raw(String.format(
+                "Deleted waypoint %d at (%.1f, %.1f, %.1f) — distance: %.1f blocks",
+                order, closestPos.x, closestPos.y, closestPos.z, Math.sqrt(closestDist))));
     }
 
     private void executeDelete(CommandContext commandContext, WorldPathData pathData) {

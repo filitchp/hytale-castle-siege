@@ -10,6 +10,7 @@
 - https://github.com/OwnerAli/Hytale-Template/tree/feature/interactive
 
 #### NPCs
+- https://hytale.com/news/2026/2/npc-technical-rundown
 - https://hytalemodding.dev/en/docs/official-documentation/npc/9-inter-npc-interaction
 - https://hytale.game/en/mastering-npc-commands/
 - 
