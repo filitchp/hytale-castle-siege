@@ -155,7 +155,7 @@ public class WaveManager {
             ))
     );
 
-    private static final int MAX_COLS = 2;
+    private static final int MAX_COLS = 1;
     private static final double ROW_SPACING = 8.0;
     private static final Vector3d SPAWN_ORIGIN = new Vector3d(-0.5, 80.0, 0.5);
 
