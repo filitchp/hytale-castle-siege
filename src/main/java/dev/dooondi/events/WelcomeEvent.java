@@ -14,6 +14,7 @@ import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.spawn.ISpawnProvider;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import com.hypixel.hytale.protocol.GameMode;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -44,15 +45,17 @@ public class WelcomeEvent {
             }
         }
 
-        // Clear all inventory sections before giving starter items.
-        CombinedItemContainer everything = InventoryComponent.getCombined(
-                store, ref, InventoryComponent.EVERYTHING);
-        everything.clear();
+        if (player.getGameMode() != GameMode.Creative) {
+            // Clear all inventory sections before giving starter items.
+            CombinedItemContainer everything = InventoryComponent.getCombined(
+                    store, ref, InventoryComponent.EVERYTHING);
+            everything.clear();
 
-        // Give starter items.
-        player.giveItem(new ItemStack(HAMMER_ID, 1), ref, store);
-        player.giveItem(new ItemStack("Weapon_Axe_Crude", 1), ref, store);
+            // Give starter items.
+            player.giveItem(new ItemStack(HAMMER_ID, 1), ref, store);
+            player.giveItem(new ItemStack("Weapon_Axe_Crude", 1), ref, store);
 
-        player.sendMessage(Message.raw("You received the Iron Hammer and a Crude Axe. Click the hammer to open the Wave UI."));
+            player.sendMessage(Message.raw("You received the Iron Hammer and a Crude Axe. Click the hammer to open the Wave UI."));
+        }
     }
 }

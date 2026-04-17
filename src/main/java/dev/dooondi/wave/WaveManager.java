@@ -18,6 +18,7 @@ import it.unimi.dsi.fastutil.Pair;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 
@@ -56,7 +57,13 @@ public class WaveManager {
     // Loop around the front lower staircase
     private static final UUID CS_FRONT_LOWER_LOOP_UUID = UUID.fromString("c8a0a8c0-8a10-413a-b35e-5222cda5505a");
 
-    private static final double Z_THRESHOLD = -20.0;
+    private static final UUID[] LOOP_PATH_UUIDS = {
+            CS_COURTYARD_LOOP_UUID,
+            CS_FRONT_LOWER_LOOP_UUID
+    };
+
+    private static final Random RANDOM = new Random();
+    private static final double Z_THRESHOLD = -27.0;
 
     private static final AtomicInteger currentWave = new AtomicInteger(0);
     private static final AtomicInteger totalKills = new AtomicInteger(0);
@@ -179,8 +186,8 @@ public class WaveManager {
             ))
     );
 
-    private static final int MAX_COLS = 1;
-    private static final double ROW_SPACING = 8.0;
+    private static final int MAX_COLS = 2;
+    private static final double ROW_SPACING = 4.0;
     private static final Vector3d SPAWN_ORIGIN = new Vector3d(-0.5, 80.0, 0.5);
 
     public static int getCurrentWave() {
@@ -314,16 +321,20 @@ public class WaveManager {
 
         var rotation = new Vector3f(0f, 0f, 0f);
 
-        // Look up both prefab paths: straight approach and courtyard loop.
+        // Look up prefab paths: straight approach and all loop variants.
         WorldPathData pathData = store.getResource(WorldPathData.getResourceType());
         IPrefabPath straightPath = null;
-        IPrefabPath loopPath = null;
+        Map<UUID, IPrefabPath> loopPaths = new java.util.HashMap<>();
         if (pathData != null) {
             for (IPrefabPath p : pathData.getAllPrefabPaths()) {
                 if (p.getId().equals(CS_CASTLE_STRAIGHT_UUID)) {
                     straightPath = p;
-                } else if (p.getId().equals(CS_COURTYARD_LOOP_UUID)) {
-                    loopPath = p;
+                } else {
+                    for (UUID loopUuid : LOOP_PATH_UUIDS) {
+                        if (p.getId().equals(loopUuid)) {
+                            loopPaths.put(loopUuid, p);
+                        }
+                    }
                 }
             }
         }
@@ -331,9 +342,11 @@ public class WaveManager {
             messageSender.accept("ERROR: Straight prefab path not found: " + CS_CASTLE_STRAIGHT_UUID);
             return;
         }
-        if (loopPath == null) {
-            messageSender.accept("ERROR: Courtyard loop prefab path not found: " + CS_COURTYARD_LOOP_UUID);
-            return;
+        for (UUID loopUuid : LOOP_PATH_UUIDS) {
+            if (!loopPaths.containsKey(loopUuid)) {
+                messageSender.accept("ERROR: Loop prefab path not found: " + loopUuid);
+                return;
+            }
         }
 
         // Spawn all mobs and send them on the prefab path immediately.
@@ -382,12 +395,12 @@ public class WaveManager {
         messageSender.accept("Wave " + waveNumber + " started! " + spawnCount + " mobs spawned.");
 
         if (world != null) {
-            startPositionTracking(store, world, loopPath);
+            startPositionTracking(store, world, loopPaths);
         }
     }
 
     private static void startPositionTracking(Store<EntityStore> store, World world,
-                                              IPrefabPath loopPath) {
+                                              Map<UUID, IPrefabPath> loopPaths) {
         ScheduledFuture<?> prev = positionTrackingTask;
         if (prev != null) {
             prev.cancel(false);
@@ -409,8 +422,11 @@ public class WaveManager {
                             crossedZThreshold.add(mobRef);
                             NPCEntity npc = waveMobEntities.get(mobRef);
                             if (npc != null) {
-                                npc.getPathManager().setPrefabPath(CS_COURTYARD_LOOP_UUID, loopPath);
-                                System.out.printf("[CastleSiege] Mob entered castle (z=%.2f), switched to courtyard loop%n", pos.z);
+                                UUID chosenUuid = LOOP_PATH_UUIDS[RANDOM.nextInt(LOOP_PATH_UUIDS.length)];
+                                IPrefabPath chosenPath = loopPaths.get(chosenUuid);
+                                npc.getPathManager().setPrefabPath(chosenUuid, chosenPath);
+                                System.out.printf("[CastleSiege] Mob entered castle (z=%.2f), assigned to loop %s%n",
+                                        pos.z, chosenPath.getName());
                             }
                         }
                     }
@@ -426,7 +442,7 @@ public class WaveManager {
         int col = index % MAX_COLS;
         double halfCols = (MAX_COLS - 1) / 2.0;
         return new Vector3d(
-                origin.x + 2*(col - halfCols),
+                origin.x + 4*(col - halfCols),
                 origin.y,
                 origin.z + (row * ROW_SPACING)
         );
