@@ -33,7 +33,29 @@ public class WaveManager {
 
     public record MobEntry(String name, int count) {}
 
-    private static final UUID COURTYARD_LOOP_UUID = UUID.fromString("afd6f331-9e8c-47a7-98c6-98ec9b99e312");
+    // World ID=0 UUID=b9027423-f7fa-490f-91b2-3d12e6460e07 name="castle_straight" [ Length: 3, Loaded nodes: 3 ]
+    //   Waypoint 0: (-0.64, 80.00, -0.82)
+    //   Waypoint 1: (-0.55, 80.00, -27.90)
+    //   Waypoint 2: (-0.64, 80.00, -0.82)
+    // World ID=0 UUID=afd6f331-9e8c-47a7-98c6-98ec9b99e312 name=cs_courtyard_loop [ Length: 7, Loaded nodes: 7 ]
+    //   Waypoint 0: (-0.48, 80.00, -21.99)
+    //   Waypoint 1: (-11.25, 80.00, -22.17)
+    //   Waypoint 2: (-11.27, 80.00, -33.99)
+    //   Waypoint 3: (10.48, 80.00, -34.31)
+    //   Waypoint 4: (10.44, 80.00, -22.71)
+    //   Waypoint 5: (-0.22, 80.00, -22.42)
+    //   Waypoint 6: (-0.48, 80.00, -0.51)
+
+
+    // Gets them into the castle...
+    private static final UUID CS_CASTLE_STRAIGHT_UUID = UUID.fromString("b9027423-f7fa-490f-91b2-3d12e6460e07");
+
+    // Loop around the bottom
+    private static final UUID CS_COURTYARD_LOOP_UUID = UUID.fromString("afd6f331-9e8c-47a7-98c6-98ec9b99e312");
+
+    // Loop around the front lower staircase
+    private static final UUID CS_FRONT_LOWER_LOOP_UUID = UUID.fromString("c8a0a8c0-8a10-413a-b35e-5222cda5505a");
+
     private static final double Z_THRESHOLD = -20.0;
 
     private static final AtomicInteger currentWave = new AtomicInteger(0);
@@ -49,8 +71,10 @@ public class WaveManager {
     private static final ConcurrentHashMap<UUID, AtomicInteger> playerKills = new ConcurrentHashMap<>();
     // Per-player death counters keyed by player UUID (lifetime across all waves).
     private static final ConcurrentHashMap<UUID, AtomicInteger> playerDeaths = new ConcurrentHashMap<>();
-    // Mobs that have already crossed the Z threshold (prevents duplicate messages).
+    // Mobs that have already crossed the Z threshold and switched to the courtyard loop.
     private static final Set<Ref<EntityStore>> crossedZThreshold = ConcurrentHashMap.newKeySet();
+    // Map from mob ref to its NPCEntity, used to switch prefab paths at the Z threshold.
+    private static final ConcurrentHashMap<Ref<EntityStore>, NPCEntity> waveMobEntities = new ConcurrentHashMap<>();
     private static volatile ScheduledFuture<?> positionTrackingTask;
 
     static final ScheduledExecutorService WAVE_SCHEDULER =
@@ -272,6 +296,7 @@ public class WaveManager {
         currentWaveKills.set(0);
         currentWaveTotalMobs.set(0);
         crossedZThreshold.clear();
+        waveMobEntities.clear();
 
         // Hand out start-of-wave rewards before any mobs spawn.
         WaveRewards.awardWaveStart(waveNumber, store);
@@ -289,19 +314,25 @@ public class WaveManager {
 
         var rotation = new Vector3f(0f, 0f, 0f);
 
-        // Look up the prefab path for wave mobs.
+        // Look up both prefab paths: straight approach and courtyard loop.
         WorldPathData pathData = store.getResource(WorldPathData.getResourceType());
-        IPrefabPath prefabPath = null;
+        IPrefabPath straightPath = null;
+        IPrefabPath loopPath = null;
         if (pathData != null) {
             for (IPrefabPath p : pathData.getAllPrefabPaths()) {
-                if (p.getId().equals(COURTYARD_LOOP_UUID)) {
-                    prefabPath = p;
-                    break;
+                if (p.getId().equals(CS_CASTLE_STRAIGHT_UUID)) {
+                    straightPath = p;
+                } else if (p.getId().equals(CS_COURTYARD_LOOP_UUID)) {
+                    loopPath = p;
                 }
             }
         }
-        if (prefabPath == null) {
-            messageSender.accept("ERROR: Wave prefab path not found: " + COURTYARD_LOOP_UUID);
+        if (straightPath == null) {
+            messageSender.accept("ERROR: Straight prefab path not found: " + CS_CASTLE_STRAIGHT_UUID);
+            return;
+        }
+        if (loopPath == null) {
+            messageSender.accept("ERROR: Courtyard loop prefab path not found: " + CS_COURTYARD_LOOP_UUID);
             return;
         }
 
@@ -326,15 +357,16 @@ public class WaveManager {
 
                     if (npcEntity != null) {
                         currentWaveMobs.add(result.first());
+                        waveMobEntities.put(result.first(), npcEntity);
                         currentWaveTotalMobs.incrementAndGet();
                         spawnCount++;
                         if (world == null) {
                             world = npcEntity.getWorld();
                         }
 
-                        IPrefabPath pathRef = prefabPath;
+                        IPrefabPath startPath = straightPath;
                         WAVE_SCHEDULER.schedule(
-                                () -> npcEntity.getPathManager().setPrefabPath(COURTYARD_LOOP_UUID, pathRef),
+                                () -> npcEntity.getPathManager().setPrefabPath(CS_CASTLE_STRAIGHT_UUID, startPath),
                                 500, TimeUnit.MILLISECONDS
                         );
                     }
@@ -350,11 +382,12 @@ public class WaveManager {
         messageSender.accept("Wave " + waveNumber + " started! " + spawnCount + " mobs spawned.");
 
         if (world != null) {
-            startPositionTracking(store, world);
+            startPositionTracking(store, world, loopPath);
         }
     }
 
-    private static void startPositionTracking(Store<EntityStore> store, World world) {
+    private static void startPositionTracking(Store<EntityStore> store, World world,
+                                              IPrefabPath loopPath) {
         ScheduledFuture<?> prev = positionTrackingTask;
         if (prev != null) {
             prev.cancel(false);
@@ -374,8 +407,11 @@ public class WaveManager {
                         Vector3d pos = transform.getPosition();
                         if (pos.z <= Z_THRESHOLD) {
                             crossedZThreshold.add(mobRef);
-                            System.out.printf("[CastleSiege] Mob %s crossed Z threshold: z=%.2f at (%.2f, %.2f, %.2f)%n",
-                                    mobRef, Z_THRESHOLD, pos.x, pos.y, pos.z);
+                            NPCEntity npc = waveMobEntities.get(mobRef);
+                            if (npc != null) {
+                                npc.getPathManager().setPrefabPath(CS_COURTYARD_LOOP_UUID, loopPath);
+                                System.out.printf("[CastleSiege] Mob entered castle (z=%.2f), switched to courtyard loop%n", pos.z);
+                            }
                         }
                     }
                 } catch (Exception e) {
