@@ -20,6 +20,8 @@ import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -33,10 +35,10 @@ public class PrefabPathCommand extends AbstractTargetPlayerCommand {
     private final OptionalArg<UUID> uuidArg;
 
     public PrefabPathCommand() {
-        super("prefabpath", "Manage prefab paths. Usage: /prefabpath debug | /prefabpath edit <UUID> | /prefabpath delete <UUID>");
+        super("prefabpath", "Usage: /prefabpath list | /prefabpath edit pathId=<UUID> | /prefabpath delete pathId=<UUID>");
 
-        this.actionArg = this.withRequiredArg("action", "Action to perform (debug, edit, show, delete)", ArgTypes.STRING);
-        this.uuidArg = this.withOptionalArg("uuid", "UUID of the prefab path", ArgTypes.UUID);
+        this.actionArg = this.withRequiredArg("action", "Actions: list, debug, edit, show, add, delnode, delete", ArgTypes.STRING);
+        this.uuidArg = this.withOptionalArg("pathId", "Unique ID (UUID) of the prefab path", ArgTypes.UUID);
     }
 
     public static UUID getSelectedPath(UUID playerUuid) {
@@ -72,8 +74,10 @@ public class PrefabPathCommand extends AbstractTargetPlayerCommand {
             executeDelNode(commandContext, playerRef, pathData, store);
         } else if ("delete".equalsIgnoreCase(action)) {
             executeDelete(commandContext, pathData);
+        } else if ("list".equalsIgnoreCase(action)) {
+            executeList(commandContext, playerRef, pathData, store);
         } else {
-            commandContext.sendMessage(Message.raw("Unknown action: " + action + ". Supported: debug, edit, show, add, delnode, delete"));
+            commandContext.sendMessage(Message.raw("Unknown action: " + action + ". Supported: list, debug, edit, show, add, delnode, delete"));
         }
     }
 
@@ -98,10 +102,15 @@ public class PrefabPathCommand extends AbstractTargetPlayerCommand {
 
             List<IPrefabPathWaypoint> waypoints = path.getPathWaypoints();
             for (int i = 0; i < waypoints.size(); i++) {
-                IPrefabPathWaypoint wp = waypoints.get(i);
-                Vector3d pos = wp.getWaypointPosition(store);
-                System.out.printf("[CastleSiege]     Waypoint %d: (%.2f, %.2f, %.2f)%n",
-                        i, pos.x, pos.y, pos.z);
+                try {
+                    IPrefabPathWaypoint wp = waypoints.get(i);
+                    Vector3d pos = wp.getWaypointPosition(store);
+                    System.out.printf("[CastleSiege]     Waypoint %d: (%.2f, %.2f, %.2f)%n",
+                            i, pos.x, pos.y, pos.z);
+                } catch (NullPointerException e) {
+                    System.err.printf("[CastleSiege] ERROR: null pointer in prefab path '%s' (UUID=%s) at node %d%n",
+                            path.getName(), path.getId(), i);
+                }
             }
         }
         System.out.println("[CastleSiege] ===== end of path list =====");
@@ -137,12 +146,19 @@ public class PrefabPathCommand extends AbstractTargetPlayerCommand {
         }
 
         List<IPrefabPathWaypoint> waypoints = target.getPathWaypoints();
-        for (IPrefabPathWaypoint wp : waypoints) {
-            Vector3d pos = wp.getWaypointPosition(store);
-            ParticleUtil.spawnParticleEffect(WAYPOINT_PARTICLE, pos, store);
+        int spawned = 0;
+        for (int i = 0; i < waypoints.size(); i++) {
+            try {
+                Vector3d pos = waypoints.get(i).getWaypointPosition(store);
+                ParticleUtil.spawnParticleEffect(WAYPOINT_PARTICLE, pos, store);
+                spawned++;
+            } catch (NullPointerException e) {
+                System.err.printf("[CastleSiege] ERROR: null pointer in prefab path '%s' (UUID=%s) at node %d%n",
+                        target.getName(), target.getId(), i);
+            }
         }
 
-        commandContext.sendMessage(Message.raw("Spawned particles at " + waypoints.size()
+        commandContext.sendMessage(Message.raw("Spawned particles at " + spawned
                 + " waypoint(s) on path " + pathUuid));
     }
 
@@ -213,15 +229,26 @@ public class PrefabPathCommand extends AbstractTargetPlayerCommand {
         Vector3d playerPos = playerRef.getTransform().getPosition();
         IPrefabPathWaypoint closest = null;
         double closestDist = Double.MAX_VALUE;
-        for (IPrefabPathWaypoint wp : waypoints) {
-            Vector3d wpPos = wp.getWaypointPosition(store);
-            double dist = Math.pow(wpPos.x - playerPos.x, 2)
-                    + Math.pow(wpPos.y - playerPos.y, 2)
-                    + Math.pow(wpPos.z - playerPos.z, 2);
-            if (dist < closestDist) {
-                closestDist = dist;
-                closest = wp;
+        for (int i = 0; i < waypoints.size(); i++) {
+            try {
+                IPrefabPathWaypoint wp = waypoints.get(i);
+                Vector3d wpPos = wp.getWaypointPosition(store);
+                double dist = Math.pow(wpPos.x - playerPos.x, 2)
+                        + Math.pow(wpPos.y - playerPos.y, 2)
+                        + Math.pow(wpPos.z - playerPos.z, 2);
+                if (dist < closestDist) {
+                    closestDist = dist;
+                    closest = wp;
+                }
+            } catch (NullPointerException e) {
+                System.err.printf("[CastleSiege] ERROR: null pointer in prefab path '%s' (UUID=%s) at node %d%n",
+                        target.getName(), target.getId(), i);
             }
+        }
+
+        if (closest == null) {
+            commandContext.sendMessage(Message.raw("Could not read any waypoints on this path."));
+            return;
         }
 
         Vector3d closestPos = closest.getWaypointPosition(store);
@@ -231,6 +258,53 @@ public class PrefabPathCommand extends AbstractTargetPlayerCommand {
         commandContext.sendMessage(Message.raw(String.format(
                 "Deleted waypoint %d at (%.1f, %.1f, %.1f) — distance: %.1f blocks",
                 order, closestPos.x, closestPos.y, closestPos.z, Math.sqrt(closestDist))));
+    }
+
+    private void executeList(CommandContext commandContext, PlayerRef playerRef,
+                             WorldPathData pathData, Store<EntityStore> store) {
+        List<IPrefabPath> paths = pathData.getAllPrefabPaths();
+        if (paths.isEmpty()) {
+            commandContext.sendMessage(Message.raw("No prefab paths in this world."));
+            return;
+        }
+
+        Vector3d playerPos = playerRef.getTransform().getPosition();
+
+        record PathDistance(IPrefabPath path, double distance) {}
+
+        List<PathDistance> sorted = new ArrayList<>();
+        for (IPrefabPath path : paths) {
+            double nearest = Double.MAX_VALUE;
+            List<IPrefabPathWaypoint> waypoints = path.getPathWaypoints();
+            for (int i = 0; i < waypoints.size(); i++) {
+                try {
+                    Vector3d wpPos = waypoints.get(i).getWaypointPosition(store);
+                    double dist = Math.pow(wpPos.x - playerPos.x, 2)
+                            + Math.pow(wpPos.y - playerPos.y, 2)
+                            + Math.pow(wpPos.z - playerPos.z, 2);
+                    if (dist < nearest) {
+                        nearest = dist;
+                    }
+                } catch (NullPointerException e) {
+                    System.err.printf("[CastleSiege] ERROR: null pointer in prefab path '%s' (UUID=%s) at node %d%n",
+                            path.getName(), path.getId(), i);
+                }
+            }
+            sorted.add(new PathDistance(path, nearest));
+        }
+        sorted.sort(Comparator.comparingDouble(PathDistance::distance));
+
+        System.out.println("[CastleSiege] ===== Prefab paths (nearest first) =====");
+        for (int i = 0; i < sorted.size(); i++) {
+            PathDistance pd = sorted.get(i);
+            int nodeCount = pd.path().getPathWaypoints().size();
+            System.out.printf("[CastleSiege]   %d. %s (%d nodes) — %.1f blocks away%n",
+                    i + 1, pd.path().getName(), nodeCount, Math.sqrt(pd.distance()));
+        }
+        System.out.println("[CastleSiege] ===== end =====");
+
+        commandContext.sendMessage(Message.raw("Listed " + sorted.size()
+                + " path(s) to the server console (sorted by distance)."));
     }
 
     private void executeDelete(CommandContext commandContext, WorldPathData pathData) {
