@@ -4,6 +4,7 @@ import com.hypixel.hytale.server.core.event.events.player.*;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Interaction;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
+import dev.dooondi.commands.CsCommand;
 import dev.dooondi.commands.HealCommand;
 import dev.dooondi.commands.MobWaveCommand;
 import dev.dooondi.commands.PrefabPathCommand;
@@ -16,6 +17,7 @@ import dev.dooondi.systems.BlockPlaceEventSystem;
 import dev.dooondi.wave.MobDeathTracker;
 import dev.dooondi.wave.OpenWaveUIInteraction;
 import dev.dooondi.wave.TriggerWaveInteraction;
+import dev.dooondi.wave.WaveManager;
 
 import javax.annotation.Nonnull;
 
@@ -27,6 +29,9 @@ public class CastleSiege extends JavaPlugin {
 
     @Override
     protected void setup() {
+        WaveManager.initPersistence(this.getDataDirectory());
+
+        this.getCommandRegistry().registerCommand(new CsCommand());
         this.getCommandRegistry().registerCommand(new MobWaveCommand());
         this.getCommandRegistry().registerCommand(new HealCommand());
         this.getCommandRegistry().registerCommand(new StartWaveCommand());

@@ -16,6 +16,8 @@ import com.hypixel.hytale.builtin.path.WorldPathData;
 import com.hypixel.hytale.builtin.path.path.IPrefabPath;
 import it.unimi.dsi.fastutil.Pair;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -67,6 +69,9 @@ public class WaveManager {
 
     private static final AtomicInteger currentWave = new AtomicInteger(0);
     private static final AtomicInteger totalKills = new AtomicInteger(0);
+    // Highest wave number ever cleared, persisted across server restarts.
+    private static final AtomicInteger lastDefeatedWave = new AtomicInteger(0);
+    private static volatile Path saveFile;
 
     // Set of entity refs for mobs spawned in the current wave that are still alive.
     private static final Set<Ref<EntityStore>> currentWaveMobs = ConcurrentHashMap.newKeySet();
@@ -185,8 +190,46 @@ public class WaveManager {
         return currentWave.get();
     }
 
+    public static int getLastDefeatedWave() {
+        return lastDefeatedWave.get();
+    }
+
     public static int getMaxWave() {
         return 20;
+    }
+
+    /**
+     * Loads the persisted last-defeated wave from disk. Call once during plugin
+     * setup with the plugin's data directory. The current wave is initialised to
+     * the saved value so the next /cs next picks up where the world left off.
+     */
+    public static void initPersistence(Path dataDir) {
+        try {
+            Files.createDirectories(dataDir);
+            saveFile = dataDir.resolve("wave_progress.txt");
+            if (Files.exists(saveFile)) {
+                int wave = Integer.parseInt(Files.readString(saveFile).trim());
+                if (wave < 0) wave = 0;
+                if (wave > getMaxWave()) wave = getMaxWave();
+                lastDefeatedWave.set(wave);
+                currentWave.set(wave);
+                System.out.println("[CastleSiege] Loaded saved progress: last defeated wave = " + wave);
+            } else {
+                System.out.println("[CastleSiege] No saved wave progress at " + saveFile);
+            }
+        } catch (Exception e) {
+            System.err.println("[CastleSiege] Failed to load wave progress: " + e.getMessage());
+        }
+    }
+
+    private static void saveProgress() {
+        Path file = saveFile;
+        if (file == null) return;
+        try {
+            Files.writeString(file, Integer.toString(lastDefeatedWave.get()));
+        } catch (Exception e) {
+            System.err.println("[CastleSiege] Failed to save wave progress: " + e.getMessage());
+        }
     }
 
     public static int getTotalKills() {
@@ -220,6 +263,32 @@ public class WaveManager {
     }
 
     /**
+     * Wipes all wave state and despawns tracked wave mobs. Must be called from
+     * the world thread because setToDespawn touches NPC entity state.
+     */
+    public static void resetGame() {
+        ScheduledFuture<?> prev = positionTrackingTask;
+        if (prev != null) {
+            prev.cancel(false);
+            positionTrackingTask = null;
+        }
+        for (NPCEntity npc : waveMobEntities.values()) {
+            npc.setToDespawn();
+        }
+        currentWave.set(0);
+        totalKills.set(0);
+        currentWaveKills.set(0);
+        currentWaveTotalMobs.set(0);
+        currentWaveMobs.clear();
+        waveMobEntities.clear();
+        crossedZThreshold.clear();
+        playerKills.clear();
+        playerDeaths.clear();
+        lastDefeatedWave.set(0);
+        saveProgress();
+    }
+
+    /**
      * Called from MobDeathTracker when a tracked wave mob dies.
      * Removes the mob from the alive set, bumps wave+lifetime counters,
      * attributes the kill to the player UUID if provided, and hands out
@@ -244,6 +313,10 @@ public class WaveManager {
         // Last mob in the wave just died — hand out end-of-wave rewards and show title.
         if (currentWaveMobs.isEmpty()) {
             int wave = currentWave.get();
+            if (wave > lastDefeatedWave.get()) {
+                lastDefeatedWave.set(wave);
+                saveProgress();
+            }
             WaveRewards.awardWaveEnd(wave, store);
 
             EventTitleUtil.showEventTitleToWorld(

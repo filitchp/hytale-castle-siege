@@ -45,17 +45,16 @@ public class WelcomeEvent {
             }
         }
 
-        if (player.getGameMode() != GameMode.Creative) {
-            // Clear all inventory sections before giving starter items.
-            CombinedItemContainer everything = InventoryComponent.getCombined(
-                    store, ref, InventoryComponent.EVERYTHING);
-            everything.clear();
-
-            // Give starter items.
-            player.giveItem(new ItemStack(HAMMER_ID, 1), ref, store);
-            player.giveItem(new ItemStack("Weapon_Axe_Crude", 1), ref, store);
-
-            player.sendMessage(Message.raw("You received the Iron Hammer and a Crude Axe. Click the hammer to open the Wave UI."));
-        }
+        // Auto-clear and starter-grant on join is disabled; /cs reset handles it now.
+        // if (player.getGameMode() != GameMode.Creative) {
+        //     CombinedItemContainer everything = InventoryComponent.getCombined(
+        //             store, ref, InventoryComponent.EVERYTHING);
+        //     everything.clear();
+        //
+        //     player.giveItem(new ItemStack(HAMMER_ID, 1), ref, store);
+        //     player.giveItem(new ItemStack("Weapon_Axe_Crude", 1), ref, store);
+        //
+        //     player.sendMessage(Message.raw("You received the Iron Hammer and a Crude Axe. Click the hammer to open the Wave UI."));
+        // }
     }
 }
