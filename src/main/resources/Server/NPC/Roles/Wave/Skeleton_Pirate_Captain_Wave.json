@@ -33,9 +33,9 @@
   },
   "Modify": {
     "MaxHealth": 130,
-    "MaxSpeed": 20,
+    "MaxSpeed": 14,
     "RunThreshold": 0.1,
-    "HearingRange": 8,
+    "HearingRange": 2,
     "ViewSector": 270,
     "WakingPeriod": [
       0,
@@ -49,9 +49,7 @@
     "FlockArray": {
       "Compute": "FlockArray"
     },
-    "FollowPatrolPath": {
-      "Compute": "FollowPatrolPath"
-    },
+    "FollowPatrolPath": true,
     "Patrol": {
       "Compute": "Patrol"
     },

@@ -93,54 +93,46 @@ public class WaveManager {
 
     public static final Map<Integer, List<MobEntry>> WAVE_TABLE = Map.ofEntries(
             Map.entry(1, List.of(
-                    new MobEntry("Rat_Wave", 3)
+                    new MobEntry("Rat_Wave", 4)
             )),
             Map.entry(2, List.of(
-                    new MobEntry("Rat_Wave", 5)
+                    new MobEntry("Rat_Wave", 6)
             )),
             Map.entry(3, List.of(
-                    new MobEntry("Rat_Wave", 3),
-                    new MobEntry("Skeleton_Wave", 2)
+                    new MobEntry("Rat_Wave", 4),
+                    new MobEntry("Snake_Rattle_Wave", 4)
             )),
             Map.entry(4, List.of(
-                    new MobEntry("Skeleton_Wave", 4),
-                    new MobEntry("Rat_Wave", 2)
+                    new MobEntry("Snake_Rattle_Wave", 4),
+                    new MobEntry("Skeleton_Wave", 2)
             )),
+            // TODO: archers
             Map.entry(5, List.of(
-                    new MobEntry("Skeleton_Wave", 5),
-                    new MobEntry("Snake_Rattle_Wave", 2)
+                    new MobEntry("Skeleton_Wave", 4)
             )),
             Map.entry(6, List.of(
-                    new MobEntry("Snake_Rattle_Wave", 4),
                     new MobEntry("Skeleton_Wave", 3)
             )),
             Map.entry(7, List.of(
-                    new MobEntry("Skeleton_Wave", 4),
-                    new MobEntry("Snake_Rattle_Wave", 3),
-                    new MobEntry("Rat_Wave", 4)
+                    new MobEntry("Skeleton_Wave", 4)
             )),
             Map.entry(8, List.of(
-                    new MobEntry("Snake_Rattle_Wave", 5),
                     new MobEntry("Skeleton_Wave", 5)
             )),
             Map.entry(9, List.of(
                     new MobEntry("Skeleton_Wave", 6),
-                    new MobEntry("Snake_Rattle_Wave", 4),
                     new MobEntry("Skeleton_Pirate_Captain_Wave", 1)
             )),
             Map.entry(10, List.of(
                     new MobEntry("Skeleton_Pirate_Captain_Wave", 2),
-                    new MobEntry("Skeleton_Wave", 6),
                     new MobEntry("Snake_Rattle_Wave", 4)
             )),
             Map.entry(11, List.of(
                     new MobEntry("Skeleton_Pirate_Captain_Wave", 3),
-                    new MobEntry("Snake_Rattle_Wave", 5),
                     new MobEntry("Skeleton_Wave", 4)
             )),
             Map.entry(12, List.of(
                     new MobEntry("Skeleton_Pirate_Captain_Wave", 4),
-                    new MobEntry("Snake_Rattle_Wave", 6),
                     new MobEntry("Skeleton_Wave", 5)
             )),
             Map.entry(13, List.of(
@@ -150,7 +142,6 @@ public class WaveManager {
             )),
             Map.entry(14, List.of(
                     new MobEntry("Skeleton_Pirate_Captain_Wave", 5),
-                    new MobEntry("Snake_Rattle_Wave", 6),
                     new MobEntry("Skeleton_Wave", 6),
                     new MobEntry("Rat_Wave", 6)
             )),
