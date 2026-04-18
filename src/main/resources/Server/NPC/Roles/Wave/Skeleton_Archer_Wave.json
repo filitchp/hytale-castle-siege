@@ -17,6 +17,7 @@
     "FlockArray": {
       "Value": [
         "Skeleton",
+        "Skeleton_Archer",
         "Skeleton_Pirate_Striker",
         "Skeleton_Pirate_Gunner"
       ],
@@ -28,7 +29,7 @@
       "Description": "When set to false, NPCs wont try to avoid each other or player, it can lead to them stacking together, but can help to avoid jerky-like movement in enclosed space."
     },
     "NameTranslationKey": {
-      "Value": "server.npcRoles.Skeleton.name",
+      "Value": "server.npcRoles.Skeleton_Archer.name",
       "Description": "Translation key for NPC name display"
     }
   },
@@ -43,9 +44,9 @@
       24
     ],
     "DropList": "",
-    "Appearance": "Skeleton",
+    "Appearance": "Skeleton_Archer",
     "Weapons": [
-      "Weapon_Sword_Bone"
+      "Weapon_Shortbow_Iron_Rusty"
     ],
     "FlockArray": {
       "Compute": "FlockArray"
@@ -59,10 +60,17 @@
     "WanderRadius": {
       "Compute": "WanderRadius"
     },
-    "AttackDistance": 3,
+    "Attack": "Skeleton_Archer_Bow_Shoot",
+    "CombatBackOffAfterAttack": false,
+    "AttackDistance": 15,
+    "CombatFleeIfTooCloseDistance": 4,
     "DesiredAttackDistanceRange": [
-      1, 1.6
+      5,
+      14.5
     ],
+    "CombatBehaviorDistance": 15,
+    "TargetRange": 15,
+    "LeashMinPlayerDistance": 18,
     "CombatMessageTargetGroups": [
       "Skeleton"
     ],
@@ -71,6 +79,7 @@
     },
     "IsMemory": true,
     "MemoriesCategory": "Undead",
+    "MemoriesNameOverride": "Skeleton_Archer",
     "BreathesInWater": true,
     "NameTranslationKey": {
       "Compute": "NameTranslationKey"

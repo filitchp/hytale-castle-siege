@@ -5,6 +5,9 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
+import com.hypixel.hytale.server.core.modules.entitystats.EntityStatMap;
+import com.hypixel.hytale.server.core.modules.entitystats.EntityStatValue;
+import com.hypixel.hytale.server.core.modules.entitystats.asset.DefaultEntityStatTypes;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 
 import java.util.Collections;
@@ -65,8 +68,8 @@ public final class WaveRewards {
                     // Start of wave
                     List.of(new RewardItem("Ore_Iron", 10),
                             new RewardItem("Rubble_Marble", 50),
-                            new RewardItem("Ingredient_Stick", 50)),
-                    // End fo wave
+                            new RewardItem("Ingredient_Stick", 100)),
+                    // End of wave
                     List.of(new RewardItem("Ingredient_Fabric_Scrap_Linen", 25),
                             new RewardItem("Ingredient_Leather_Light", 10))
             )),
@@ -121,6 +124,27 @@ public final class WaveRewards {
         WaveRewardSet set = WAVE_REWARDS.get(waveNumber);
         if (set == null || set.end().isEmpty()) return;
         awardItemsToAllPlayers(set.end(), store, "Wave " + waveNumber + " clear reward");
+    }
+
+    public static void healAllPlayersToFull(Store<EntityStore> store) {
+        int healthIdx = DefaultEntityStatTypes.getHealth();
+        store.forEachChunk(Player.getComponentType(), (chunk, buffer) -> {
+            for (int i = 0; i < chunk.size(); i++) {
+                Ref<EntityStore> ref = chunk.getReferenceTo(i);
+                Player player = store.getComponent(ref, Player.getComponentType());
+                if (player == null) continue;
+
+                EntityStatMap stats = store.getComponent(ref, EntityStatMap.getComponentType());
+                if (stats == null) continue;
+                EntityStatValue health = stats.get(healthIdx);
+                if (health == null) continue;
+                float missing = health.getMax() - health.get();
+                if (missing > 0f) {
+                    stats.addStatValue(healthIdx, missing);
+                }
+                player.sendMessage(Message.raw("Wave cleared — you've been fully healed."));
+            }
+        });
     }
 
     private static void awardItemsToAllPlayers(List<RewardItem> rewards,

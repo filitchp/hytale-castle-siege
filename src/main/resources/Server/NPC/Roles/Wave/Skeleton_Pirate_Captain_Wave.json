@@ -32,7 +32,7 @@
     }
   },
   "Modify": {
-    "MaxHealth": 130,
+    "MaxHealth": 72,
     "MaxSpeed": 14,
     "RunThreshold": 0.1,
     "HearingRange": 2,

@@ -50,14 +50,31 @@ public class WaveManager {
     //   Waypoint 6: (-0.48, 80.00, -0.51)
 
 
+
     // Gets them into the castle...
     private static final UUID CS_CASTLE_STRAIGHT_UUID = UUID.fromString("b9027423-f7fa-490f-91b2-3d12e6460e07");
 
     // Loop around the bottom
     private static final UUID CS_COURTYARD_LOOP_UUID = UUID.fromString("afd6f331-9e8c-47a7-98c6-98ec9b99e312");
 
+    
+
     // Loop around the front lower staircase
     private static final UUID CS_FRONT_LOWER_LOOP_UUID = UUID.fromString("c8a0a8c0-8a10-413a-b35e-5222cda5505a");
+
+    // World ID=0 UUID=c8a0a8c0-8a10-413a-b35e-5222cda5505a name=cs_front_lower_loop [ Length: 12, Loaded nodes: 12 ]
+    //   Waypoint 0: (-0.67, 80.00, -27.41)
+    //   Waypoint 1: (-6.97, 83.50, -27.54)
+    //   Waypoint 2: (-13.67, 88.00, -27.42)
+    //   Waypoint 3: (-13.52, 88.00, -20.94)
+    //   Waypoint 4: (-10.99, 88.00, -20.81)
+    //   Waypoint 5: (-10.81, 90.00, -16.57)
+    //   Waypoint 6: (-0.34, 86.00, -16.88)
+    //   Waypoint 7: (9.73, 90.00, -16.98)
+    //   Waypoint 8: (10.13, 88.00, -21.07)
+    //   Waypoint 9: (13.15, 88.00, -21.22)
+    //   Waypoint 10: (12.71, 88.00, -27.82)
+    //   Waypoint 11: (7.48, 85.00, -27.59)
 
     private static final UUID[] LOOP_PATH_UUIDS = {
             CS_COURTYARD_LOOP_UUID,
@@ -111,23 +128,28 @@ public class WaveManager {
                     new MobEntry("Snake_Rattle_Wave", 4),
                     new MobEntry("Skeleton_Wave", 2)
             )),
-            // TODO: archers
             Map.entry(5, List.of(
-                    new MobEntry("Skeleton_Wave", 4)
+                    new MobEntry("Skeleton_Wave", 4),
+                    new MobEntry("Skeleton_Archer_Wave", 4)
             )),
             Map.entry(6, List.of(
-                    new MobEntry("Skeleton_Wave", 3)
+                    new MobEntry("Skeleton_Wave", 6),
+                    new MobEntry("Skeleton_Archer_Wave", 6)
             )),
             Map.entry(7, List.of(
-                    new MobEntry("Skeleton_Wave", 4)
+                    new MobEntry("Skeleton_Wave", 8),
+                    new MobEntry("Skeleton_Archer_Wave", 8)
             )),
             Map.entry(8, List.of(
-                    new MobEntry("Skeleton_Wave", 5)
+                    new MobEntry("Skeleton_Wave", 10),
+                    new MobEntry("Skeleton_Archer_Wave", 10)
             )),
             Map.entry(9, List.of(
-                    new MobEntry("Skeleton_Wave", 6),
-                    new MobEntry("Skeleton_Pirate_Captain_Wave", 1)
+                    new MobEntry("Skeleton_Pirate_Captain_Wave", 2),
+                    new MobEntry("Skeleton_Wave", 10),
+                    new MobEntry("Skeleton_Archer_Wave", 10)
             )),
+            // TODO: boss
             Map.entry(10, List.of(
                     new MobEntry("Skeleton_Pirate_Captain_Wave", 2),
                     new MobEntry("Snake_Rattle_Wave", 4)
@@ -142,18 +164,19 @@ public class WaveManager {
             )),
             Map.entry(13, List.of(
                     new MobEntry("Skeleton_Pirate_Captain_Wave", 5),
-                    new MobEntry("Snake_Rattle_Wave", 5),
-                    new MobEntry("Skeleton_Wave", 6)
+                    new MobEntry("Skeleton_Wave", 6),
+                    new MobEntry("Snake_Rattle_Wave", 5)
             )),
             Map.entry(14, List.of(
                     new MobEntry("Skeleton_Pirate_Captain_Wave", 5),
                     new MobEntry("Skeleton_Wave", 6),
                     new MobEntry("Rat_Wave", 6)
             )),
+            // TODO: boss
             Map.entry(15, List.of(
                     new MobEntry("Skeleton_Pirate_Captain_Wave", 6),
-                    new MobEntry("Snake_Rattle_Wave", 7),
-                    new MobEntry("Skeleton_Wave", 7)
+                    new MobEntry("Skeleton_Wave", 7),
+                    new MobEntry("Snake_Rattle_Wave", 7)
             )),
             Map.entry(16, List.of(
                     new MobEntry("Skeleton_Pirate_Captain_Wave", 7),
@@ -175,6 +198,7 @@ public class WaveManager {
                     new MobEntry("Snake_Rattle_Wave", 9),
                     new MobEntry("Skeleton_Wave", 8)
             )),
+            // TODO: boss
             Map.entry(20, List.of(
                     new MobEntry("Skeleton_Pirate_Captain_Wave", 10),
                     new MobEntry("Snake_Rattle_Wave", 10),
@@ -318,6 +342,7 @@ public class WaveManager {
                 saveProgress();
             }
             WaveRewards.awardWaveEnd(wave, store);
+            WaveRewards.healAllPlayersToFull(store);
 
             EventTitleUtil.showEventTitleToWorld(
                     Message.raw("Wave " + wave + " / " + getMaxWave() + " Defeated!"),
