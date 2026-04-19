@@ -6,8 +6,6 @@ import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import dev.dooondi.commands.CsCommand;
 import dev.dooondi.commands.PrefabPathCommand;
-import dev.dooondi.commands.ShowWaveHudCommand;
-import dev.dooondi.commands.StartWaveCommand;
 import dev.dooondi.events.InputListener;
 import dev.dooondi.events.WelcomeEvent;
 import dev.dooondi.systems.BlockBreakEventSystem;
@@ -30,8 +28,6 @@ public class CastleSiege extends JavaPlugin {
         WaveManager.initPersistence(this.getDataDirectory());
 
         this.getCommandRegistry().registerCommand(new CsCommand());
-        this.getCommandRegistry().registerCommand(new StartWaveCommand());
-        this.getCommandRegistry().registerCommand(new ShowWaveHudCommand());
         this.getCommandRegistry().registerCommand(new PrefabPathCommand());
 
         this.getEventRegistry().registerGlobal(PlayerReadyEvent.class, WelcomeEvent::onPlayerReady);

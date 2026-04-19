@@ -4,61 +4,145 @@ Group {
   LayoutMode: Center;
 
   Group #WavePanel {
-    Anchor: (Width: 400, Height: 380);
-    LayoutMode: Top;
+    Anchor: (Width: 820, Height: 420);
+    LayoutMode: Left;
 
-    Label #Title {
-      Style: (FontSize: 32, Alignment: Center);
-      Anchor: (Top: 30);
-      Text: "Castle Siege";
-      Padding: (Full: 10);
+    Group #WaveInfoColumn {
+      Anchor: (Width: 380, Height: 400);
+      LayoutMode: Top;
+      Padding: (Right: 10);
+
+      Label #Title {
+        Style: (FontSize: 32, Alignment: Center);
+        Anchor: (Top: 30);
+        Text: "Castle Siege";
+        Padding: (Full: 10);
+      }
+
+      Label #WaveLabel {
+        Style: (FontSize: 22, Alignment: Center);
+        Anchor: (Top: 10);
+        Text: "Wave 0 / 20";
+        Padding: (Full: 5);
+      }
+
+      Label #WaveKillLabel {
+        Style: (FontSize: 18, Alignment: Center);
+        Anchor: (Top: 5);
+        Text: "Wave Kills: 0 / 0";
+        Padding: (Full: 5);
+      }
+
+      Label #PlayerKillLabel {
+        Style: (FontSize: 18, Alignment: Center);
+        Anchor: (Top: 5);
+        Text: "Your Kills: 0";
+        Padding: (Full: 5);
+      }
+
+      Label #DeathLabel {
+        Style: (FontSize: 18, Alignment: Center);
+        Anchor: (Top: 5);
+        Text: "Your Deaths: 0";
+        Padding: (Full: 5);
+      }
+
+      Label #TotalKillLabel {
+        Style: (FontSize: 18, Alignment: Center);
+        Anchor: (Top: 5);
+        Text: "Mobs Killed: 0";
+        Padding: (Full: 5);
+      }
+
+      Label #StatusLabel {
+        Style: (FontSize: 16, Alignment: Center);
+        Anchor: (Top: 10);
+        Text: "";
+        Padding: (Full: 5);
+      }
+
+      $Common.@TextButton #StartWaveBtn {
+        @Anchor = (Width: 250, Top: 10);
+        @Text = "Start Next Wave";
+      }
     }
 
-    Label #WaveLabel {
-      Style: (FontSize: 22, Alignment: Center);
-      Anchor: (Top: 10);
-      Text: "Wave 0 / 20";
-      Padding: (Full: 5);
-    }
+    Group #CommandDocsColumn {
+      Anchor: (Width: 420, Height: 400);
+      LayoutMode: Top;
+      Padding: (Left: 10);
 
-    Label #WaveKillLabel {
-      Style: (FontSize: 18, Alignment: Center);
-      Anchor: (Top: 5);
-      Text: "Wave Kills: 0 / 0";
-      Padding: (Full: 5);
-    }
+      Label {
+        Style: (FontSize: 22, Alignment: Center, RenderBold: true);
+        Anchor: (Top: 30);
+        Text: "Commands";
+        Padding: (Full: 10);
+      }
 
-    Label #PlayerKillLabel {
-      Style: (FontSize: 18, Alignment: Center);
-      Anchor: (Top: 5);
-      Text: "Your Kills: 0";
-      Padding: (Full: 5);
-    }
+      Label {
+        Style: (FontSize: 14, TextColor: #7a9cc6);
+        Anchor: (Top: 10);
+        Text: "/cs ui";
+        Padding: (Full: 2);
+      }
+      Label {
+        Style: (FontSize: 13, TextColor: #ffffff(0.85), Wrap: true);
+        Anchor: (Top: 0);
+        Text: "Open this Castle Siege panel.";
+        Padding: (Bottom: 6);
+      }
 
-    Label #DeathLabel {
-      Style: (FontSize: 18, Alignment: Center);
-      Anchor: (Top: 5);
-      Text: "Your Deaths: 0";
-      Padding: (Full: 5);
-    }
+      Label {
+        Style: (FontSize: 14, TextColor: #7a9cc6);
+        Anchor: (Top: 4);
+        Text: "/cs next";
+        Padding: (Full: 2);
+      }
+      Label {
+        Style: (FontSize: 13, TextColor: #ffffff(0.85), Wrap: true);
+        Anchor: (Top: 0);
+        Text: "Spawn the next wave of mobs.";
+        Padding: (Bottom: 6);
+      }
 
-    Label #TotalKillLabel {
-      Style: (FontSize: 18, Alignment: Center);
-      Anchor: (Top: 5);
-      Text: "Mobs Killed: 0";
-      Padding: (Full: 5);
-    }
+      Label {
+        Style: (FontSize: 14, TextColor: #7a9cc6);
+        Anchor: (Top: 4);
+        Text: "/cs wave --wave <n>";
+        Padding: (Full: 2);
+      }
+      Label {
+        Style: (FontSize: 13, TextColor: #ffffff(0.85), Wrap: true);
+        Anchor: (Top: 0);
+        Text: "Spawn a specific wave (1-20) for debugging.";
+        Padding: (Bottom: 6);
+      }
 
-    Label #StatusLabel {
-      Style: (FontSize: 16, Alignment: Center);
-      Anchor: (Top: 10);
-      Text: "";
-      Padding: (Full: 5);
-    }
+      Label {
+        Style: (FontSize: 14, TextColor: #7a9cc6);
+        Anchor: (Top: 4);
+        Text: "/cs hud";
+        Padding: (Full: 2);
+      }
+      Label {
+        Style: (FontSize: 13, TextColor: #ffffff(0.85), Wrap: true);
+        Anchor: (Top: 0);
+        Text: "Toggle the on-screen wave HUD overlay.";
+        Padding: (Bottom: 6);
+      }
 
-    $Common.@TextButton #StartWaveBtn {
-      @Anchor = (Width: 250, Top: 10);
-      @Text = "Start Next Wave";
+      Label {
+        Style: (FontSize: 14, TextColor: #7a9cc6);
+        Anchor: (Top: 4);
+        Text: "/cs reset --confirm";
+        Padding: (Full: 2);
+      }
+      Label {
+        Style: (FontSize: 13, TextColor: #ffffff(0.85), Wrap: true);
+        Anchor: (Top: 0);
+        Text: "Reset progress, despawn mobs, return players to spawn with starter gear.";
+        Padding: (Bottom: 6);
+      }
     }
   }
 }

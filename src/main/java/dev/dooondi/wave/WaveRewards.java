@@ -77,26 +77,33 @@ public final class WaveRewards {
             //       Wave 6
             // ------------------
             Map.entry(6, WaveRewardSet.of(
-                    Collections.singletonList(new RewardItem("Ore_Iron", 15)), // Start
+                    Collections.singletonList(new RewardItem("Ore_Iron", 10)), // Start
                     Collections.singletonList(new RewardItem("Potion_Health_Greater", 2))  // End
             )),
             // ------------------
             //       Wave 7
             // ------------------
-            Map.entry(7, WaveRewardSet.startOnly(
-                    new RewardItem("Ore_Iron", 20)
+            Map.entry(7, WaveRewardSet.of(
+                    // Start of wave
+                    List.of(new RewardItem("Ore_Iron", 10),
+                            new RewardItem("Rubble_Marble", 50),
+                            new RewardItem("Ingredient_Stick", 100)),
+                    // End of wave
+                    List.of(new RewardItem("Ingredient_Fabric_Scrap_Linen", 10),
+                            new RewardItem("Ingredient_Leather_Light", 10))
             )),
             // ------------------
             //       Wave 8
             // ------------------
             Map.entry(8, WaveRewardSet.startOnly(
-                    new RewardItem("Ore_Iron", 10)
+                    new RewardItem("Ore_Iron", 15),
+                    new RewardItem("Potion_Health_Greater", 2)
             )),
             // ------------------
             //       Wave 9
             // ------------------
             Map.entry(9, WaveRewardSet.startOnly(
-                    new RewardItem("Ore_Iron", 10)
+                    new RewardItem("Ore_Iron", 20)
             )),
             // ------------------
             //       Wave 10
@@ -105,10 +112,28 @@ public final class WaveRewards {
                     // Start of wave
                     List.of(new RewardItem("Ore_Thorium", 20),
                             new RewardItem("Rubble_Marble", 50),
-                            new RewardItem("Ingredient_Stick", 50)),
-                    // End fo wave
+                            new RewardItem("Ingredient_Stick", 100)),
+                    // End of wave
                     List.of(new RewardItem("Halloween_Broomstick", 1),
                             new RewardItem("Potion_Health_Greater", 4))
+            )),
+            // ------------------
+            //       Wave 11
+            // ------------------
+            Map.entry(11, WaveRewardSet.of(
+                    // Start of wave
+                    List.of(new RewardItem("Ore_Thorium", 10)),
+                    // End of wave
+                    List.of(new RewardItem("Potion_Health_Greater", 2))
+            )),
+            // ------------------
+            //       Wave 12
+            // ------------------
+            Map.entry(12, WaveRewardSet.of(
+                    // Start of wave
+                    List.of(new RewardItem("Ore_Thorium", 15)),
+                    // End of wave
+                    List.of(new RewardItem("Potion_Health_Greater", 2))
             ))
     );
 

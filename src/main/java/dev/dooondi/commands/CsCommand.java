@@ -12,18 +12,23 @@ import com.hypixel.hytale.server.core.command.system.arguments.system.RequiredAr
 import com.hypixel.hytale.server.core.command.system.arguments.types.ArgTypes;
 import com.hypixel.hytale.server.core.command.system.basecommands.AbstractTargetPlayerCommand;
 import com.hypixel.hytale.server.core.entity.entities.Player;
+import com.hypixel.hytale.server.core.entity.entities.player.hud.CustomUIHud;
 import com.hypixel.hytale.server.core.inventory.InventoryComponent;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.inventory.container.CombinedItemContainer;
+import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.spawn.ISpawnProvider;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import dev.dooondi.events.WelcomeEvent;
+import dev.dooondi.ui.WaveHUD;
 import dev.dooondi.ui.WaveUI;
 import dev.dooondi.wave.WaveManager;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 import org.checkerframework.checker.nullness.compatqual.NullableDecl;
+
+import javax.annotation.Nonnull;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -34,10 +39,10 @@ public class CsCommand extends AbstractTargetPlayerCommand {
     private final FlagArg confirmArg;
 
     public CsCommand() {
-        super("cs", "Castle Siege command. Actions: reset [--confirm], ui, wave <n>, next");
+        super("cs", "Castle Siege command. Actions: reset [--confirm], ui, hud, wave <n>, next");
 
         this.actionArg = this.withRequiredArg(
-                "action", "Actions: reset, ui, wave, next", ArgTypes.STRING);
+                "action", "Actions: reset, ui, hud, wave, next", ArgTypes.STRING);
         this.waveArg = this.withOptionalArg(
                 "wave", "Wave number for the 'wave' action (1-20)", ArgTypes.INTEGER);
         this.confirmArg = this.withFlagArg(
@@ -59,13 +64,15 @@ public class CsCommand extends AbstractTargetPlayerCommand {
             executeReset(commandContext, world, store);
         } else if ("ui".equalsIgnoreCase(action)) {
             executeUi(commandContext, playerEntityRef, playerRef, world, store);
+        } else if ("hud".equalsIgnoreCase(action)) {
+            executeHud(commandContext, playerRef, world);
         } else if ("wave".equalsIgnoreCase(action)) {
             executeWave(commandContext, store);
         } else if ("next".equalsIgnoreCase(action)) {
             executeNext(commandContext, store);
         } else {
             commandContext.sendMessage(Message.raw(
-                    "Unknown action: " + action + ". Supported: reset, ui, wave, next"));
+                    "Unknown action: " + action + ". Supported: reset, ui, hud, wave, next"));
         }
     }
 
@@ -123,6 +130,41 @@ public class CsCommand extends AbstractTargetPlayerCommand {
         CompletableFuture.runAsync(
                 () -> player.getPageManager().openCustomPage(playerEntityRef, store, new WaveUI(playerRef)),
                 world);
+    }
+
+    private void executeHud(CommandContext commandContext, PlayerRef playerRef, World world) {
+        Player player = commandContext.senderAs(Player.class);
+        if (player == null) {
+            commandContext.sendMessage(Message.raw("This command must be run by a player."));
+            return;
+        }
+
+        CompletableFuture.runAsync(() -> {
+            if (player.getHudManager().getCustomHud() instanceof WaveHUD) {
+                player.getHudManager().setCustomHud(playerRef, new CustomUIHud(playerRef) {
+                    @Override
+                    protected void build(@Nonnull UICommandBuilder uiCommandBuilder) {
+                    }
+                });
+                playerRef.sendMessage(Message.raw("Wave HUD hidden."));
+            } else {
+                WaveHUD hud = new WaveHUD(playerRef);
+                player.getHudManager().setCustomHud(playerRef, hud);
+
+                int current = WaveManager.getCurrentWave();
+                int max = WaveManager.getMaxWave();
+                hud.setWaveLabel(current, max);
+                if (current == 0) {
+                    hud.setStatus("Type /cs next to begin");
+                } else if (current >= max) {
+                    hud.setStatus("All waves completed!");
+                } else {
+                    hud.setStatus("Type /cs next for next wave");
+                }
+
+                playerRef.sendMessage(Message.raw("Wave HUD shown."));
+            }
+        }, world);
     }
 
     private void executeWave(CommandContext commandContext, Store<EntityStore> store) {
