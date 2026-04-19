@@ -36,10 +36,26 @@ public class WaveManager {
 
     public record MobEntry(String name, int count) {}
 
+    // ---------------------------------
+    //     Charge forward (all mobs)
+    // ---------------------------------
+
     // World ID=0 UUID=b9027423-f7fa-490f-91b2-3d12e6460e07 name="castle_straight" [ Length: 3, Loaded nodes: 3 ]
     //   Waypoint 0: (-0.64, 80.00, -0.82)
     //   Waypoint 1: (-0.55, 80.00, -27.90)
     //   Waypoint 2: (-0.64, 80.00, -0.82)
+
+    // These paths get mobs them into the castle...
+    // They have different starting points so that mobs are close enough to the beginning, but also in front of the
+    // mobs so they do not go backwards before going forwards...
+    private static final UUID CS_CHARGE_CASTLE_CLOSE_UUID = UUID.fromString("b9027423-f7fa-490f-91b2-3d12e6460e07");
+    private static final UUID CS_CHARGE_CASTLE_MED_UUID = UUID.fromString("0f035977-e728-4bfb-b10d-f4365b08ca7b");
+    private static final UUID CS_CHARGE_CASTLE_FAR_UUID = UUID.fromString("4e439313-50fc-4ab4-b2fe-a0d0c8eac513");
+
+    // ---------------------------------
+    //      Melee Mob AI Node Hints
+    // ---------------------------------
+    // Loop around the bottom courtyard of the castle (no stairs)
     // World ID=0 UUID=afd6f331-9e8c-47a7-98c6-98ec9b99e312 name=cs_courtyard_loop [ Length: 7, Loaded nodes: 7 ]
     //   Waypoint 0: (-0.48, 80.00, -21.99)
     //   Waypoint 1: (-11.25, 80.00, -22.17)
@@ -48,27 +64,7 @@ public class WaveManager {
     //   Waypoint 4: (10.44, 80.00, -22.71)
     //   Waypoint 5: (-0.22, 80.00, -22.42)
     //   Waypoint 6: (-0.48, 80.00, -0.51)
-
-
-
-    // These paths get mobs them into the castle...
-    private static final UUID CS_CHARGE_CASTLE_CLOSE_UUID = UUID.fromString("b9027423-f7fa-490f-91b2-3d12e6460e07");
-    private static final UUID CS_CHARGE_CASTLE_MED_UUID = UUID.fromString("0f035977-e728-4bfb-b10d-f4365b08ca7b");
-    private static final UUID CS_CHARGE_CASTLE_FAR_UUID = UUID.fromString("4e439313-50fc-4ab4-b2fe-a0d0c8eac513");
-
-
-    // Flank castle left for archers
-    private static final UUID CS_FLANK_LEFT_UUID = UUID.fromString("5aa77ec0-0fce-4222-a82b-095c12b5e3f2");
-
-
-
-    // Loop around the bottom courtyard of the castle (no stairs)
     private static final UUID CS_COURTYARD_LOOP_UUID = UUID.fromString("afd6f331-9e8c-47a7-98c6-98ec9b99e312");
-
-    
-
-    // From the castle courtyard walk up the left staircase and do a loop around through the front/center crafting room
-    private static final UUID CS_FRONT_LOWER_LOOP_UUID = UUID.fromString("c8a0a8c0-8a10-413a-b35e-5222cda5505a");
 
     // World ID=0 UUID=c8a0a8c0-8a10-413a-b35e-5222cda5505a name=cs_front_lower_loop [ Length: 12, Loaded nodes: 12 ]
     //   Waypoint 0: (-0.67, 80.00, -27.41)
@@ -84,9 +80,73 @@ public class WaveManager {
     //   Waypoint 10: (12.71, 88.00, -27.82)
     //   Waypoint 11: (7.48, 85.00, -27.59)
 
-    private static final UUID[] LOOP_PATH_UUIDS = {
+    // From the castle courtyard walk up the left staircase and do a loop around through the front/center crafting room
+    // and back down the right staircase
+    private static final UUID CS_FRONT_LOWER_LOOP_UUID = UUID.fromString("c8a0a8c0-8a10-413a-b35e-5222cda5505a");
+
+    // From the castle courtyard walk up the right staircase and do a loop around through the elevated rear quarters
+    // and back down the left staircase.
+    // World ID=0 UUID=c7576cff-10ab-4fe7-b5b8-1d5708ff8f5a name=cs_front_upper_loop [ Length: 14, Loaded nodes: 14 ]
+    // Waypoint 0: (-0.54, 80.00, -27.77)
+    // Waypoint 1: (5.27, 83.00, -27.46)
+    // Waypoint 2: (12.71, 88.00, -27.46)
+    // Waypoint 3: (12.88, 88.00, -33.90)
+    // Waypoint 4: (9.85, 88.00, -34.00)
+    // Waypoint 5: (9.79, 88.00, -36.80)
+    // Waypoint 6: (6.36, 90.00, -36.71)
+    // Waypoint 7: (-0.01, 94.00, -37.06)
+    // Waypoint 8: (-6.38, 91.00, -36.64)
+    // Waypoint 9: (-10.97, 88.00, -36.59)
+    // Waypoint 10: (-11.11, 88.00, -33.76)
+    // Waypoint 11: (-14.19, 88.00, -33.80)
+    // Waypoint 12: (-13.86, 88.00, -27.72)
+    // Waypoint 13: (-7.83, 84.50, -27.55)
+    private static final UUID CS_FRONT_UPPER_LOOP_UUID = UUID.fromString("c7576cff-10ab-4fe7-b5b8-1d5708ff8f5a");
+
+    // ---------------------------
+    //     Archer AI Node Hints
+    // ---------------------------
+    // World ID=0 UUID=c015894c-08d7-4272-a763-93c33354c08d name=cs_flank_right [ Length: 23, Loaded nodes: 23 ]
+    // Waypoint 0: (-0.34, 80.00, 3.88)
+    // Waypoint 1: (9.29, 80.00, 2.47)
+    // Waypoint 2: (16.24, 80.00, -0.04)
+    // Waypoint 3: (23.26, 80.00, -3.06)
+    // Waypoint 4: (24.20, 80.00, -9.87)
+    // Waypoint 5: (24.17, 80.00, -18.44)
+    // Waypoint 6: (24.13, 80.00, -28.07)
+    // Waypoint 7: (24.09, 80.00, -39.07)
+    // Waypoint 8: (24.05, 80.00, -49.84)
+    // Waypoint 9: (17.77, 80.00, -49.99)
+    // Waypoint 10: (11.40, 80.00, -50.15)
+    // Waypoint 11: (1.55, 80.00, -50.40)
+    // Waypoint 12: (-8.67, 80.00, -50.48)
+    // Waypoint 13: (-17.74, 80.00, -50.55)
+    // Waypoint 14: (-23.83, 80.00, -50.60)
+    // Waypoint 15: (-24.30, 80.00, -43.98)
+    // Waypoint 16: (-24.36, 80.00, -35.68)
+    // Waypoint 17: (-24.42, 80.00, -27.11)
+    // Waypoint 18: (-24.49, 80.00, -17.26)
+    // Waypoint 19: (-24.53, 80.00, -10.66)
+    // Waypoint 20: (-24.57, 80.00, -4.93)
+    // Waypoint 21: (-19.64, 80.00, -2.16)
+    // Waypoint 22: (-11.18, 80.00, 0.91)
+
+    // Flank castle left for archers. Around the castle
+    private static final UUID CS_FLANK_LEFT_UUID = UUID.fromString("5aa77ec0-0fce-4222-a82b-095c12b5e3f2");
+
+    // Flank castle right for archers. Around the castle
+    private static final UUID CS_FLANK_RIGHT_UUID = UUID.fromString("c015894c-08d7-4272-a763-93c33354c08d");
+
+    private static final UUID[] INNER_CASTLE_LOOP_PATHS = {
             CS_COURTYARD_LOOP_UUID,
-            CS_FRONT_LOWER_LOOP_UUID
+            CS_FRONT_LOWER_LOOP_UUID,
+            CS_FRONT_UPPER_LOOP_UUID
+    };
+
+    // Archers entering the outside path are randomly routed onto one of these flanks.
+    private static final UUID[] FLANK_PATH_UUIDS = {
+            CS_FLANK_LEFT_UUID,
+            CS_FLANK_RIGHT_UUID
     };
 
     private static final Random RANDOM = new Random();
@@ -102,7 +162,7 @@ public class WaveManager {
     private static final double FAR_SPAWN_Z_THRESHOLD = 26.0;
 
     // "Outside path" rectangle (XZ). Archers spawned inside this box get sent on
-    // the left-flank path instead of charging straight down the center.
+    // either the left-flank or right-flank path instead of charging straight down the center.
     private static final double OUTSIDE_X_MIN = -6.0;
     private static final double OUTSIDE_X_MAX = 6.0;
     private static final double OUTSIDE_Z_MIN = 0.0;
@@ -443,7 +503,7 @@ public class WaveManager {
         IPrefabPath straightPath = null;
         IPrefabPath chargeMedPath = null;
         IPrefabPath chargeFarPath = null;
-        IPrefabPath flankLeftPath = null;
+        Map<UUID, IPrefabPath> flankPaths = new java.util.HashMap<>();
         Map<UUID, IPrefabPath> loopPaths = new java.util.HashMap<>();
         if (pathData != null) {
             for (IPrefabPath p : pathData.getAllPrefabPaths()) {
@@ -453,10 +513,13 @@ public class WaveManager {
                     chargeMedPath = p;
                 } else if (p.getId().equals(CS_CHARGE_CASTLE_FAR_UUID)) {
                     chargeFarPath = p;
-                } else if (p.getId().equals(CS_FLANK_LEFT_UUID)) {
-                    flankLeftPath = p;
                 } else {
-                    for (UUID loopUuid : LOOP_PATH_UUIDS) {
+                    for (UUID flankUuid : FLANK_PATH_UUIDS) {
+                        if (p.getId().equals(flankUuid)) {
+                            flankPaths.put(flankUuid, p);
+                        }
+                    }
+                    for (UUID loopUuid : INNER_CASTLE_LOOP_PATHS) {
                         if (p.getId().equals(loopUuid)) {
                             loopPaths.put(loopUuid, p);
                         }
@@ -476,11 +539,13 @@ public class WaveManager {
             messageSender.accept("ERROR: Charge-far prefab path not found: " + CS_CHARGE_CASTLE_FAR_UUID);
             return;
         }
-        if (flankLeftPath == null) {
-            messageSender.accept("ERROR: Flank-left prefab path not found: " + CS_FLANK_LEFT_UUID);
-            return;
+        for (UUID flankUuid : FLANK_PATH_UUIDS) {
+            if (!flankPaths.containsKey(flankUuid)) {
+                messageSender.accept("ERROR: Flank prefab path not found: " + flankUuid);
+                return;
+            }
         }
-        for (UUID loopUuid : LOOP_PATH_UUIDS) {
+        for (UUID loopUuid : INNER_CASTLE_LOOP_PATHS) {
             if (!loopPaths.containsKey(loopUuid)) {
                 messageSender.accept("ERROR: Loop prefab path not found: " + loopUuid);
                 return;
@@ -548,13 +613,13 @@ public class WaveManager {
         messageSender.accept("Wave " + waveNumber + " started! " + spawnCount + " mobs spawned.");
 
         if (world != null) {
-            startPositionTracking(store, world, loopPaths, flankLeftPath);
+            startPositionTracking(store, world, loopPaths, flankPaths);
         }
     }
 
     private static void startPositionTracking(Store<EntityStore> store, World world,
                                               Map<UUID, IPrefabPath> loopPaths,
-                                              IPrefabPath flankLeftPath) {
+                                              Map<UUID, IPrefabPath> flankPaths) {
         ScheduledFuture<?> prev = positionTrackingTask;
         if (prev != null) {
             prev.cancel(false);
@@ -577,7 +642,7 @@ public class WaveManager {
                             crossedZThreshold.add(mobRef);
                             NPCEntity npc = waveMobEntities.get(mobRef);
                             if (npc != null) {
-                                UUID chosenUuid = LOOP_PATH_UUIDS[RANDOM.nextInt(LOOP_PATH_UUIDS.length)];
+                                UUID chosenUuid = INNER_CASTLE_LOOP_PATHS[RANDOM.nextInt(INNER_CASTLE_LOOP_PATHS.length)];
                                 IPrefabPath chosenPath = loopPaths.get(chosenUuid);
                                 npc.getPathManager().setPrefabPath(chosenUuid, chosenPath);
                                 System.out.printf("[CastleSiege] Mob entered castle (x=%.2f, z=%.2f), assigned to loop %s%n",
@@ -592,9 +657,11 @@ public class WaveManager {
                             if (npc != null && npc.getRoleName() != null
                                     && npc.getRoleName().contains("Archer")) {
                                 flankedArchers.add(mobRef);
-                                npc.getPathManager().setPrefabPath(CS_FLANK_LEFT_UUID, flankLeftPath);
+                                UUID chosenUuid = FLANK_PATH_UUIDS[RANDOM.nextInt(FLANK_PATH_UUIDS.length)];
+                                IPrefabPath chosenPath = flankPaths.get(chosenUuid);
+                                npc.getPathManager().setPrefabPath(chosenUuid, chosenPath);
                                 System.out.printf("[CastleSiege] Archer reached outside path (x=%.2f, z=%.2f), routed to %s%n",
-                                        pos.x, pos.z, flankLeftPath.getName());
+                                        pos.x, pos.z, chosenPath.getName());
                             }
                         }
                     }

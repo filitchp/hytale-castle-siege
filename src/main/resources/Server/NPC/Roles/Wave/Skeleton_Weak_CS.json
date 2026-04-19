@@ -71,7 +71,7 @@
     },
     "IsMemory": true,
     "MemoriesCategory": "Undead",
-    "BreathesInWater": true,
+    "BreathesInWater": false,
     "NameTranslationKey": {
       "Compute": "NameTranslationKey"
     }
