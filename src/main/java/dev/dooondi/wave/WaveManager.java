@@ -51,15 +51,23 @@ public class WaveManager {
 
 
 
-    // Gets them into the castle...
-    private static final UUID CS_CASTLE_STRAIGHT_UUID = UUID.fromString("b9027423-f7fa-490f-91b2-3d12e6460e07");
+    // These paths get mobs them into the castle...
+    private static final UUID CS_CHARGE_CASTLE_CLOSE_UUID = UUID.fromString("b9027423-f7fa-490f-91b2-3d12e6460e07");
+    private static final UUID CS_CHARGE_CASTLE_MED_UUID = UUID.fromString("0f035977-e728-4bfb-b10d-f4365b08ca7b");
+    private static final UUID CS_CHARGE_CASTLE_FAR_UUID = UUID.fromString("4e439313-50fc-4ab4-b2fe-a0d0c8eac513");
 
-    // Loop around the bottom
+
+    // Flank castle left for archers
+    private static final UUID CS_FLANK_LEFT_UUID = UUID.fromString("5aa77ec0-0fce-4222-a82b-095c12b5e3f2");
+
+
+
+    // Loop around the bottom courtyard of the castle (no stairs)
     private static final UUID CS_COURTYARD_LOOP_UUID = UUID.fromString("afd6f331-9e8c-47a7-98c6-98ec9b99e312");
 
     
 
-    // Loop around the front lower staircase
+    // From the castle courtyard walk up the left staircase and do a loop around through the front/center crafting room
     private static final UUID CS_FRONT_LOWER_LOOP_UUID = UUID.fromString("c8a0a8c0-8a10-413a-b35e-5222cda5505a");
 
     // World ID=0 UUID=c8a0a8c0-8a10-413a-b35e-5222cda5505a name=cs_front_lower_loop [ Length: 12, Loaded nodes: 12 ]
@@ -82,7 +90,23 @@ public class WaveManager {
     };
 
     private static final Random RANDOM = new Random();
-    private static final double Z_THRESHOLD = -27.0;
+    // Castle courtyard rectangle (XZ). A mob is considered "in the castle" once
+    // its position falls inside [COURTYARD_X_MIN, COURTYARD_X_MAX] x [COURTYARD_Z_MIN, COURTYARD_Z_MAX].
+    private static final double COURTYARD_X_MIN = -14.0;
+    private static final double COURTYARD_X_MAX = 14.0;
+    private static final double COURTYARD_Z_MIN = -39.0;
+    private static final double COURTYARD_Z_MAX = -27.0;
+    // Charge-path tiering: a mob's distance behind the spawn origin (in +z) decides
+    // which approach path it gets routed onto. (origin, MED] → med, (MED, FAR] → far.
+    private static final double MED_SPAWN_Z_THRESHOLD = 11.0;
+    private static final double FAR_SPAWN_Z_THRESHOLD = 26.0;
+
+    // "Outside path" rectangle (XZ). Archers spawned inside this box get sent on
+    // the left-flank path instead of charging straight down the center.
+    private static final double OUTSIDE_X_MIN = -6.0;
+    private static final double OUTSIDE_X_MAX = 6.0;
+    private static final double OUTSIDE_Z_MIN = 0.0;
+    private static final double OUTSIDE_Z_MAX = 6.0;
 
     private static final AtomicInteger currentWave = new AtomicInteger(0);
     private static final AtomicInteger totalKills = new AtomicInteger(0);
@@ -102,6 +126,8 @@ public class WaveManager {
     private static final ConcurrentHashMap<UUID, AtomicInteger> playerDeaths = new ConcurrentHashMap<>();
     // Mobs that have already crossed the Z threshold and switched to the courtyard loop.
     private static final Set<Ref<EntityStore>> crossedZThreshold = ConcurrentHashMap.newKeySet();
+    // Archers that have already been redirected onto the left flank path.
+    private static final Set<Ref<EntityStore>> flankedArchers = ConcurrentHashMap.newKeySet();
     // Map from mob ref to its NPCEntity, used to switch prefab paths at the Z threshold.
     private static final ConcurrentHashMap<Ref<EntityStore>, NPCEntity> waveMobEntities = new ConcurrentHashMap<>();
     private static volatile ScheduledFuture<?> positionTrackingTask;
@@ -130,24 +156,24 @@ public class WaveManager {
             )),
             Map.entry(5, List.of(
                     new MobEntry("Skeleton_Weak_CS", 4),
-                    new MobEntry("Skeleton_Archer_Weak_CS", 4)
+                    new MobEntry("Skeleton_Archer_Weak_CS", 2)
             )),
             Map.entry(6, List.of(
+                    new MobEntry("Skeleton_Weak_CS", 4),
+                    new MobEntry("Skeleton_Archer_Weak_CS", 4)
+            )),
+            Map.entry(7, List.of(
+                    new MobEntry("Skeleton_Weak_CS", 4),
+                    new MobEntry("Skeleton_Archer_Weak_CS", 6)
+            )),
+            Map.entry(8, List.of(
                     new MobEntry("Skeleton_Weak_CS", 6),
                     new MobEntry("Skeleton_Archer_Weak_CS", 6)
             )),
-            Map.entry(7, List.of(
-                    new MobEntry("Skeleton_Weak_CS", 8),
-                    new MobEntry("Skeleton_Archer_Weak_CS", 8)
-            )),
-            Map.entry(8, List.of(
-                    new MobEntry("Skeleton_Weak_CS", 10),
-                    new MobEntry("Skeleton_Archer_Weak_CS", 10)
-            )),
             Map.entry(9, List.of(
                     new MobEntry("Skeleton_Pirate_Captain_Wave", 2),
-                    new MobEntry("Skeleton_Weak_CS", 10),
-                    new MobEntry("Skeleton_Archer_Weak_CS", 10)
+                    new MobEntry("Skeleton_Weak_CS", 6),
+                    new MobEntry("Skeleton_Archer_Weak_CS", 6)
             )),
             // TODO: boss
             Map.entry(10, List.of(
@@ -306,6 +332,7 @@ public class WaveManager {
         currentWaveMobs.clear();
         waveMobEntities.clear();
         crossedZThreshold.clear();
+        flankedArchers.clear();
         playerKills.clear();
         playerDeaths.clear();
         lastDefeatedWave.set(0);
@@ -392,6 +419,7 @@ public class WaveManager {
         currentWaveKills.set(0);
         currentWaveTotalMobs.set(0);
         crossedZThreshold.clear();
+        flankedArchers.clear();
         waveMobEntities.clear();
 
         // Hand out start-of-wave rewards before any mobs spawn.
@@ -410,14 +438,23 @@ public class WaveManager {
 
         var rotation = new Vector3f(0f, 0f, 0f);
 
-        // Look up prefab paths: straight approach and all loop variants.
+        // Look up prefab paths: close, med, far approach, and all loop variants.
         WorldPathData pathData = store.getResource(WorldPathData.getResourceType());
         IPrefabPath straightPath = null;
+        IPrefabPath chargeMedPath = null;
+        IPrefabPath chargeFarPath = null;
+        IPrefabPath flankLeftPath = null;
         Map<UUID, IPrefabPath> loopPaths = new java.util.HashMap<>();
         if (pathData != null) {
             for (IPrefabPath p : pathData.getAllPrefabPaths()) {
-                if (p.getId().equals(CS_CASTLE_STRAIGHT_UUID)) {
+                if (p.getId().equals(CS_CHARGE_CASTLE_CLOSE_UUID)) {
                     straightPath = p;
+                } else if (p.getId().equals(CS_CHARGE_CASTLE_MED_UUID)) {
+                    chargeMedPath = p;
+                } else if (p.getId().equals(CS_CHARGE_CASTLE_FAR_UUID)) {
+                    chargeFarPath = p;
+                } else if (p.getId().equals(CS_FLANK_LEFT_UUID)) {
+                    flankLeftPath = p;
                 } else {
                     for (UUID loopUuid : LOOP_PATH_UUIDS) {
                         if (p.getId().equals(loopUuid)) {
@@ -428,7 +465,19 @@ public class WaveManager {
             }
         }
         if (straightPath == null) {
-            messageSender.accept("ERROR: Straight prefab path not found: " + CS_CASTLE_STRAIGHT_UUID);
+            messageSender.accept("ERROR: Straight prefab path not found: " + CS_CHARGE_CASTLE_CLOSE_UUID);
+            return;
+        }
+        if (chargeMedPath == null) {
+            messageSender.accept("ERROR: Charge-med prefab path not found: " + CS_CHARGE_CASTLE_MED_UUID);
+            return;
+        }
+        if (chargeFarPath == null) {
+            messageSender.accept("ERROR: Charge-far prefab path not found: " + CS_CHARGE_CASTLE_FAR_UUID);
+            return;
+        }
+        if (flankLeftPath == null) {
+            messageSender.accept("ERROR: Flank-left prefab path not found: " + CS_FLANK_LEFT_UUID);
             return;
         }
         for (UUID loopUuid : LOOP_PATH_UUIDS) {
@@ -466,10 +515,25 @@ public class WaveManager {
                             world = npcEntity.getWorld();
                         }
 
-                        IPrefabPath startPath = straightPath;
+                        // Every mob first heads toward the castle on a charge path.
+                        // Branching to flank/loop paths is handled at runtime by
+                        // startPositionTracking once their position changes.
+                        double zDist = pos.z - SPAWN_ORIGIN.z;
+                        UUID startUuid;
+                        IPrefabPath startPath;
+                        if (zDist > FAR_SPAWN_Z_THRESHOLD) {
+                            startUuid = CS_CHARGE_CASTLE_FAR_UUID;
+                            startPath = chargeFarPath;
+                        } else if (zDist > MED_SPAWN_Z_THRESHOLD) {
+                            startUuid = CS_CHARGE_CASTLE_MED_UUID;
+                            startPath = chargeMedPath;
+                        } else {
+                            startUuid = CS_CHARGE_CASTLE_CLOSE_UUID;
+                            startPath = straightPath;
+                        }
                         WAVE_SCHEDULER.schedule(
-                                () -> npcEntity.getPathManager().setPrefabPath(CS_CASTLE_STRAIGHT_UUID, startPath),
-                                500, TimeUnit.MILLISECONDS
+                                () -> npcEntity.getPathManager().setPrefabPath(startUuid, startPath),
+                                100, TimeUnit.MILLISECONDS
                         );
                     }
                 } else if (debug) {
@@ -484,12 +548,13 @@ public class WaveManager {
         messageSender.accept("Wave " + waveNumber + " started! " + spawnCount + " mobs spawned.");
 
         if (world != null) {
-            startPositionTracking(store, world, loopPaths);
+            startPositionTracking(store, world, loopPaths, flankLeftPath);
         }
     }
 
     private static void startPositionTracking(Store<EntityStore> store, World world,
-                                              Map<UUID, IPrefabPath> loopPaths) {
+                                              Map<UUID, IPrefabPath> loopPaths,
+                                              IPrefabPath flankLeftPath) {
         ScheduledFuture<?> prev = positionTrackingTask;
         if (prev != null) {
             prev.cancel(false);
@@ -507,15 +572,29 @@ public class WaveManager {
                             continue;
                         }
                         Vector3d pos = transform.getPosition();
-                        if (pos.z <= Z_THRESHOLD) {
+                        if (pos.x >= COURTYARD_X_MIN && pos.x <= COURTYARD_X_MAX
+                                && pos.z >= COURTYARD_Z_MIN && pos.z <= COURTYARD_Z_MAX) {
                             crossedZThreshold.add(mobRef);
                             NPCEntity npc = waveMobEntities.get(mobRef);
                             if (npc != null) {
                                 UUID chosenUuid = LOOP_PATH_UUIDS[RANDOM.nextInt(LOOP_PATH_UUIDS.length)];
                                 IPrefabPath chosenPath = loopPaths.get(chosenUuid);
                                 npc.getPathManager().setPrefabPath(chosenUuid, chosenPath);
-                                System.out.printf("[CastleSiege] Mob entered castle (z=%.2f), assigned to loop %s%n",
-                                        pos.z, chosenPath.getName());
+                                System.out.printf("[CastleSiege] Mob entered castle (x=%.2f, z=%.2f), assigned to loop %s%n",
+                                        pos.x, pos.z, chosenPath.getName());
+                            }
+                            continue;
+                        }
+                        if (!flankedArchers.contains(mobRef)
+                                && pos.x >= OUTSIDE_X_MIN && pos.x <= OUTSIDE_X_MAX
+                                && pos.z >= OUTSIDE_Z_MIN && pos.z <= OUTSIDE_Z_MAX) {
+                            NPCEntity npc = waveMobEntities.get(mobRef);
+                            if (npc != null && npc.getRoleName() != null
+                                    && npc.getRoleName().contains("Archer")) {
+                                flankedArchers.add(mobRef);
+                                npc.getPathManager().setPrefabPath(CS_FLANK_LEFT_UUID, flankLeftPath);
+                                System.out.printf("[CastleSiege] Archer reached outside path (x=%.2f, z=%.2f), routed to %s%n",
+                                        pos.x, pos.z, flankLeftPath.getName());
                             }
                         }
                     }
@@ -523,7 +602,7 @@ public class WaveManager {
                     System.err.println("[CastleSiege] Position tracking error: " + e.getMessage());
                 }
             });
-        }, 1, 1, TimeUnit.SECONDS);
+        }, 250, 250, TimeUnit.MILLISECONDS);
     }
 
     static Vector3d computeSpawnPosition(Vector3d origin, int index) {
