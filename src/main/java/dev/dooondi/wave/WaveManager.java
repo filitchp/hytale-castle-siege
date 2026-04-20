@@ -230,8 +230,9 @@ public class WaveManager {
                     new MobEntry("Skeleton_Archer_Weak_CS", 4)
             )),
             Map.entry(7, List.of(
+                    new MobEntry("Snake_Rattle_Wave", 2),
                     new MobEntry("Skeleton_Weak_CS", 4),
-                    new MobEntry("Skeleton_Archer_Weak_CS", 6)
+                    new MobEntry("Skeleton_Archer_Weak_CS", 4)
             )),
             Map.entry(8, List.of(
                     new MobEntry("Skeleton_Weak_CS", 6),
@@ -440,7 +441,7 @@ public class WaveManager {
             refreshAllWaveHuds(store);
 
             EventTitleUtil.showEventTitleToWorld(
-                    Message.raw("Wave " + wave + " / " + getMaxWave() + " Defeated!"),
+                    Message.raw("Wave " + wave + " / " + getMaxWave() + " Complete!"),
                     Message.raw(""),
                     true,
                     EventTitleUtil.DEFAULT_ZONE,

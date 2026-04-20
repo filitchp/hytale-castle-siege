@@ -103,7 +103,9 @@ public final class WaveRewards {
             //       Wave 9
             // ------------------
             Map.entry(9, WaveRewardSet.startOnly(
-                    new RewardItem("Ore_Iron", 20)
+                    new RewardItem("Ore_Iron", 20),
+                    new RewardItem("Potion_Health_Greater", 1),
+                    new RewardItem("Wood_Oak_Trunk", 100)  // Finally some more wood!
             )),
             // ------------------
             //       Wave 10
