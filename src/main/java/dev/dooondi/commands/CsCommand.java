@@ -154,12 +154,8 @@ public class CsCommand extends AbstractTargetPlayerCommand {
                 int current = WaveManager.getCurrentWave();
                 int max = WaveManager.getMaxWave();
                 hud.setWaveLabel(current, max);
-                if (current == 0) {
-                    hud.setStatus("Type /cs next to begin");
-                } else if (current >= max) {
+                if (current >= max) {
                     hud.setStatus("All waves completed!");
-                } else {
-                    hud.setStatus("Type /cs next for next wave");
                 }
 
                 playerRef.sendMessage(Message.raw("Wave HUD shown."));

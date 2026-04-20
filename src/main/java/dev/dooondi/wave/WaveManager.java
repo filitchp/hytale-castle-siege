@@ -19,6 +19,7 @@ import com.hypixel.hytale.server.npc.NPCPlugin;
 import com.hypixel.hytale.server.npc.entities.NPCEntity;
 import com.hypixel.hytale.builtin.path.WorldPathData;
 import com.hypixel.hytale.builtin.path.path.IPrefabPath;
+import dev.dooondi.ui.WaveHUD;
 import it.unimi.dsi.fastutil.Pair;
 
 import java.nio.file.Files;
@@ -216,6 +217,7 @@ public class WaveManager {
                     new MobEntry("Snake_Rattle_Wave", 4)
             )),
             Map.entry(4, List.of(
+                    new MobEntry("Rat_Wave", 4),
                     new MobEntry("Snake_Rattle_Wave", 4),
                     new MobEntry("Skeleton_Weak_CS", 2)
             )),
@@ -435,6 +437,7 @@ public class WaveManager {
             }
             WaveRewards.awardWaveEnd(wave, store);
             WaveRewards.healAllPlayersToFull(store);
+            refreshAllWaveHuds(store);
 
             EventTitleUtil.showEventTitleToWorld(
                     Message.raw("Wave " + wave + " / " + getMaxWave() + " Defeated!"),
@@ -491,6 +494,7 @@ public class WaveManager {
         WaveRewards.awardWaveStart(waveNumber, store);
 
         playWaveStartSound(store);
+        refreshAllWaveHuds(store);
 
         // Show title to all players in the world.
         EventTitleUtil.showEventTitleToWorld(
@@ -603,6 +607,8 @@ public class WaveManager {
                             startUuid = CS_CHARGE_CASTLE_CLOSE_UUID;
                             startPath = straightPath;
                         }
+
+                        // TODO: is scheduler really needed here?
                         WAVE_SCHEDULER.schedule(
                                 () -> npcEntity.getPathManager().setPrefabPath(startUuid, startPath),
                                 100, TimeUnit.MILLISECONDS
@@ -634,8 +640,8 @@ public class WaveManager {
         positionTrackingTask = WAVE_SCHEDULER.scheduleAtFixedRate(() -> {
             // Enqueue the store read onto the world thread.
             world.execute(() -> {
-                try {
-                    for (Ref<EntityStore> mobRef : currentWaveMobs) {
+                for (Ref<EntityStore> mobRef : currentWaveMobs) {
+                    try {
                         if (crossedZThreshold.contains(mobRef)) {
                             continue;
                         }
@@ -671,15 +677,52 @@ public class WaveManager {
                                         pos.x, pos.z, chosenPath.getName());
                             }
                         }
+                    } catch (Exception e) {
+                        System.err.println("[CastleSiege] Position tracking dropped stale mob: " + e.getMessage());
+                        untrackStaleMob(mobRef, store);
                     }
-                } catch (Exception e) {
-                    System.err.println("[CastleSiege] Position tracking error: " + e.getMessage());
                 }
             });
         }, 250, 250, TimeUnit.MILLISECONDS);
     }
 
-    private static final String WAVE_START_SOUND_ID = "SFX_Skeleton_Praetorian_Alerted";
+    private static final String WAVE_START_SOUND_ID = "SFX_Eye_Void_Attack_Summon";
+
+    private static void untrackStaleMob(Ref<EntityStore> mobRef, Store<EntityStore> store) {
+        waveMobEntities.remove(mobRef);
+        crossedZThreshold.remove(mobRef);
+        flankedArchers.remove(mobRef);
+        // Forwards to the same end-of-wave bookkeeping recordMobDeath uses;
+        // null killer = no player kill credit.
+        recordMobDeath(mobRef, null, store);
+    }
+
+    public static void refreshAllWaveHuds(Store<EntityStore> store) {
+        int current = currentWave.get();
+        int max = getMaxWave();
+        String status;
+        if (current >= max && !isWaveInProgress()) {
+            status = "All waves completed!";
+        } else if (isWaveInProgress()) {
+            status = "Wave in progress...";
+        } else if (current == 0) {
+            status = "Type /cs next to begin";
+        } else {
+            status = "Type /cs next for next wave";
+        }
+
+        store.forEachChunk(Player.getComponentType(), (chunk, buffer) -> {
+            for (int i = 0; i < chunk.size(); i++) {
+                Ref<EntityStore> ref = chunk.getReferenceTo(i);
+                Player player = store.getComponent(ref, Player.getComponentType());
+                if (player == null) continue;
+                if (player.getHudManager().getCustomHud() instanceof WaveHUD hud) {
+                    hud.setWaveLabel(current, max);
+                    hud.setStatus(status);
+                }
+            }
+        });
+    }
 
     private static void playWaveStartSound(Store<EntityStore> store) {
         int idx = SoundEvent.getAssetMap().getIndexOrDefault(WAVE_START_SOUND_ID, -1);

@@ -17,7 +17,7 @@
     "WakingPeriod": [0, 24],
     "FollowPatrolPath": true,
     "BreathesInWater": false,
-    "DropList": "",
+    "DropList": "Drop_Rat",
     "Weapons": [],
     "OffHand": [],
     "_InteractionVars": {

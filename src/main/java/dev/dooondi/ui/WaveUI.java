@@ -46,13 +46,14 @@ public class WaveUI extends InteractiveCustomUIPage<WaveUI.Data> {
         int max = WaveManager.getMaxWave();
         int waveKills = WaveManager.getCurrentWaveKills();
         int waveTotal = WaveManager.getCurrentWaveTotalMobs();
+        int remaining = waveTotal - waveKills;
         int totalKills = WaveManager.getTotalKills();
         int myKills = WaveManager.getPlayerKills(playerRef.getUuid());
         int myDeaths = WaveManager.getPlayerDeaths(playerRef.getUuid());
 
         builder.set("#WaveLabel.TextSpans", Message.raw("Wave " + current + " / " + max));
         builder.set("#WaveKillLabel.TextSpans",
-                Message.raw("Wave Kills: " + waveKills + " / " + waveTotal));
+                Message.raw("Mobs Remaining: " + remaining + " out of " + waveTotal));
         builder.set("#PlayerKillLabel.TextSpans", Message.raw("Your Kills: " + myKills));
         builder.set("#DeathLabel.TextSpans", Message.raw("Your Deaths: " + myDeaths));
         builder.set("#TotalKillLabel.TextSpans", Message.raw("Mobs Killed: " + totalKills));
@@ -61,7 +62,7 @@ public class WaveUI extends InteractiveCustomUIPage<WaveUI.Data> {
         if (current >= max && !WaveManager.isWaveInProgress()) {
             status = "All waves complete!";
         } else if (WaveManager.isWaveInProgress()) {
-            status = "Wave in progress — clear it to continue";
+            status = "Wave in progress! " + remaining + " out of " + waveTotal + "mobs remain.";
         } else {
             status = "Click to start the next wave";
         }
