@@ -19,7 +19,6 @@
         "Skeleton",
         "Skeleton_Archer",
         "Skeleton_Ranger",
-        "Skeleton_Pirate_Striker",
         "Skeleton_Pirate_Gunner"
       ],
       "TypeHint": "String",

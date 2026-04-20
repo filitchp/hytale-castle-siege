@@ -263,49 +263,44 @@ public class WaveManager {
                     new MobEntry("Skeleton_Pirate_Captain_CS", 1)
             )),
             Map.entry(13, List.of(
-                    new MobEntry("Skeleton_Sturdy_CS", 4),
+                    new MobEntry("Skeleton_Archer_Weak_CS", 3),
+                    new MobEntry("Skeleton_Sturdy_CS", 3),
                     new MobEntry("Skeleton_Pirate_Gunner_CS", 2),
                     new MobEntry("Skeleton_Pirate_Striker_CS", 4),
-                    new MobEntry("Skeleton_Pirate_Captain_CS", 1),
-                    new MobEntry("Snake_Rattle_CS", 5)
+                    new MobEntry("Skeleton_Pirate_Captain_CS", 1)
             )),
             Map.entry(14, List.of(
-                    new MobEntry("Skeleton_Sturdy_CS", 2),
-                    new MobEntry("Skeleton_Pirate_Gunner_CS", 2),
+                    new MobEntry("Skeleton_Archer_Sturdy_CS", 3),
+                    new MobEntry("Skeleton_Sturdy_CS", 3),
+                    new MobEntry("Skeleton_Pirate_Gunner_CS", 3),
                     new MobEntry("Skeleton_Pirate_Striker_CS", 4),
-                    new MobEntry("Skeleton_Pirate_Captain_CS", 1),
-                    new MobEntry("Skeleton_Archer_Weak_CS", 4)
+                    new MobEntry("Skeleton_Pirate_Captain_CS", 1)
             )),
-            // TODO: boss
             Map.entry(15, List.of(
-                    new MobEntry("Skeleton_Pirate_Captain_CS", 6),
-                    new MobEntry("Skeleton_Weak_CS", 7),
-                    new MobEntry("Snake_Rattle_CS", 7)
+                    new MobEntry("Skeleton_Archer_Sturdy_CS", 3),
+                    new MobEntry("Skeleton_Pirate_Gunner_CS", 3),
+                    new MobEntry("Skeleton_Pirate_Captain_CS", 1),
+                    new MobEntry("Skeleton_Sturdy_CS", 6)
             )),
             Map.entry(16, List.of(
-                    new MobEntry("Skeleton_Pirate_Captain_CS", 7),
-                    new MobEntry("Snake_Rattle_CS", 8),
+                    new MobEntry("Skeleton_Pirate_Captain_CS", 1),
                     new MobEntry("Skeleton_Weak_CS", 6)
             )),
             Map.entry(17, List.of(
                     new MobEntry("Skeleton_Pirate_Captain_CS", 8),
-                    new MobEntry("Snake_Rattle_CS", 6),
                     new MobEntry("Skeleton_Weak_CS", 8)
             )),
             Map.entry(18, List.of(
                     new MobEntry("Skeleton_Pirate_Captain_CS", 8),
-                    new MobEntry("Snake_Rattle_CS", 8),
                     new MobEntry("Skeleton_Weak_CS", 8)
             )),
             Map.entry(19, List.of(
                     new MobEntry("Skeleton_Pirate_Captain_CS", 9),
-                    new MobEntry("Snake_Rattle_CS", 9),
                     new MobEntry("Skeleton_Weak_CS", 8)
             )),
             // TODO: boss
             Map.entry(20, List.of(
                     new MobEntry("Skeleton_Pirate_Captain_CS", 10),
-                    new MobEntry("Snake_Rattle_CS", 10),
                     new MobEntry("Skeleton_Weak_CS", 10)
             ))
     );

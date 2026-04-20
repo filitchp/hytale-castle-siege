@@ -32,8 +32,8 @@
     }
   },
   "Modify": {
-    "MaxHealth": 72,
-    "MaxSpeed": 14,
+    "MaxHealth": 120,
+    "MaxSpeed": 16,
     "RunThreshold": 0.1,
     "HearingRange": 2,
     "ViewSector": 270,
