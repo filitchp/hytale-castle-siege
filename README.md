@@ -65,5 +65,9 @@ For in-depth configuration, you can visit the [ScaffoldIt Plugin Docs](https://s
 - [Hytale Modding Discord](https://discord.gg/hytalemodding)
 - [ScaffoldIt Plugin Docs](https://scaffoldit.dev)
 
+## Credits
+- https://fontstruct.com/fontstructions/download/2828592
+
 ## License
 MIT
+

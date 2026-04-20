@@ -134,6 +134,33 @@ public final class WaveRewards {
                     List.of(new RewardItem("Ore_Thorium", 15)),
                     // End of wave
                     List.of(new RewardItem("Potion_Health_Greater", 2))
+            )),
+            // ------------------
+            //       Wave 13
+            // ------------------
+            Map.entry(13, WaveRewardSet.of(
+                    // Start of wave
+                    List.of(new RewardItem("Ore_Thorium", 20)),
+                    // End of wave
+                    List.of(new RewardItem("Potion_Health_Greater", 2))
+            )),
+            // ------------------
+            //       Wave 14
+            // ------------------
+            Map.entry(14, WaveRewardSet.of(
+                    // Start of wave
+                    List.of(new RewardItem("Ore_Thorium", 25)),
+                    // End of wave
+                    List.of(new RewardItem("Potion_Health_Greater", 2))
+            )),
+            // ------------------
+            //       Wave 15
+            // ------------------
+            Map.entry(15, WaveRewardSet.of(
+                    // Start of wave
+                    List.of(new RewardItem("Ore_Adamantite", 10)),
+                    // End of wave
+                    List.of(new RewardItem("Potion_Health_Greater", 2))
             ))
     );
 
@@ -167,7 +194,7 @@ public final class WaveRewards {
                 if (missing > 0f) {
                     stats.addStatValue(healthIdx, missing);
                 }
-                player.sendMessage(Message.raw("Wave cleared — you've been fully healed."));
+//                player.sendMessage(Message.raw("Wave cleared — you've been fully healed."));
             }
         });
     }

@@ -9,13 +9,18 @@
     "ViewRange": 4,
     "HearingRange": 4,
     "AlertedRange": 5,
+    "ApplySeparation": {
+      "Compute": "ApplySeparation"
+    },
+    "FollowPatrolPath": {
+      "Compute": "FollowPatrolPath"
+    },
     "Attack": "Root_NPC_Rat_Attack",
     "AttackDistance": 2,
     "CombatBehaviorDistance": 3,
     "CombatBackOffAfterAttack": false,
     "ChaseRelativeSpeed": 0.6,
     "WakingPeriod": [0, 24],
-    "FollowPatrolPath": true,
     "BreathesInWater": false,
     "DropList": "Drop_Rat",
     "Weapons": [

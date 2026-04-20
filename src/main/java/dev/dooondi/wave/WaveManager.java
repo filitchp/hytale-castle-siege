@@ -4,7 +4,12 @@ import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.math.vector.Vector3d;
 import com.hypixel.hytale.math.vector.Vector3f;
+import com.hypixel.hytale.protocol.SoundCategory;
 import com.hypixel.hytale.server.core.Message;
+import com.hypixel.hytale.server.core.asset.type.soundevent.config.SoundEvent;
+import com.hypixel.hytale.server.core.entity.entities.Player;
+import com.hypixel.hytale.server.core.universe.PlayerRef;
+import com.hypixel.hytale.server.core.universe.world.SoundUtil;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.npc.INonPlayerCharacter;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
@@ -485,6 +490,8 @@ public class WaveManager {
         // Hand out start-of-wave rewards before any mobs spawn.
         WaveRewards.awardWaveStart(waveNumber, store);
 
+        playWaveStartSound(store);
+
         // Show title to all players in the world.
         EventTitleUtil.showEventTitleToWorld(
                 Message.raw("Starting Wave " + waveNumber + " / " + getMaxWave()),
@@ -670,6 +677,21 @@ public class WaveManager {
                 }
             });
         }, 250, 250, TimeUnit.MILLISECONDS);
+    }
+
+    private static final String WAVE_START_SOUND_ID = "SFX_Skeleton_Praetorian_Alerted";
+
+    private static void playWaveStartSound(Store<EntityStore> store) {
+        int idx = SoundEvent.getAssetMap().getIndexOrDefault(WAVE_START_SOUND_ID, -1);
+        if (idx < 0) return;
+        store.forEachChunk(Player.getComponentType(), (chunk, buffer) -> {
+            for (int i = 0; i < chunk.size(); i++) {
+                Ref<EntityStore> ref = chunk.getReferenceTo(i);
+                PlayerRef pr = store.getComponent(ref, PlayerRef.getComponentType());
+                if (pr == null) continue;
+                SoundUtil.playSoundEvent2dToPlayer(pr, idx, SoundCategory.SFX);
+            }
+        });
     }
 
     static Vector3d computeSpawnPosition(Vector3d origin, int index) {
