@@ -1,0 +1,80 @@
+{
+  "Type": "Variant",
+  "Reference": "Template_Intelligent",
+  "Parameters": {
+    "WanderRadius": {
+      "Value": 3,
+      "Description": "General wander radius for idle wander and wander on the break."
+    },
+    "FollowPatrolPath": {
+      "Value": true,
+      "Description": "Whether this NPC will follow patrol paths at all."
+    },
+    "Patrol": {
+      "Value": false,
+      "Description": "Whether or not this NPC will patrol during its waking hours, either alone or as part of a group."
+    },
+    "FlockArray": {
+      "Value": [
+        "Skeleton",
+        "Skeleton_Knight",
+        "Skeleton_Soldier"
+      ],
+      "TypeHint": "String",
+      "Description": "Array containing NPCs for this flock type."
+    },
+    "ApplySeparation": {
+      "Value": false,
+      "Description": "When set to false, NPCs wont try to avoid each other or player, it can lead to them stacking together, but can help to avoid jerky-like movement in enclosed space."
+    },
+    "NameTranslationKey": {
+      "Value": "server.npcRoles.Skeleton_Knight.name",
+      "Description": "Translation key for NPC name display"
+    }
+  },
+  "Modify": {
+    "MaxHealth": 60,
+    "MaxSpeed": 14,
+    "RunThreshold": 0.1,
+    "HearingRange": 2,
+    "ViewSector": 270,
+    "WakingPeriod": [
+      0,
+      24
+    ],
+    "DropList": "",
+    "Appearance": "Skeleton_Knight",
+    "Weapons": [
+      "Weapon_Battleaxe_Iron"
+    ],
+    "FlockArray": {
+      "Compute": "FlockArray"
+    },
+    "FollowPatrolPath": {
+      "Compute": "FollowPatrolPath"
+    },
+    "Patrol": {
+      "Compute": "Patrol"
+    },
+    "WanderRadius": {
+      "Compute": "WanderRadius"
+    },
+    "AttackDistance": 3.5,
+    "DesiredAttackDistanceRange": [
+      1.5, 2.2
+    ],
+    "CombatMessageTargetGroups": [
+      "Skeleton"
+    ],
+    "ApplySeparation": {
+      "Compute": "ApplySeparation"
+    },
+    "IsMemory": true,
+    "MemoriesCategory": "Undead",
+    "MemoriesNameOverride": "Skeleton_Knight",
+    "BreathesInWater": false,
+    "NameTranslationKey": {
+      "Compute": "NameTranslationKey"
+    }
+  }
+}

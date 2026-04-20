@@ -207,18 +207,18 @@ public class WaveManager {
 
     public static final Map<Integer, List<MobEntry>> WAVE_TABLE = Map.ofEntries(
             Map.entry(1, List.of(
-                    new MobEntry("Rat_Wave", 4)
+                    new MobEntry("Rat_CS", 4)
             )),
             Map.entry(2, List.of(
-                    new MobEntry("Rat_Wave", 6)
+                    new MobEntry("Rat_CS", 6)
             )),
             Map.entry(3, List.of(
-                    new MobEntry("Rat_Wave", 4),
-                    new MobEntry("Snake_Rattle_Wave", 4)
+                    new MobEntry("Rat_CS", 4),
+                    new MobEntry("Snake_Rattle_CS", 4)
             )),
             Map.entry(4, List.of(
-                    new MobEntry("Rat_Wave", 4),
-                    new MobEntry("Snake_Rattle_Wave", 4),
+                    new MobEntry("Rat_CS", 4),
+                    new MobEntry("Snake_Rattle_CS", 4),
                     new MobEntry("Skeleton_Weak_CS", 2)
             )),
             Map.entry(5, List.of(
@@ -230,7 +230,7 @@ public class WaveManager {
                     new MobEntry("Skeleton_Archer_Weak_CS", 4)
             )),
             Map.entry(7, List.of(
-                    new MobEntry("Snake_Rattle_Wave", 2),
+                    new MobEntry("Snake_Rattle_CS", 2),
                     new MobEntry("Skeleton_Weak_CS", 4),
                     new MobEntry("Skeleton_Archer_Weak_CS", 4)
             )),
@@ -239,63 +239,73 @@ public class WaveManager {
                     new MobEntry("Skeleton_Archer_Weak_CS", 6)
             )),
             Map.entry(9, List.of(
-                    new MobEntry("Skeleton_Pirate_Captain_Wave", 2),
+                    new MobEntry("Skeleton_Pirate_Captain_CS", 2),
                     new MobEntry("Skeleton_Weak_CS", 6),
                     new MobEntry("Skeleton_Archer_Weak_CS", 6)
             )),
             // TODO: boss
             Map.entry(10, List.of(
-                    new MobEntry("Skeleton_Pirate_Captain_Wave", 2),
-                    new MobEntry("Snake_Rattle_Wave", 4)
+                    new MobEntry("Skeleton_Pirate_Captain_CS", 1),
+                    new MobEntry("Skeleton_Pirate_Gunner_CS", 1),
+                    new MobEntry("Skeleton_Pirate_Striker_CS", 1),
+                    new MobEntry("Snake_Rattle_CS", 4)
             )),
             Map.entry(11, List.of(
-                    new MobEntry("Skeleton_Pirate_Captain_Wave", 3),
+                    new MobEntry("Skeleton_Pirate_Captain_CS", 1),
+                    new MobEntry("Skeleton_Pirate_Gunner_CS", 1),
+                    new MobEntry("Skeleton_Pirate_Striker_CS", 2),
                     new MobEntry("Skeleton_Weak_CS", 4)
             )),
             Map.entry(12, List.of(
-                    new MobEntry("Skeleton_Pirate_Captain_Wave", 4),
-                    new MobEntry("Skeleton_Weak_CS", 5)
+                    new MobEntry("Skeleton_Sturdy_CS", 2),
+                    new MobEntry("Skeleton_Pirate_Gunner_CS", 2),
+                    new MobEntry("Skeleton_Pirate_Striker_CS", 2),
+                    new MobEntry("Skeleton_Pirate_Captain_CS", 1)
             )),
             Map.entry(13, List.of(
-                    new MobEntry("Skeleton_Pirate_Captain_Wave", 5),
-                    new MobEntry("Skeleton_Weak_CS", 6),
-                    new MobEntry("Snake_Rattle_Wave", 5)
+                    new MobEntry("Skeleton_Sturdy_CS", 4),
+                    new MobEntry("Skeleton_Pirate_Gunner_CS", 2),
+                    new MobEntry("Skeleton_Pirate_Striker_CS", 4),
+                    new MobEntry("Skeleton_Pirate_Captain_CS", 1),
+                    new MobEntry("Snake_Rattle_CS", 5)
             )),
             Map.entry(14, List.of(
-                    new MobEntry("Skeleton_Pirate_Captain_Wave", 5),
-                    new MobEntry("Skeleton_Weak_CS", 6),
-                    new MobEntry("Rat_Wave", 6)
+                    new MobEntry("Skeleton_Sturdy_CS", 2),
+                    new MobEntry("Skeleton_Pirate_Gunner_CS", 2),
+                    new MobEntry("Skeleton_Pirate_Striker_CS", 4),
+                    new MobEntry("Skeleton_Pirate_Captain_CS", 1),
+                    new MobEntry("Skeleton_Archer_Weak_CS", 4)
             )),
             // TODO: boss
             Map.entry(15, List.of(
-                    new MobEntry("Skeleton_Pirate_Captain_Wave", 6),
+                    new MobEntry("Skeleton_Pirate_Captain_CS", 6),
                     new MobEntry("Skeleton_Weak_CS", 7),
-                    new MobEntry("Snake_Rattle_Wave", 7)
+                    new MobEntry("Snake_Rattle_CS", 7)
             )),
             Map.entry(16, List.of(
-                    new MobEntry("Skeleton_Pirate_Captain_Wave", 7),
-                    new MobEntry("Snake_Rattle_Wave", 8),
+                    new MobEntry("Skeleton_Pirate_Captain_CS", 7),
+                    new MobEntry("Snake_Rattle_CS", 8),
                     new MobEntry("Skeleton_Weak_CS", 6)
             )),
             Map.entry(17, List.of(
-                    new MobEntry("Skeleton_Pirate_Captain_Wave", 8),
-                    new MobEntry("Snake_Rattle_Wave", 6),
+                    new MobEntry("Skeleton_Pirate_Captain_CS", 8),
+                    new MobEntry("Snake_Rattle_CS", 6),
                     new MobEntry("Skeleton_Weak_CS", 8)
             )),
             Map.entry(18, List.of(
-                    new MobEntry("Skeleton_Pirate_Captain_Wave", 8),
-                    new MobEntry("Snake_Rattle_Wave", 8),
+                    new MobEntry("Skeleton_Pirate_Captain_CS", 8),
+                    new MobEntry("Snake_Rattle_CS", 8),
                     new MobEntry("Skeleton_Weak_CS", 8)
             )),
             Map.entry(19, List.of(
-                    new MobEntry("Skeleton_Pirate_Captain_Wave", 9),
-                    new MobEntry("Snake_Rattle_Wave", 9),
+                    new MobEntry("Skeleton_Pirate_Captain_CS", 9),
+                    new MobEntry("Snake_Rattle_CS", 9),
                     new MobEntry("Skeleton_Weak_CS", 8)
             )),
             // TODO: boss
             Map.entry(20, List.of(
-                    new MobEntry("Skeleton_Pirate_Captain_Wave", 10),
-                    new MobEntry("Snake_Rattle_Wave", 10),
+                    new MobEntry("Skeleton_Pirate_Captain_CS", 10),
+                    new MobEntry("Snake_Rattle_CS", 10),
                     new MobEntry("Skeleton_Weak_CS", 10)
             ))
     );
@@ -360,6 +370,10 @@ public class WaveManager {
 
     public static int getCurrentWaveTotalMobs() {
         return currentWaveTotalMobs.get();
+    }
+
+    public static int getMobsRemaining() {
+        return currentWaveMobs.size();
     }
 
     public static boolean isWaveInProgress() {
@@ -428,6 +442,8 @@ public class WaveManager {
         if (killerUuid != null) {
             playerKills.computeIfAbsent(killerUuid, k -> new AtomicInteger(0)).incrementAndGet();
         }
+
+        refreshAllWaveHuds(store);
 
         // Last mob in the wave just died — hand out end-of-wave rewards and show title.
         if (currentWaveMobs.isEmpty()) {
@@ -701,16 +717,7 @@ public class WaveManager {
     public static void refreshAllWaveHuds(Store<EntityStore> store) {
         int current = currentWave.get();
         int max = getMaxWave();
-        String status;
-        if (current >= max && !isWaveInProgress()) {
-            status = "All waves completed!";
-        } else if (isWaveInProgress()) {
-            status = "Wave in progress...";
-        } else if (current == 0) {
-            status = "Type /cs next to begin";
-        } else {
-            status = "Type /cs next for next wave";
-        }
+        String status = computeHudStatus();
 
         store.forEachChunk(Player.getComponentType(), (chunk, buffer) -> {
             for (int i = 0; i < chunk.size(); i++) {
@@ -723,6 +730,20 @@ public class WaveManager {
                 }
             }
         });
+    }
+
+    public static void refreshWaveHud(WaveHUD hud) {
+        hud.setWaveLabel(currentWave.get(), getMaxWave());
+        hud.setStatus(computeHudStatus());
+    }
+
+    private static String computeHudStatus() {
+        int current = currentWave.get();
+        int max = getMaxWave();
+        if (current >= max && !isWaveInProgress()) {
+            return "All waves completed!";
+        }
+        return "Mobs remaining: " + getMobsRemaining();
     }
 
     private static void playWaveStartSound(Store<EntityStore> store) {

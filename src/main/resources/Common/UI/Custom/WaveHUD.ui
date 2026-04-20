@@ -17,7 +17,7 @@ Group {
     Label #WaveStatus {
       Style: (FontSize: 16, Alignment: Center);
       Anchor: (Top: 5);
-      Text: "Type /startwave to begin";
+      Text: "Mobs remaining: 0";
       Padding: (Full: 5);
     }
   }

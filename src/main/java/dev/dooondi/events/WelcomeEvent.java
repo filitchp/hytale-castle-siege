@@ -15,6 +15,8 @@ import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.spawn.ISpawnProvider;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import com.hypixel.hytale.protocol.GameMode;
+import dev.dooondi.ui.WaveHUD;
+import dev.dooondi.wave.WaveManager;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -42,6 +44,12 @@ public class WelcomeEvent {
                     CompletableFuture.runAsync(
                             () -> player.moveTo(ref, pos.x, pos.y, pos.z, store), world);
                 }
+
+                CompletableFuture.runAsync(() -> {
+                    WaveHUD hud = new WaveHUD(playerRef);
+                    player.getHudManager().setCustomHud(playerRef, hud);
+                    WaveManager.refreshWaveHud(hud);
+                }, world);
             }
         }
 

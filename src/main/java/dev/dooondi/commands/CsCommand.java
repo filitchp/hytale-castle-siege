@@ -150,14 +150,7 @@ public class CsCommand extends AbstractTargetPlayerCommand {
             } else {
                 WaveHUD hud = new WaveHUD(playerRef);
                 player.getHudManager().setCustomHud(playerRef, hud);
-
-                int current = WaveManager.getCurrentWave();
-                int max = WaveManager.getMaxWave();
-                hud.setWaveLabel(current, max);
-                if (current >= max) {
-                    hud.setStatus("All waves completed!");
-                }
-
+                WaveManager.refreshWaveHud(hud);
                 playerRef.sendMessage(Message.raw("Wave HUD shown."));
             }
         }, world);
