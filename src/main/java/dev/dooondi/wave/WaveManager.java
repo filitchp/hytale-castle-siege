@@ -321,7 +321,7 @@ public class WaveManager {
     // is too tall to fit under the castle gate.
     private static final String BOSS_ROLE = "Skeleton_Burnt_Praetorian_CS";
     private static final Vector3d BOSS_SPAWN_POS = new Vector3d(0.0, 80.0, -27.5); // Courtyard center
-    private static final long BOSS_SPAWN_DELAY_MS = 2500;
+    private static final long BOSS_SPAWN_DELAY_MS = 4000;
     private static final String BOSS_PARTICLE = "Praetorian_Summon_Energy";
     private static final AtomicBoolean pendingBoss = new AtomicBoolean(false);
 
