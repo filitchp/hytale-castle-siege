@@ -227,7 +227,8 @@ public class WaveManager {
             )),
             Map.entry(6, List.of(
                     new MobEntry("Skeleton_Weak_CS", 4),
-                    new MobEntry("Skeleton_Archer_Weak_CS", 4)
+                    new MobEntry("Skeleton_Archer_Weak_CS", 4),
+                    new MobEntry("Skeleton_Archer_Sturdy_CS", 4)
             )),
             Map.entry(7, List.of(
                     new MobEntry("Snake_Rattle_CS", 2),
@@ -283,24 +284,25 @@ public class WaveManager {
                     new MobEntry("Skeleton_Sturdy_CS", 6)
             )),
             Map.entry(16, List.of(
-                    new MobEntry("Skeleton_Archer_Sturdy_CS", 3),
-                    new MobEntry("Skeleton_Pirate_Gunner_CS", 3),
-                    new MobEntry("Skeleton_Pirate_Captain_CS", 1),
+                    new MobEntry("Skeleton_Archer_Weak_CS", 6),
+                    new MobEntry("Skeleton_Archer_Sturdy_CS", 6),
+                    new MobEntry("Spawn_Void_CS", 1),
                     new MobEntry("Skeleton_Sturdy_CS", 6)
             )),
             Map.entry(17, List.of(
-                    new MobEntry("Skeleton_Archer_Sturdy_CS", 3),
-                    new MobEntry("Skeleton_Pirate_Gunner_CS", 3),
-                    new MobEntry("Skeleton_Pirate_Captain_CS", 1),
-                    new MobEntry("Skeleton_Sturdy_CS", 6)
+                    new MobEntry("Skeleton_Archer_Weak_CS", 8),
+                    new MobEntry("Skeleton_Archer_Sturdy_CS", 6),
+                    new MobEntry("Spawn_Void_CS", 2),
+                    new MobEntry("Skeleton_Sturdy_CS", 8)
             )),
             Map.entry(18, List.of(
-                    new MobEntry("Skeleton_Archer_Sturdy_CS", 3),
-                    new MobEntry("Skeleton_Pirate_Gunner_CS", 3),
-                    new MobEntry("Skeleton_Pirate_Captain_CS", 1),
-                    new MobEntry("Skeleton_Sturdy_CS", 6)
+                    new MobEntry("Skeleton_Archer_Weak_CS", 10),
+                    new MobEntry("Skeleton_Archer_Sturdy_CS", 6),
+                    new MobEntry("Spawn_Void_CS", 2),
+                    new MobEntry("Skeleton_Sturdy_CS", 8)
             )),
             Map.entry(19, List.of(
+                    new MobEntry("Skeleton_Archer_Weak_CS", 10),
                     new MobEntry("Skeleton_Archer_Sturdy_CS", 3),
                     new MobEntry("Skeleton_Pirate_Gunner_CS", 3),
                     new MobEntry("Skeleton_Pirate_Captain_CS", 1),
@@ -546,6 +548,8 @@ public class WaveManager {
             messageSender.accept("Unknown wave number: " + waveNumber + ". Valid range is 1-20.");
             return;
         }
+
+        currentWave.set(waveNumber);
 
         // Reset wave-scoped tracking.
         currentWaveMobs.clear();
