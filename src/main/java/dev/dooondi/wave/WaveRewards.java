@@ -167,6 +167,7 @@ public final class WaveRewards {
                     // Start of wave
                     List.of(new RewardItem("Ore_Adamantite", 25), // Straight to adamantite
                             new RewardItem("Ingredient_Leather_Heavy", 8),
+                            new RewardItem("Ingredient_Venom", 2),
                             new RewardItem("Wood_Oak_Trunk", 50)),
                     // End of wave
                     List.of(new RewardItem("Potion_Health_Greater", 1)) // Back off a little on the health

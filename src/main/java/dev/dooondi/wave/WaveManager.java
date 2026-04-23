@@ -283,20 +283,28 @@ public class WaveManager {
                     new MobEntry("Skeleton_Sturdy_CS", 6)
             )),
             Map.entry(16, List.of(
+                    new MobEntry("Skeleton_Archer_Sturdy_CS", 3),
+                    new MobEntry("Skeleton_Pirate_Gunner_CS", 3),
                     new MobEntry("Skeleton_Pirate_Captain_CS", 1),
-                    new MobEntry("Skeleton_Weak_CS", 6)
+                    new MobEntry("Skeleton_Sturdy_CS", 6)
             )),
             Map.entry(17, List.of(
-                    new MobEntry("Skeleton_Pirate_Captain_CS", 8),
-                    new MobEntry("Skeleton_Weak_CS", 8)
+                    new MobEntry("Skeleton_Archer_Sturdy_CS", 3),
+                    new MobEntry("Skeleton_Pirate_Gunner_CS", 3),
+                    new MobEntry("Skeleton_Pirate_Captain_CS", 1),
+                    new MobEntry("Skeleton_Sturdy_CS", 6)
             )),
             Map.entry(18, List.of(
-                    new MobEntry("Skeleton_Pirate_Captain_CS", 8),
-                    new MobEntry("Skeleton_Weak_CS", 8)
+                    new MobEntry("Skeleton_Archer_Sturdy_CS", 3),
+                    new MobEntry("Skeleton_Pirate_Gunner_CS", 3),
+                    new MobEntry("Skeleton_Pirate_Captain_CS", 1),
+                    new MobEntry("Skeleton_Sturdy_CS", 6)
             )),
             Map.entry(19, List.of(
-                    new MobEntry("Skeleton_Pirate_Captain_CS", 9),
-                    new MobEntry("Skeleton_Weak_CS", 8)
+                    new MobEntry("Skeleton_Archer_Sturdy_CS", 3),
+                    new MobEntry("Skeleton_Pirate_Gunner_CS", 3),
+                    new MobEntry("Skeleton_Pirate_Captain_CS", 1),
+                    new MobEntry("Skeleton_Sturdy_CS", 6)
             )),
             // TODO: boss
             Map.entry(20, List.of(
@@ -319,6 +327,51 @@ public class WaveManager {
 
     public static int getMaxWave() {
         return 20;
+    }
+
+    public record MobCombatStats(double attackDistance, double dps) {}
+    public record WaveStatsSummary(int totalMobs, double meleeDps, double rangedDps,
+                                   List<String> unknownRoles) {}
+
+    private static final double RANGED_DISTANCE_THRESHOLD = 5.0;
+
+    // Per-role attack distance pulled straight from each Wave/*.json. DPS values are
+    // approximations: weapon-base damage / typical swing-or-shot interval. Update
+    // when new wave roles land or when balance shifts.
+    private static final Map<String, MobCombatStats> MOB_STATS = Map.ofEntries(
+            Map.entry("Rat_CS",                       new MobCombatStats(2.0,  2.0)),  // bite
+            Map.entry("Snake_Rattle_CS",              new MobCombatStats(2.0,  3.0)),  // bite
+            Map.entry("Skeleton_Weak_CS",             new MobCombatStats(3.0,  5.0)),  // bone sword
+            Map.entry("Skeleton_Sturdy_CS",           new MobCombatStats(3.5,  8.0)),  // iron battleaxe
+            Map.entry("Skeleton_Pirate_Captain_CS",   new MobCombatStats(3.0,  7.0)),  // cutlass
+            Map.entry("Skeleton_Pirate_Striker_CS",   new MobCombatStats(3.0,  7.0)),  // cutlass
+            Map.entry("Skeleton_Pirate_Gunner_CS",    new MobCombatStats(15.0, 5.0)),  // blunderbuss
+            Map.entry("Skeleton_Archer_Weak_CS",      new MobCombatStats(25.0, 3.5)),  // rusty shortbow
+            Map.entry("Skeleton_Archer_Sturdy_CS",    new MobCombatStats(25.0, 5.0))   // iron shortbow
+    );
+
+    public static WaveStatsSummary computeWaveStats(int waveNumber) {
+        List<MobEntry> entries = WAVE_TABLE.get(waveNumber);
+        if (entries == null) return new WaveStatsSummary(0, 0.0, 0.0, List.of());
+        int total = 0;
+        double melee = 0.0;
+        double ranged = 0.0;
+        java.util.List<String> unknown = new java.util.ArrayList<>();
+        for (MobEntry e : entries) {
+            total += e.count();
+            MobCombatStats s = MOB_STATS.get(e.name());
+            if (s == null) {
+                unknown.add(e.name());
+                continue;
+            }
+            double dps = s.dps() * e.count();
+            if (s.attackDistance() > RANGED_DISTANCE_THRESHOLD) {
+                ranged += dps;
+            } else {
+                melee += dps;
+            }
+        }
+        return new WaveStatsSummary(total, melee, ranged, unknown);
     }
 
     /**

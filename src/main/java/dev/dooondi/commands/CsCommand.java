@@ -39,10 +39,10 @@ public class CsCommand extends AbstractTargetPlayerCommand {
     private final FlagArg confirmArg;
 
     public CsCommand() {
-        super("cs", "Castle Siege command. Actions: reset [--confirm], ui, hud, wave <n>, next");
+        super("cs", "Castle Siege command. Actions: reset [--confirm], ui, hud, wave <n>, next, debugmobs");
 
         this.actionArg = this.withRequiredArg(
-                "action", "Actions: reset, ui, hud, wave, next", ArgTypes.STRING);
+                "action", "Actions: reset, ui, hud, wave, next, debugmobs", ArgTypes.STRING);
         this.waveArg = this.withOptionalArg(
                 "wave", "Wave number for the 'wave' action (1-20)", ArgTypes.INTEGER);
         this.confirmArg = this.withFlagArg(
@@ -70,9 +70,11 @@ public class CsCommand extends AbstractTargetPlayerCommand {
             executeWave(commandContext, store);
         } else if ("next".equalsIgnoreCase(action)) {
             executeNext(commandContext, store);
+        } else if ("debugmobs".equalsIgnoreCase(action)) {
+            executeDebugMobs(commandContext);
         } else {
             commandContext.sendMessage(Message.raw(
-                    "Unknown action: " + action + ". Supported: reset, ui, hud, wave, next"));
+                    "Unknown action: " + action + ". Supported: reset, ui, hud, wave, next, debugmobs"));
         }
     }
 
@@ -170,5 +172,42 @@ public class CsCommand extends AbstractTargetPlayerCommand {
     private void executeNext(CommandContext commandContext, Store<EntityStore> store) {
         WaveManager.spawnNextWave(store,
                 msg -> commandContext.sendMessage(Message.raw(msg)));
+    }
+
+    private void executeDebugMobs(CommandContext commandContext) {
+        int max = WaveManager.getMaxWave();
+        String header = "=== Wave Stats (mobs / melee DPS / ranged DPS) ===";
+        commandContext.sendMessage(Message.raw(header));
+        System.out.println("[CastleSiege] " + header);
+
+        int totalMobsAll = 0;
+        double totalMeleeAll = 0.0;
+        double totalRangedAll = 0.0;
+        java.util.Set<String> unknownAll = new java.util.LinkedHashSet<>();
+
+        for (int w = 1; w <= max; w++) {
+            WaveManager.WaveStatsSummary s = WaveManager.computeWaveStats(w);
+            totalMobsAll += s.totalMobs();
+            totalMeleeAll += s.meleeDps();
+            totalRangedAll += s.rangedDps();
+            unknownAll.addAll(s.unknownRoles());
+            String line = String.format(
+                    "Wave %2d: %3d mobs | %6.1f melee DPS | %6.1f ranged DPS",
+                    w, s.totalMobs(), s.meleeDps(), s.rangedDps());
+            commandContext.sendMessage(Message.raw(line));
+            System.out.println("[CastleSiege] " + line);
+        }
+
+        String totalLine = String.format(
+                "TOTAL  : %3d mobs | %6.1f melee DPS | %6.1f ranged DPS",
+                totalMobsAll, totalMeleeAll, totalRangedAll);
+        commandContext.sendMessage(Message.raw(totalLine));
+        System.out.println("[CastleSiege] " + totalLine);
+
+        if (!unknownAll.isEmpty()) {
+            String warn = "WARN: missing MOB_STATS entries for: " + String.join(", ", unknownAll);
+            commandContext.sendMessage(Message.raw(warn));
+            System.out.println("[CastleSiege] " + warn);
+        }
     }
 }
