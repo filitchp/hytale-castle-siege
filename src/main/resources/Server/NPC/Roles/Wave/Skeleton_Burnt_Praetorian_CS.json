@@ -1,0 +1,81 @@
+{
+  "Type": "Variant",
+  "Reference": "Template_Intelligent",
+  "Parameters": {
+    "WanderRadius": {
+      "Value": 3,
+      "Description": "General wander radius for idle wander and wander on the break."
+    },
+    "FollowPatrolPath": {
+      "Value": true,
+      "Description": "Whether this NPC will follow patrol paths at all."
+    },
+    "Patrol": {
+      "Value": false,
+      "Description": "Whether or not this NPC will patrol during its waking hours, either alone or as part of a group."
+    },
+    "FlockArray": {
+      "Value": [
+        "Skeleton_Burnt_Praetorian"
+      ],
+      "TypeHint": "String",
+      "Description": "Array containing NPCs for this flock type."
+    },
+    "ApplySeparation": {
+      "Value": false,
+      "Description": "When set to false, NPCs wont try to avoid each other or player, it can lead to them stacking together, but can help to avoid jerky-like movement in enclosed space."
+    },
+    "NameTranslationKey": {
+      "Value": "server.npcRoles.Skeleton_Burnt_Praetorian.name",
+      "Description": "Translation key for NPC name display"
+    }
+  },
+  "Modify": {
+    "MaxHealth": 600,
+    "MaxSpeed": 12,
+    "RunThreshold": 0.1,
+    "HearingRange": 2,
+    "ViewSector": 270,
+    "WakingPeriod": [
+      0,
+      24
+    ],
+    "DropList": "",
+    "Appearance": "Skeleton_Burnt_Praetorian",
+    "Weapons": [
+      "Weapon_Longsword_Praetorian_NPC"
+    ],
+    "OffHand": [
+      "Weapon_Shield_Praetorian"
+    ],
+    "DefaultOffHandSlot": 0,
+    "LeashMinPlayerDistance": 18,
+    "FlockArray": {
+      "Compute": "FlockArray"
+    },
+    "FollowPatrolPath": {
+      "Compute": "FollowPatrolPath"
+    },
+    "Patrol": {
+      "Compute": "Patrol"
+    },
+    "WanderRadius": {
+      "Compute": "WanderRadius"
+    },
+    "UseCombatActionEvaluator": true,
+    "_CombatConfig": "CAE_Skeleton_Praetorian",
+    "CombatMessageTargetGroups": [
+      "Skeleton"
+    ],
+    "ApplySeparation": {
+      "Compute": "ApplySeparation"
+    },
+    "IsMemory": true,
+    "MemoriesCategory": "Undead",
+    "MemoriesNameOverride": "Skeleton_Burnt_Praetorian",
+    "BreathesInWater": true,
+    "NameTranslationKey": {
+      "Compute": "NameTranslationKey"
+    }
+  }
+}

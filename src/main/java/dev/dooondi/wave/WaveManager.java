@@ -9,6 +9,7 @@ import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.asset.type.soundevent.config.SoundEvent;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
+import com.hypixel.hytale.server.core.universe.world.ParticleUtil;
 import com.hypixel.hytale.server.core.universe.world.SoundUtil;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.npc.INonPlayerCharacter;
@@ -35,6 +36,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
@@ -308,12 +310,20 @@ public class WaveManager {
                     new MobEntry("Skeleton_Pirate_Captain_CS", 1),
                     new MobEntry("Skeleton_Sturdy_CS", 6)
             )),
-            // TODO: boss
             Map.entry(20, List.of(
                     new MobEntry("Skeleton_Pirate_Captain_CS", 10),
-                    new MobEntry("Skeleton_Weak_CS", 10)
+                    new MobEntry("Skeleton_Weak_CS", 10),
+                    new MobEntry("Skeleton_Burnt_Praetorian_CS", 1)
             ))
     );
+
+    // Boss summon happens at the courtyard center because the Burnt Praetorian
+    // is too tall to fit under the castle gate.
+    private static final String BOSS_ROLE = "Skeleton_Burnt_Praetorian_CS";
+    private static final Vector3d BOSS_SPAWN_POS = new Vector3d(0.0, 80.0, -27.5); // Courtyard center
+    private static final long BOSS_SPAWN_DELAY_MS = 2500;
+    private static final String BOSS_PARTICLE = "Praetorian_Summon_Energy";
+    private static final AtomicBoolean pendingBoss = new AtomicBoolean(false);
 
     private static final int MAX_COLS = 3;
     private static final double ROW_SPACING = 3.0;
@@ -349,7 +359,8 @@ public class WaveManager {
             Map.entry("Skeleton_Pirate_Striker_CS",   new MobCombatStats(3.0,  7.0)),  // cutlass
             Map.entry("Skeleton_Pirate_Gunner_CS",    new MobCombatStats(15.0, 5.0)),  // blunderbuss
             Map.entry("Skeleton_Archer_Weak_CS",      new MobCombatStats(25.0, 3.5)),  // rusty shortbow
-            Map.entry("Skeleton_Archer_Sturdy_CS",    new MobCombatStats(25.0, 5.0))   // iron shortbow
+            Map.entry("Skeleton_Archer_Sturdy_CS",    new MobCombatStats(25.0, 5.0)),  // iron shortbow
+            Map.entry("Skeleton_Burnt_Praetorian_CS", new MobCombatStats(4.0, 18.0))   // praetorian longsword + charge
     );
 
     public static WaveStatsSummary computeWaveStats(int waveNumber) {
@@ -427,7 +438,7 @@ public class WaveManager {
     }
 
     public static boolean isWaveInProgress() {
-        return !currentWaveMobs.isEmpty();
+        return !currentWaveMobs.isEmpty() || pendingBoss.get();
     }
 
     public static int getPlayerKills(UUID playerUuid) {
@@ -467,6 +478,7 @@ public class WaveManager {
         flankedArchers.clear();
         playerKills.clear();
         playerDeaths.clear();
+        pendingBoss.set(false);
         lastDefeatedWave.set(0);
         saveProgress();
     }
@@ -496,7 +508,8 @@ public class WaveManager {
         refreshAllWaveHuds(store);
 
         // Last mob in the wave just died — hand out end-of-wave rewards and show title.
-        if (currentWaveMobs.isEmpty()) {
+        // Don't fire end-of-wave logic if a boss summon is mid-flight; wait for him to land.
+        if (currentWaveMobs.isEmpty() && !pendingBoss.get()) {
             int wave = currentWave.get();
             if (wave > lastDefeatedWave.get()) {
                 lastDefeatedWave.set(wave);
@@ -558,6 +571,7 @@ public class WaveManager {
         crossedZThreshold.clear();
         flankedArchers.clear();
         waveMobEntities.clear();
+        pendingBoss.set(false);
 
         // Hand out start-of-wave rewards before any mobs spawn.
         WaveRewards.awardWaveStart(waveNumber, store);
@@ -636,7 +650,12 @@ public class WaveManager {
         int spawnCount = 0;
         int mobIndex = 0;
         World world = null;
+        boolean hasBoss = false;
         for (MobEntry entry : entries) {
+            if (BOSS_ROLE.equals(entry.name())) {
+                hasBoss = true;
+                continue; // Boss is spawned separately with particles + delay.
+            }
             for (int i = 0; i < entry.count(); i++) {
                 Vector3d pos = computeSpawnPosition(SPAWN_ORIGIN, mobIndex);
 
@@ -696,7 +715,73 @@ public class WaveManager {
 
         if (world != null) {
             startPositionTracking(store, world, loopPaths, flankPaths);
+            if (hasBoss) {
+                IPrefabPath bossLoopPath = loopPaths.get(CS_COURTYARD_LOOP_UUID);
+                scheduleBossSpawn(store, world, waveNumber, bossLoopPath, messageSender);
+            }
         }
+    }
+
+    private static void scheduleBossSpawn(Store<EntityStore> store, World world,
+                                          int waveNumber, IPrefabPath bossLoopPath,
+                                          Consumer<String> messageSender) {
+        pendingBoss.set(true);
+        spawnBossSummonParticles(store);
+        messageSender.accept("A dread chill fills the courtyard...");
+
+        WAVE_SCHEDULER.schedule(() -> world.execute(() -> {
+            try {
+                if (currentWave.get() != waveNumber) {
+                    pendingBoss.set(false);
+                    return;
+                }
+                Vector3f rotation = new Vector3f(0f, 0f, 0f);
+                Pair<Ref<EntityStore>, INonPlayerCharacter> result =
+                        NPCPlugin.get().spawnNPC(store, BOSS_ROLE, null, BOSS_SPAWN_POS, rotation);
+                if (result == null) {
+                    pendingBoss.set(false);
+                    messageSender.accept("ERROR: Boss failed to spawn.");
+                    return;
+                }
+                NPCEntity npcEntity = store.getComponent(result.first(), NPCEntity.getComponentType());
+                if (npcEntity == null) {
+                    pendingBoss.set(false);
+                    messageSender.accept("ERROR: Boss spawned without NPCEntity component.");
+                    return;
+                }
+                currentWaveMobs.add(result.first());
+                waveMobEntities.put(result.first(), npcEntity);
+                currentWaveTotalMobs.incrementAndGet();
+                // Boss already in courtyard; mark as crossed so the position tracker leaves him alone.
+                crossedZThreshold.add(result.first());
+                pendingBoss.set(false);
+                refreshAllWaveHuds(store);
+                messageSender.accept("THE BURNT PRAETORIAN HAS RISEN!");
+
+                if (bossLoopPath != null) {
+                    WAVE_SCHEDULER.schedule(
+                            () -> npcEntity.getPathManager().setPrefabPath(CS_COURTYARD_LOOP_UUID, bossLoopPath),
+                            500, TimeUnit.MILLISECONDS
+                    );
+                }
+            } catch (Exception e) {
+                pendingBoss.set(false);
+                System.err.println("[CastleSiege] Boss spawn failed: " + e.getMessage());
+            }
+        }), BOSS_SPAWN_DELAY_MS, TimeUnit.MILLISECONDS);
+    }
+
+    private static void spawnBossSummonParticles(Store<EntityStore> store) {
+        ParticleUtil.spawnParticleEffect(BOSS_PARTICLE, BOSS_SPAWN_POS, store);
+        double r = 1.5;
+        ParticleUtil.spawnParticleEffect(BOSS_PARTICLE,
+                new Vector3d(BOSS_SPAWN_POS.x + r, BOSS_SPAWN_POS.y, BOSS_SPAWN_POS.z), store);
+        ParticleUtil.spawnParticleEffect(BOSS_PARTICLE,
+                new Vector3d(BOSS_SPAWN_POS.x - r, BOSS_SPAWN_POS.y, BOSS_SPAWN_POS.z), store);
+        ParticleUtil.spawnParticleEffect(BOSS_PARTICLE,
+                new Vector3d(BOSS_SPAWN_POS.x, BOSS_SPAWN_POS.y, BOSS_SPAWN_POS.z + r), store);
+        ParticleUtil.spawnParticleEffect(BOSS_PARTICLE,
+                new Vector3d(BOSS_SPAWN_POS.x, BOSS_SPAWN_POS.y, BOSS_SPAWN_POS.z - r), store);
     }
 
     private static void startPositionTracking(Store<EntityStore> store, World world,

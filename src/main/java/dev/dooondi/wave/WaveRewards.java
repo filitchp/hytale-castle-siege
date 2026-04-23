@@ -116,7 +116,7 @@ public final class WaveRewards {
                             new RewardItem("Rubble_Marble", 50),
                             new RewardItem("Ingredient_Stick", 100)),
                     // End of wave
-                    List.of(new RewardItem("Potion_Health_Greater", 4))
+                    List.of(new RewardItem("Potion_Health_Greater", 1))
             )),
             // ------------------
             //       Wave 11
@@ -125,7 +125,7 @@ public final class WaveRewards {
                     // Start of wave
                     List.of(new RewardItem("Ore_Thorium", 10)),
                     // End of wave
-                    List.of(new RewardItem("Potion_Health_Greater", 2))
+                    List.of(new RewardItem("Potion_Health_Greater", 1))
             )),
             // ------------------
             //       Wave 12
@@ -138,7 +138,7 @@ public final class WaveRewards {
 
                     ),
                     // End of wave
-                    List.of(new RewardItem("Potion_Health_Greater", 2))
+                    List.of(new RewardItem("Potion_Health_Greater", 1))
             )),
             // ------------------
             //       Wave 13
@@ -178,7 +178,11 @@ public final class WaveRewards {
             Map.entry(16, WaveRewardSet.of(
                     // Start of wave
                     List.of(new RewardItem("Ore_Adamantite", 25),
-                            new RewardItem("Ingredient_Leather_Heavy", 8)),
+                            new RewardItem("Ingredient_Leather_Heavy", 8),
+                            new RewardItem("Ingredient_Venom", 2),
+                            new RewardItem("Ingredient_Fabric_Cloth_Cindercloth", 6)
+
+                    ),
                     // End of wave
                     List.of(new RewardItem("Potion_Health_Greater", 1)) // Back off a little on the health
             )),
@@ -190,7 +194,22 @@ public final class WaveRewards {
                     List.of(new RewardItem("Wood_Oak_Trunk", 50)), // Not a lucky wave!
                     // End of wave
                     List.of(new RewardItem("Potion_Health_Greater", 1)) // Back off a little on the health
+            )),
+
+            // ------------------
+            //       Wave 18
+            // ------------------
+            Map.entry(18, WaveRewardSet.endOnly(
+                    new RewardItem("Potion_Health_Greater", 1) // Better save these
+            )),
+
+            // ------------------
+            //       Wave 19
+            // ------------------
+            Map.entry(19, WaveRewardSet.endOnly(
+                    new RewardItem("Potion_Health_Greater", 1)  // One more for the boss
             ))
+
     );
 
     private WaveRewards() {}
