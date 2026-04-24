@@ -21,7 +21,7 @@ hytale {
     }
 
     manifest {
-        Group = "Doondi"
+        Group = "Dooondi"
         Name = "CastleSiege"
         Main = "dev.dooondi.CastleSiege"
     }

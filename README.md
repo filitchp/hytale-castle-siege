@@ -1,26 +1,33 @@
-# Hytale Castle Siege Mini Game
+# Hytale Castle Siege Minigame
 
-### External Guides
+[![Java](https://img.shields.io/badge/Java-v25.0-bf710a?style=for-the-badge)](https://openjdk.org)
+[![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE.md)
 
-### General
-- https://britakee-studios.gitbook.io/hytale-modding-documentation
+Castle Siege is a cooperative tower-defense inspired minigame for Hytale. Defend your castle against 20 waves of increasingly difficult mobs. 
+Play it solo or with your friends.
 
-#### Player Interaction
-- https://www.youtube.com/watch?v=SITX2Mgdqqc
-- https://github.com/OwnerAli/Hytale-Template/tree/feature/interactive
+#### How It Works
+Run Castle Siege locally or on a server. At spawn, you receive a custom game tool "hammer" - right-click it to open the minigame UI and start the first wave.&nbsp; Enemies march in formation - utilizing Hytale's prefab AI path hints - forcing players to choose their strategy carefully. Clear every mob in a wave to advance to the next one.
 
-#### NPCs
-- https://hytale.com/news/2026/2/npc-technical-rundown
-- https://hytalemodding.dev/en/docs/official-documentation/npc/9-inter-npc-interaction
-- https://hytale.game/en/mastering-npc-commands/
-- 
-## Original Getting Started Content
+#### Features
+- 20 hand-crafted waves - Enemy composition scales from easy to tricky.
+- Rewards - Earn crafting materials (wood, ore, health potions, etc) during each wave. Use them to gear up between waves.
+- Co-op multiplayer - All players fight together. Per-player stats and team stats are tracked.
 
-A ready-to-use starting point for creating Hytale server plugins with Java, _or Kotlin_. If you've
-been using the Asset Editor and want to start writing server-side logic — custom commands, event
-handling, gameplay systems — this is the simplest place to begin.
+#### Getting Started
+1. Install the mod on in Hytale or your dedicated server.
+2. Join the included world and use `cs reset --confirm` to prepare the world. Your items will be replaced with the bare basics: a crude ax and a Castle Siege game tool "hammer"
+3. Right click while holding the Castle Siege "hammer" to open the Wave UI and start Wave 1.
+4. Fight!
 
-## How to start?
+#### Commands
+The game includes the following in-game commands:
+TODO
+
+## Developer Guide
+The code was used the [Hytale Modding plugin template](https://github.com/HytaleModding/plugin-template).
+
+See the complete getting started guide [here](https://hytalemodding.dev/en/docs/guides/plugin/setting-up-env#setting-up-your-workspace)
 
 1. Copy the template by downloading it or using the "Use this template" button.
 2. [Configure or Install the Java SDK](https://hytalemodding.dev/en/docs/guides/plugin/setting-up-env)
@@ -59,14 +66,25 @@ For in-depth configuration, you can visit the [ScaffoldIt Plugin Docs](https://s
 - **Hot-reload doesn't work** –
   _Verify you're using JetBrains Runtime, not a regular JDK._
 
-## Resources
+## Additional Resources
 
+### General
 - [Hytale Modding Guides](https://hytalemodding.dev)
 - [Hytale Modding Discord](https://discord.gg/hytalemodding)
 - [ScaffoldIt Plugin Docs](https://scaffoldit.dev)
+- [Hytale Modding Guide by Britakee Studios](https://britakee-studios.gitbook.io/hytale-modding-documentation)
+
+#### Player Interaction
+- https://www.youtube.com/watch?v=SITX2Mgdqqc
+- [Interactive Items Example Source by OwnerAli](https://github.com/OwnerAli/Hytale-Template/tree/feature/interactive)
+
+#### NPCs
+- https://hytale.com/news/2026/2/npc-technical-rundown
+- https://hytalemodding.dev/en/docs/official-documentation/npc/9-inter-npc-interaction
+- https://hytale.game/en/mastering-npc-commands/
 
 ## Credits
-- https://fontstruct.com/fontstructions/download/2828592
+- [MTN Hytale font by Martin Costa](https://fontstruct.com/fontstructions/download/2828592)
 
 ## License
 MIT

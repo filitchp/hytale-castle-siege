@@ -4,6 +4,7 @@ import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.math.vector.Vector3d;
 import com.hypixel.hytale.math.vector.Vector3f;
+import com.hypixel.hytale.protocol.Color;
 import com.hypixel.hytale.protocol.SoundCategory;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.asset.type.soundevent.config.SoundEvent;
@@ -311,8 +312,7 @@ public class WaveManager {
                     new MobEntry("Skeleton_Sturdy_CS", 6)
             )),
             Map.entry(20, List.of(
-                    new MobEntry("Skeleton_Pirate_Captain_CS", 10),
-                    new MobEntry("Skeleton_Weak_CS", 10),
+                    new MobEntry("Skeleton_Archer_Weak_CS", 10),
                     new MobEntry("Skeleton_Burnt_Praetorian_CS", 1)
             ))
     );
@@ -323,6 +323,8 @@ public class WaveManager {
     private static final Vector3d BOSS_SPAWN_POS = new Vector3d(0.0, 80.0, -27.5); // Courtyard center
     private static final long BOSS_SPAWN_DELAY_MS = 4000;
     private static final String BOSS_PARTICLE = "Praetorian_Summon_Energy";
+    private static final float BOSS_PARTICLE_SCALE = 4.0f;
+    private static final Color BOSS_PARTICLE_COLOR = new Color((byte) 0xFF, (byte) 0xFF, (byte) 0xFF);
     private static final AtomicBoolean pendingBoss = new AtomicBoolean(false);
 
     private static final int MAX_COLS = 3;
@@ -711,7 +713,7 @@ public class WaveManager {
             }
         }
 
-        messageSender.accept("Wave " + waveNumber + " started! " + spawnCount + " mobs spawned.");
+//        messageSender.accept("Wave " + waveNumber + " started! " + spawnCount + " mobs spawned.");
 
         if (world != null) {
             startPositionTracking(store, world, loopPaths, flankPaths);
@@ -727,7 +729,7 @@ public class WaveManager {
                                           Consumer<String> messageSender) {
         pendingBoss.set(true);
         spawnBossSummonParticles(store);
-        messageSender.accept("A dread chill fills the courtyard...");
+        messageSender.accept("A dreadful chill fills the courtyard...");
 
         WAVE_SCHEDULER.schedule(() -> world.execute(() -> {
             try {
@@ -772,16 +774,27 @@ public class WaveManager {
     }
 
     private static void spawnBossSummonParticles(Store<EntityStore> store) {
-        ParticleUtil.spawnParticleEffect(BOSS_PARTICLE, BOSS_SPAWN_POS, store);
+        // Convenience overloads don't expose particle scale, so collect player refs
+        // ourselves and call the scale-aware variant directly.
+        java.util.List<Ref<EntityStore>> playerRefs = new java.util.ArrayList<>();
+        store.forEachChunk(Player.getComponentType(), (chunk, buffer) -> {
+            for (int i = 0; i < chunk.size(); i++) {
+                playerRefs.add(chunk.getReferenceTo(i));
+            }
+        });
+
+        spawnScaledParticle(BOSS_SPAWN_POS, playerRefs, store);
         double r = 1.5;
-        ParticleUtil.spawnParticleEffect(BOSS_PARTICLE,
-                new Vector3d(BOSS_SPAWN_POS.x + r, BOSS_SPAWN_POS.y, BOSS_SPAWN_POS.z), store);
-        ParticleUtil.spawnParticleEffect(BOSS_PARTICLE,
-                new Vector3d(BOSS_SPAWN_POS.x - r, BOSS_SPAWN_POS.y, BOSS_SPAWN_POS.z), store);
-        ParticleUtil.spawnParticleEffect(BOSS_PARTICLE,
-                new Vector3d(BOSS_SPAWN_POS.x, BOSS_SPAWN_POS.y, BOSS_SPAWN_POS.z + r), store);
-        ParticleUtil.spawnParticleEffect(BOSS_PARTICLE,
-                new Vector3d(BOSS_SPAWN_POS.x, BOSS_SPAWN_POS.y, BOSS_SPAWN_POS.z - r), store);
+        spawnScaledParticle(new Vector3d(BOSS_SPAWN_POS.x + r, BOSS_SPAWN_POS.y, BOSS_SPAWN_POS.z), playerRefs, store);
+        spawnScaledParticle(new Vector3d(BOSS_SPAWN_POS.x - r, BOSS_SPAWN_POS.y, BOSS_SPAWN_POS.z), playerRefs, store);
+        spawnScaledParticle(new Vector3d(BOSS_SPAWN_POS.x, BOSS_SPAWN_POS.y, BOSS_SPAWN_POS.z + r), playerRefs, store);
+        spawnScaledParticle(new Vector3d(BOSS_SPAWN_POS.x, BOSS_SPAWN_POS.y, BOSS_SPAWN_POS.z - r), playerRefs, store);
+    }
+
+    private static void spawnScaledParticle(Vector3d pos, java.util.List<Ref<EntityStore>> playerRefs,
+                                            Store<EntityStore> store) {
+        ParticleUtil.spawnParticleEffect(BOSS_PARTICLE, pos,
+                0f, 0f, 0f, BOSS_PARTICLE_SCALE, BOSS_PARTICLE_COLOR, playerRefs, store);
     }
 
     private static void startPositionTracking(Store<EntityStore> store, World world,
@@ -875,9 +888,9 @@ public class WaveManager {
     }
 
     private static String computeHudStatus() {
-        int current = currentWave.get();
-        int max = getMaxWave();
-        if (current >= max && !isWaveInProgress()) {
+        // "Completed" only after the final wave has actually been beaten —
+        // not during wave 20 startup, before mobs (or the boss) have spawned.
+        if (lastDefeatedWave.get() >= getMaxWave()) {
             return "All waves completed!";
         }
         return "Mobs remaining: " + getMobsRemaining();
