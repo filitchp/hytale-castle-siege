@@ -242,7 +242,7 @@ public final class WaveRewards {
                 if (missing > 0f) {
                     stats.addStatValue(healthIdx, missing);
                 }
-//                player.sendMessage(Message.raw("Wave cleared — you've been fully healed."));
+//                player.sendMessage(Message.raw("Wave cleared - you've been fully healed."));
             }
         });
     }

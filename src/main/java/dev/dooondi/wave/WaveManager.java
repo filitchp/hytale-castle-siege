@@ -495,7 +495,7 @@ public class WaveManager {
     public static void recordMobDeath(Ref<EntityStore> mobRef, UUID killerUuid,
                                       Store<EntityStore> store) {
         if (!currentWaveMobs.remove(mobRef)) {
-            // Not a tracked wave mob — ignore (still count toward lifetime totals).
+            // Not a tracked wave mob - ignore (still count toward lifetime totals).
             totalKills.incrementAndGet();
             if (killerUuid != null) {
                 playerKills.computeIfAbsent(killerUuid, k -> new AtomicInteger(0)).incrementAndGet();
@@ -510,7 +510,7 @@ public class WaveManager {
 
         refreshAllWaveHuds(store);
 
-        // Last mob in the wave just died — hand out end-of-wave rewards and show title.
+        // Last mob in the wave just died - hand out end-of-wave rewards and show title.
         // Don't fire end-of-wave logic if a boss summon is mid-flight; wait for him to land.
         if (currentWaveMobs.isEmpty() && !pendingBoss.get()) {
             int wave = currentWave.get();
@@ -899,7 +899,7 @@ public class WaveManager {
     }
 
     private static String computeHudStatus() {
-        // "Completed" only after the final wave has actually been beaten —
+        // "Completed" only after the final wave has actually been beaten -
         // not during wave 20 startup, before mobs (or the boss) have spawned.
         if (lastDefeatedWave.get() >= getMaxWave()) {
             return "All waves completed!";

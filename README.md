@@ -4,7 +4,7 @@
 [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE.md)
 
 Castle Siege is a cooperative tower-defense inspired minigame for Hytale. Defend your castle against 20 waves of increasingly difficult mobs. 
-Play it solo or with your friends.
+Play it solo or with your friends. **[Download it here](https://legacy.curseforge.com/hytale/worlds/castle-siege)**
 
 ### How It Works
 Run Castle Siege locally or on a server. At spawn, you receive a custom game tool "hammer" - right-click it to open the minigame UI and start the first wave.&nbsp; Enemies march in formation - utilizing Hytale's prefab AI path hints - forcing players to choose their strategy carefully. Clear every mob in a wave to advance to the next one.
@@ -36,11 +36,18 @@ Run Castle Siege locally or on a server. At spawn, you receive a custom game too
 
 ### Commands
 The game includes the following in-game commands:
-TODO
 
-Use the command `/cs reset --confirm` to prepare the world. Your items will be replaced with the bare basics: a crude ax and a Castle Siege game tool "hammer"
+- `/cs <action>` - Castle Siege control command. Available to all players. Actions:
+  - `reset --confirm` - Resets the wave counter to 0, despawns all wave NPCs, teleports every player to spawn, and replaces their inventory with just the Wave Hammer and a Crude Axe. Run without `--confirm` first to see a summary.
+  - `ui` - Opens the Wave UI page (same as right-clicking the Castle Siege hammer).
+  - `hud` - Toggles the Wave HUD overlay on/off.
+  - `wave --wave <n>` - Jumps to and starts wave `n` (1–20).
+  - `next` - Starts the next wave.
+  - `debugmobs` - Prints per-wave mob counts and DPS estimates to chat and the server log.
 
-### For Developers
+Use `/cs reset --confirm` to prepare the world. Your items will be replaced with the bare basics: a crude ax and a Castle Siege game tool "hammer".
+
+## For Developers
 Castle Siege use the **[Hytale Modding plugin template](https://github.com/HytaleModding/plugin-template)** so give check them out and give them lots of support!
 
 See their complete getting started guide [here](https://hytalemodding.dev/en/docs/guides/plugin/setting-up-env#setting-up-your-workspace)
@@ -58,7 +65,6 @@ See their complete getting started guide [here](https://hytalemodding.dev/en/doc
 
 With that you will be prompted in the output to authorize your server, and then you can start
 developing your plugin while the server is live reloading the code changes.
-
 
 ### Scaffoldit Plugin
 

@@ -256,7 +256,7 @@ public class PrefabPathCommand extends AbstractTargetPlayerCommand {
         pathData.removePrefabPathWaypoint(target.getWorldGenId(), pathUuid, order);
 
         commandContext.sendMessage(Message.raw(String.format(
-                "Deleted waypoint %d at (%.1f, %.1f, %.1f) — distance: %.1f blocks",
+                "Deleted waypoint %d at (%.1f, %.1f, %.1f) - distance: %.1f blocks",
                 order, closestPos.x, closestPos.y, closestPos.z, Math.sqrt(closestDist))));
     }
 
@@ -298,7 +298,7 @@ public class PrefabPathCommand extends AbstractTargetPlayerCommand {
         for (int i = 0; i < sorted.size(); i++) {
             PathDistance pd = sorted.get(i);
             int nodeCount = pd.path().getPathWaypoints().size();
-            System.out.printf("[CastleSiege]   %d. %s (%d nodes) — %.1f blocks away%n",
+            System.out.printf("[CastleSiege]   %d. %s (%d nodes) - %.1f blocks away%n",
                     i + 1, pd.path().getName(), nodeCount, Math.sqrt(pd.distance()));
         }
         System.out.println("[CastleSiege] ===== end =====");
