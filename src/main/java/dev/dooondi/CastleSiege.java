@@ -27,6 +27,7 @@ public class CastleSiege extends JavaPlugin {
     @Override
     protected void setup() {
         WaveManager.initPersistence(this.getDataDirectory());
+        WelcomeEvent.initPersistence(this.getDataDirectory());
 
         CsCommand csCommand = new CsCommand();
         this.getCommandRegistry().registerCommand(csCommand);
