@@ -1,5 +1,3 @@
-/devserver_backup
-
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
@@ -44,5 +42,8 @@ build/
 ### Gradle ###
 .gradle
 .kotlin
-devserver
-/.idea/
+/com
+/temp_assets
+/release
+/devserver*
+/media/gitignore
