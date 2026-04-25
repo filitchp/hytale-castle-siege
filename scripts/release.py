@@ -5,6 +5,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from PIL import Image
+
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 MANIFEST_PATH = PROJECT_ROOT / "src" / "main" / "resources" / "manifest.json"
 
@@ -47,6 +49,15 @@ def main() -> int:
         PROJECT_ROOT / "build" / "libs" / "dev.dooondi.castlesiege.jar",
         mods_dir / "dev.dooondi.castlesiege.jar",
     )
+
+    target_w, target_h = 576, 360
+    with Image.open(PROJECT_ROOT / "media" / "icon.png") as icon:
+        scaled_h = round(icon.height * target_w / icon.width)
+        scaled = icon.resize((target_w, scaled_h), Image.LANCZOS)
+        crop_top = (scaled_h - target_h) // 2 - 40
+        scaled.crop((0, crop_top, target_w, crop_top + target_h)).save(
+            world_dir / "preview.png"
+        )
 
     print(f"Release prepared at {release_dir}")
     return 0
