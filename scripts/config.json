@@ -1,0 +1,43 @@
+{
+  "Version": 4,
+  "ServerName": "CastleSiege",
+  "MOTD": "",
+  "Password": "",
+  "MaxPlayers": 4,
+  "MaxViewRadius": 32,
+  "Defaults": {
+    "World": "default",
+    "GameMode": "Adventure"
+  },
+  "ConnectionTimeouts": {},
+  "RateLimit": {},
+  "Modules": {
+    "PathPlugin": {
+      "Modules": {}
+    }
+  },
+  "LogLevels": {},
+  "Mods": {
+    "Dooondi:CastleSiege": {
+      "Enabled": true
+    }
+  },
+  "DefaultModsEnabled": false,
+  "DisplayTmpTagsInStrings": false,
+  "PlayerStorage": {
+    "Type": "Hytale"
+  },
+  "AuthCredentialStore": {
+    "Type": "Encrypted",
+    "Path": "auth.enc"
+  },
+  "Update": {},
+  "Backup": {
+    "Enabled": true,
+    "FrequencyMinutes": 30,
+    "Directory": "backup",
+    "MaxCount": 5,
+    "ArchiveMaxCount": 5
+  },
+  "WorldMap": {}
+}

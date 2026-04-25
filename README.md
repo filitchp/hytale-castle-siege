@@ -29,8 +29,8 @@ Run Castle Siege locally or on a server. At spawn, you receive a custom game too
 
 2. Launch Hytale and state the world.
 3. Use the command `/cs reset --confirm` to prepare the world. Your items will be replaced with the bare basics: a crude ax and a Castle Siege game tool "hammer"
-3. Right click while holding the Castle Siege "hammer" to open the Wave UI and start Wave 1.
-4. Fight!
+4. Right click while holding the Castle Siege "hammer" to open the Wave UI and start Wave 1.
+5. Fight!
 
 ### Commands
 The game includes the following in-game commands:
