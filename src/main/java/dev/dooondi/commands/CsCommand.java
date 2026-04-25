@@ -41,6 +41,9 @@ public class CsCommand extends AbstractTargetPlayerCommand {
     public CsCommand() {
         super("cs", "Castle Siege command. Actions: reset [--confirm], ui, hud, wave <n>, next, debugmobs");
 
+        this.setPermissionGroups("CastleSiege");
+//        this.setPermissionGroups("Default");
+
         this.actionArg = this.withRequiredArg(
                 "action", "Actions: reset, ui, hud, wave, next, debugmobs", ArgTypes.STRING);
         this.waveArg = this.withOptionalArg(

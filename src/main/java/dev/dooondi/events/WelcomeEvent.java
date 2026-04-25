@@ -10,6 +10,7 @@ import com.hypixel.hytale.server.core.event.events.player.PlayerReadyEvent;
 import com.hypixel.hytale.server.core.inventory.InventoryComponent;
 import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.inventory.container.CombinedItemContainer;
+import com.hypixel.hytale.server.core.permissions.PermissionsModule;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.spawn.ISpawnProvider;
@@ -23,6 +24,7 @@ import java.util.concurrent.CompletableFuture;
 public class WelcomeEvent {
 
     public static final String HAMMER_ID = "CastleSiege_WaveHammer";
+    public static final String CS_PERMISSION_GROUP = "CastleSiege";
 
     public static void onPlayerReady(PlayerReadyEvent event) {
         Player player = event.getPlayer();
@@ -30,6 +32,11 @@ public class WelcomeEvent {
 
         Ref<EntityStore> ref = event.getPlayerRef();
         Store<EntityStore> store = ref.getStore();
+
+        PlayerRef joinPlayerRef = store.getComponent(ref, PlayerRef.getComponentType());
+        if (joinPlayerRef != null) {
+            PermissionsModule.get().addUserToGroup(joinPlayerRef.getUuid(), CS_PERMISSION_GROUP);
+        }
 
         // Defer teleport to the next tick so the game finishes restoring
         // the player's saved position before we override it.

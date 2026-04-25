@@ -2,6 +2,7 @@ package dev.dooondi;
 
 import com.hypixel.hytale.server.core.event.events.player.*;
 import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Interaction;
+import com.hypixel.hytale.server.core.permissions.PermissionsModule;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import dev.dooondi.commands.CsCommand;
@@ -27,8 +28,15 @@ public class CastleSiege extends JavaPlugin {
     protected void setup() {
         WaveManager.initPersistence(this.getDataDirectory());
 
-        this.getCommandRegistry().registerCommand(new CsCommand());
+        CsCommand csCommand = new CsCommand();
+        this.getCommandRegistry().registerCommand(csCommand);
         this.getCommandRegistry().registerCommand(new PrefabPathCommand());
+
+        if (csCommand.getPermission() != null) {
+            PermissionsModule.get().addGroupPermission(
+                    WelcomeEvent.CS_PERMISSION_GROUP,
+                    java.util.Set.of(csCommand.getPermission()));
+        }
 
         this.getEventRegistry().registerGlobal(PlayerReadyEvent.class, WelcomeEvent::onPlayerReady);
 
