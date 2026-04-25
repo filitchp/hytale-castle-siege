@@ -2,7 +2,7 @@
     "Group": "Dooondi",
     "Name": "CastleSiege",
     "Version": "1.0.0",
-    "Description": "Description of your plugin",
+    "Description": "Co-op tower-defense inspired minigame. Must use with the provided map",
     "Authors": [
         {
             "Name": "Dooondi",
@@ -15,7 +15,7 @@
             "Url": "https://pooky.world"
         }
     ],
-    "Website": "https://pooky.world",
+    "Website": "https://legacy.curseforge.com/hytale/mods/castle-siege",
     "DisabledByDefault": false,
     "IncludesAssetPack": false,
     "Dependencies": {},

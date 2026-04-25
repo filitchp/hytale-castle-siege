@@ -1,4 +1,4 @@
-# Hytale Castle Siege Minigame
+## Hytale Castle Siege Minigame
 
 [![Java](https://img.shields.io/badge/Java-v25.0-bf710a?style=for-the-badge)](https://openjdk.org)
 [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE.md)
@@ -6,21 +6,33 @@
 Castle Siege is a cooperative tower-defense inspired minigame for Hytale. Defend your castle against 20 waves of increasingly difficult mobs. 
 Play it solo or with your friends.
 
-#### How It Works
+### How It Works
 Run Castle Siege locally or on a server. At spawn, you receive a custom game tool "hammer" - right-click it to open the minigame UI and start the first wave.&nbsp; Enemies march in formation - utilizing Hytale's prefab AI path hints - forcing players to choose their strategy carefully. Clear every mob in a wave to advance to the next one.
 
-#### Features
+### Features
 - 20 hand-crafted waves - Enemy composition scales from easy to tricky.
 - Rewards - Earn crafting materials (wood, ore, health potions, etc) during each wave. Use them to gear up between waves.
 - Co-op multiplayer - All players fight together. Per-player stats and team stats are tracked.
 
-#### Getting Started
-1. Install the mod on in Hytale or your dedicated server.
-2. Join the included world and use `cs reset --confirm` to prepare the world. Your items will be replaced with the bare basics: a crude ax and a Castle Siege game tool "hammer"
+### Getting Started
+1. Add the world + mod to your Hytale Save directory or your dedicated server.
+
+    **Easiest way:**
+        Open the game launcher, go to **settings** (the gear icon next to the play button), and click "open directory" to find the UserData\Saves folder. 
+
+    **Key Locations:**
+   - Windows: `%appdata%\Hytale\UserData\Saves\`
+   - Linux: `~/.var/app/com.hypixel.HytaleLauncher/data/Hytale/UserData/Saves/`
+   - macOS: `~/Library/Application Support/Hytale/UserData/Saves/`
+
+   Add the Castle Siege world there.
+
+2. Launch Hytale and state the world.
+3. Use the command `/cs reset --confirm` to prepare the world. Your items will be replaced with the bare basics: a crude ax and a Castle Siege game tool "hammer"
 3. Right click while holding the Castle Siege "hammer" to open the Wave UI and start Wave 1.
 4. Fight!
 
-#### Commands
+### Commands
 The game includes the following in-game commands:
 TODO
 

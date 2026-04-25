@@ -89,7 +89,7 @@ public class CsCommand extends AbstractTargetPlayerCommand {
 
         // All store-mutating work runs on the world thread.
         CompletableFuture.runAsync(() -> {
-            WaveManager.resetGame();
+            WaveManager.resetGame(store);
 
             ISpawnProvider spawnProvider = world.getWorldConfig().getSpawnProvider();
 

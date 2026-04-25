@@ -461,7 +461,7 @@ public class WaveManager {
      * Wipes all wave state and despawns tracked wave mobs. Must be called from
      * the world thread because setToDespawn touches NPC entity state.
      */
-    public static void resetGame() {
+    public static void resetGame(Store<EntityStore> store) {
         ScheduledFuture<?> prev = positionTrackingTask;
         if (prev != null) {
             prev.cancel(false);
@@ -483,6 +483,7 @@ public class WaveManager {
         pendingBoss.set(false);
         lastDefeatedWave.set(0);
         saveProgress();
+        refreshAllWaveHuds(store);
     }
 
     /**

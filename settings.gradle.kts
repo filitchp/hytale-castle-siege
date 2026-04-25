@@ -1,4 +1,4 @@
-rootProject.name = "dev.dooondi"
+rootProject.name = "dev.dooondi.castlesiege"
 
 plugins {
     // See documentation on https://scaffoldit.dev
