@@ -6,8 +6,15 @@
 Castle Siege is a cooperative tower-defense inspired minigame for Hytale. Defend your castle against 20 waves of increasingly difficult mobs. 
 Play it solo or with your friends. **[Download it here](https://legacy.curseforge.com/hytale/worlds/castle-siege)**
 
+<p align="center">
+  <a href="media/screenshots/main.jpg"><img src="media/screenshots/main.jpg" alt="Main" height="125"></a>
+  <a href="media/screenshots/gameplay-1.jpg"><img src="media/screenshots/gameplay-1.jpg" alt="Gameplay 1" width="200"></a>
+  <a href="media/screenshots/gameplay-2.jpg"><img src="media/screenshots/gameplay-2.jpg" alt="Gameplay 2" width="200"></a>
+  <a href="media/screenshots/gameplay-3.jpg"><img src="media/screenshots/gameplay-3.jpg" alt="Gameplay 3" width="200"></a>
+</p>
+
 ### How It Works
-Run Castle Siege locally or on a server. At spawn, you receive a custom game tool "hammer" - right-click it to open the minigame UI and start the first wave.&nbsp; Enemies march in formation - utilizing Hytale's prefab AI path hints - forcing players to choose their strategy carefully. Clear every mob in a wave to advance to the next one.
+Run Castle Siege locally or on a server. At spawn, you receive a custom game tool "hammer" - right-click it to open the minigame UI and start the first wave. Enemies march in formation - utilizing Hytale's prefab AI path hints - forcing players to choose their strategy carefully. Clear every mob in a wave to advance to the next one.
 
 ### Features
 - **20 hand-crafted waves** - Progressively difficult mob formations.
