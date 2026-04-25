@@ -522,15 +522,21 @@ public class WaveManager {
             WaveRewards.healAllPlayersToFull(store);
             refreshAllWaveHuds(store);
 
+            boolean finalWave = wave >= getMaxWave();
+            String subtitle = finalWave ? "Congrats, you beat Castle Siege!" : "";
             EventTitleUtil.showEventTitleToWorld(
                     Message.raw("Wave " + wave + " / " + getMaxWave() + " Complete!"),
-                    Message.raw(""),
+                    Message.raw(subtitle),
                     true,
                     EventTitleUtil.DEFAULT_ZONE,
                     EventTitleUtil.DEFAULT_DURATION,
                     EventTitleUtil.DEFAULT_FADE_DURATION,
                     EventTitleUtil.DEFAULT_FADE_DURATION,
                     store);
+
+            if (finalWave) {
+                playVictorySound(store);
+            }
         }
     }
 
@@ -826,8 +832,9 @@ public class WaveManager {
                                 UUID chosenUuid = INNER_CASTLE_LOOP_PATHS[RANDOM.nextInt(INNER_CASTLE_LOOP_PATHS.length)];
                                 IPrefabPath chosenPath = loopPaths.get(chosenUuid);
                                 npc.getPathManager().setPrefabPath(chosenUuid, chosenPath);
-                                System.out.printf("[CastleSiege] Mob entered castle (x=%.2f, z=%.2f), assigned to loop %s%n",
-                                        pos.x, pos.z, chosenPath.getName());
+                                // DEBUG
+                                // System.out.printf("[CastleSiege] Mob entered castle (x=%.2f, z=%.2f), assigned to loop %s%n",
+                                //        pos.x, pos.z, chosenPath.getName());
                             }
                             continue;
                         }
@@ -841,8 +848,8 @@ public class WaveManager {
                                 UUID chosenUuid = FLANK_PATH_UUIDS[RANDOM.nextInt(FLANK_PATH_UUIDS.length)];
                                 IPrefabPath chosenPath = flankPaths.get(chosenUuid);
                                 npc.getPathManager().setPrefabPath(chosenUuid, chosenPath);
-                                System.out.printf("[CastleSiege] Archer reached outside path (x=%.2f, z=%.2f), routed to %s%n",
-                                        pos.x, pos.z, chosenPath.getName());
+                                // System.out.printf("[CastleSiege] Archer reached outside path (x=%.2f, z=%.2f), routed to %s%n",
+                                //         pos.x, pos.z, chosenPath.getName());
                             }
                         }
                     } catch (Exception e) {
@@ -855,6 +862,9 @@ public class WaveManager {
     }
 
     private static final String WAVE_START_SOUND_ID = "SFX_Eye_Void_Attack_Summon";
+    private static final String VICTORY_SOUND_ID = "SFX_Discovery_Z1_Medium";
+    private static final float VICTORY_SOUND_VOLUME = 4.0f;
+    private static final float VICTORY_SOUND_PITCH = 1.0f;
 
     private static void untrackStaleMob(Ref<EntityStore> mobRef, Store<EntityStore> store) {
         waveMobEntities.remove(mobRef);
@@ -906,6 +916,20 @@ public class WaveManager {
                 PlayerRef pr = store.getComponent(ref, PlayerRef.getComponentType());
                 if (pr == null) continue;
                 SoundUtil.playSoundEvent2dToPlayer(pr, idx, SoundCategory.SFX);
+            }
+        });
+    }
+
+    private static void playVictorySound(Store<EntityStore> store) {
+        int idx = SoundEvent.getAssetMap().getIndexOrDefault(VICTORY_SOUND_ID, -1);
+        if (idx < 0) return;
+        store.forEachChunk(Player.getComponentType(), (chunk, buffer) -> {
+            for (int i = 0; i < chunk.size(); i++) {
+                Ref<EntityStore> ref = chunk.getReferenceTo(i);
+                PlayerRef pr = store.getComponent(ref, PlayerRef.getComponentType());
+                if (pr == null) continue;
+                SoundUtil.playSoundEvent2dToPlayer(
+                        pr, idx, SoundCategory.SFX, VICTORY_SOUND_VOLUME, VICTORY_SOUND_PITCH);
             }
         });
     }
