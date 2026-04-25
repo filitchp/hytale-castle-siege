@@ -92,6 +92,24 @@ For in-depth configuration, you can visit the [ScaffoldIt Plugin Docs](https://s
 - **Hot-reload doesn't work** –
   _Verify you're using JetBrains Runtime, not a regular JDK._
 
+### Releases
+
+Use `scripts/release.py` to package a distributable world for the version declared in `src/main/resources/manifest.json`.
+
+```
+python3 scripts/release.py
+```
+
+The script will:
+1. Temporarily set `IncludesAssetPack: true` in `manifest.json`, run `./gradlew build`, then restore the original manifest.
+2. Create `release/v{version}/Castle-Siege-World-v{version}/` containing:
+    - `config.json` (copied from `scripts/config.json`)
+    - `universe/` (copied from `devserver/universe`, with the `players/` directory stripped out)
+    - `mods/dev.dooondi.castlesiege.jar` (the freshly built plugin)
+    - `preview.png` (a 576x360 cropped/resized version of `media/icon.png`)
+
+**Requirements:** Python 3 with [Pillow](https://pypi.org/project/Pillow/) installed (`pip install Pillow`).
+
 ## Additional Resources
 
 ### General
