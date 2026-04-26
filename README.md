@@ -4,7 +4,7 @@
 [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE.md)
 
 Castle Siege is a cooperative tower-defense inspired minigame for Hytale. Defend your castle against 20 waves of increasingly difficult mobs. 
-Play it solo or with your friends. **[Download it here](https://legacy.curseforge.com/hytale/worlds/castle-siege)**
+Play it solo or with your friends. **[Download it here](https://www.curseforge.com/hytale/worlds/castle-siege)**
 
 <p align="center">
   <a href="media/screenshots/main.jpg"><img src="media/screenshots/main.jpg" alt="Main" height="125"></a>
