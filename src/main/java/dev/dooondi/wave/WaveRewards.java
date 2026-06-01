@@ -8,6 +8,7 @@ import com.hypixel.hytale.server.core.inventory.ItemStack;
 import com.hypixel.hytale.server.core.modules.entitystats.EntityStatMap;
 import com.hypixel.hytale.server.core.modules.entitystats.EntityStatValue;
 import com.hypixel.hytale.server.core.modules.entitystats.asset.DefaultEntityStatTypes;
+import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 
 import java.util.Collections;
@@ -260,8 +261,11 @@ public final class WaveRewards {
                 for (RewardItem reward : rewards) {
                     player.giveItem(new ItemStack(reward.itemId(), reward.quantity()), ref, store);
                 }
-                player.sendMessage(Message.raw("[" + reasonLabel + "] Received "
-                        + summarize(rewards)));
+                PlayerRef playerRef = store.getComponent(ref, PlayerRef.getComponentType());
+                if (playerRef != null) {
+                    playerRef.sendMessage(Message.raw("[" + reasonLabel + "] Received "
+                            + summarize(rewards)));
+                }
             }
         });
     }

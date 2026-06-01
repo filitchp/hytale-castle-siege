@@ -2,8 +2,8 @@ package dev.dooondi.wave;
 
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
-import com.hypixel.hytale.math.vector.Vector3d;
-import com.hypixel.hytale.math.vector.Vector3f;
+import com.hypixel.hytale.math.vector.Rotation3f;
+import org.joml.Vector3d;
 import com.hypixel.hytale.protocol.Color;
 import com.hypixel.hytale.protocol.SoundCategory;
 import com.hypixel.hytale.server.core.Message;
@@ -599,7 +599,7 @@ public class WaveManager {
                 EventTitleUtil.DEFAULT_FADE_DURATION,
                 store);
 
-        var rotation = new Vector3f(0f, 0f, 0f);
+        var rotation = new Rotation3f(0f, 0f, 0f);
 
         // Look up prefab paths: close, med, far approach, and all loop variants.
         WorldPathData pathData = store.getResource(WorldPathData.getResourceType());
@@ -744,7 +744,7 @@ public class WaveManager {
                     pendingBoss.set(false);
                     return;
                 }
-                Vector3f rotation = new Vector3f(0f, 0f, 0f);
+                Rotation3f rotation = new Rotation3f(0f, 0f, 0f);
                 Pair<Ref<EntityStore>, INonPlayerCharacter> result =
                         NPCPlugin.get().spawnNPC(store, BOSS_ROLE, null, BOSS_SPAWN_POS, rotation);
                 if (result == null) {
@@ -885,7 +885,7 @@ public class WaveManager {
                 Ref<EntityStore> ref = chunk.getReferenceTo(i);
                 Player player = store.getComponent(ref, Player.getComponentType());
                 if (player == null) continue;
-                if (player.getHudManager().getCustomHud() instanceof WaveHUD hud) {
+                if (player.getHudManager().getCustomHud(WaveHUD.KEY) instanceof WaveHUD hud) {
                     hud.setWaveLabel(current, max);
                     hud.setStatus(status);
                 }
