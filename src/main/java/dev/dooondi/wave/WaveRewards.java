@@ -115,7 +115,10 @@ public final class WaveRewards {
                     // Start of wave
                     List.of(new RewardItem("Ore_Thorium", 20),
                             new RewardItem("Rubble_Marble", 50),
-                            new RewardItem("Ingredient_Stick", 100)),
+                            new RewardItem("Ingredient_Stick", 100),
+                            new RewardItem("Ingredient_Leather_Medium", 10),
+                            new RewardItem("Wood_Oak_Trunk", 50)
+                    ),
                     // End of wave
                     List.of(new RewardItem("Potion_Health_Greater", 1))
             )),
@@ -136,7 +139,6 @@ public final class WaveRewards {
                     List.of(
                             new RewardItem("Ore_Thorium", 15),
                             new RewardItem("Ingredient_Leather_Medium", 4)
-
                     ),
                     // End of wave
                     List.of(new RewardItem("Potion_Health_Greater", 1))
@@ -146,7 +148,7 @@ public final class WaveRewards {
             // ------------------
             Map.entry(13, WaveRewardSet.of(
                     // Start of wave
-                    List.of(new RewardItem("Ore_Thorium", 20),
+                    List.of(new RewardItem("Ore_Thorium", 5),
                             new RewardItem("Ingredient_Leather_Medium", 4)),
                     // End of wave
                     List.of(new RewardItem("Potion_Health_Greater", 2))
@@ -156,8 +158,8 @@ public final class WaveRewards {
             // ------------------
             Map.entry(14, WaveRewardSet.of(
                     // Start of wave
-                    List.of(new RewardItem("Ore_Thorium", 25),
-                            new RewardItem("Ingredient_Leather_Medium", 8)),
+                    List.of(new RewardItem("Ore_Thorium", 5),
+                            new RewardItem("Ingredient_Leather_Medium", 4)),
                     // End of wave
                     List.of(new RewardItem("Potion_Health_Greater", 2))
             )),
@@ -181,7 +183,7 @@ public final class WaveRewards {
                     List.of(new RewardItem("Ore_Adamantite", 25),
                             new RewardItem("Ingredient_Leather_Heavy", 8),
                             new RewardItem("Ingredient_Venom", 2),
-                            new RewardItem("Ingredient_Fabric_Cloth_Cindercloth", 6)
+                            new RewardItem("Ingredient_Fabric_Scrap_Cindercloth", 6)
 
                     ),
                     // End of wave
