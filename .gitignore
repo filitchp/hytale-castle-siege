@@ -47,3 +47,6 @@ build/
 /release
 /devserver*
 /media/gitignore
+
+### Misc ###
+/media/video/
