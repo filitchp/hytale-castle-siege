@@ -3,6 +3,14 @@
   <component name="AdditionalModuleElements">
     <content url="file://$MODULE_DIR$/../.." dumb="true">
       <excludeFolder url="file://$MODULE_DIR$/../../build" />
+      <excludeFolder url="file://$MODULE_DIR$/../../devserver" />
+      <excludeFolder url="file://$MODULE_DIR$/../../devserver_" />
+      <excludeFolder url="file://$MODULE_DIR$/../../devserver_backup" />
+      <excludeFolder url="file://$MODULE_DIR$/../../devserver_backup2" />
+      <excludeFolder url="file://$MODULE_DIR$/../../devserver_backup3" />
+      <excludeFolder url="file://$MODULE_DIR$/../../devserver_backup4" />
+      <excludeFolder url="file://$MODULE_DIR$/../../media/video" />
+      <excludeFolder url="file://$MODULE_DIR$/../../release" />
     </content>
   </component>
 </module>
