@@ -6,10 +6,12 @@ import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.protocol.packets.interface_.CustomPageLifetime;
 import com.hypixel.hytale.protocol.packets.interface_.CustomUIEventBindingType;
 import com.hypixel.hytale.server.core.Message;
+import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.entity.entities.player.pages.InteractiveCustomUIPage;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
 import com.hypixel.hytale.server.core.ui.builder.UIEventBuilder;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
+import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import dev.dooondi.wave.WaveManager;
 
@@ -27,18 +29,32 @@ public class WaveUI extends InteractiveCustomUIPage<WaveUI.Data> {
         uiCommandBuilder.append("WaveUI.ui");
         applyLabels(uiCommandBuilder);
         uiEventBuilder.addEventBinding(CustomUIEventBindingType.Activating, "#StartWaveBtn");
+        uiEventBuilder.addEventBinding(CustomUIEventBindingType.Activating, "#ResetBtn");
     }
 
     @Override
     public void handleDataEvent(@Nonnull Ref<EntityStore> ref, @Nonnull Store<EntityStore> store, Data data) {
         super.handleDataEvent(ref, store, data);
 
-        WaveManager.spawnNextWave(store,
-                msg -> playerRef.sendMessage(Message.raw(msg)));
+        if (isGameComplete()) {
+            Player player = store.getComponent(ref, Player.getComponentType());
+            World world = (player != null) ? player.getWorld() : null;
+            if (world != null) {
+                WaveManager.fullReset(world, store);
+            }
+        } else {
+            WaveManager.spawnNextWave(store,
+                    msg -> playerRef.sendMessage(Message.raw(msg)));
+        }
 
         UICommandBuilder builder = new UICommandBuilder();
         applyLabels(builder);
         sendUpdate(builder);
+    }
+
+    private boolean isGameComplete() {
+        return WaveManager.getCurrentWave() >= WaveManager.getMaxWave()
+                && !WaveManager.isWaveInProgress();
     }
 
     private void applyLabels(UICommandBuilder builder) {
@@ -58,8 +74,9 @@ public class WaveUI extends InteractiveCustomUIPage<WaveUI.Data> {
         builder.set("#DeathLabel.TextSpans", Message.raw("Your Deaths: " + myDeaths));
         builder.set("#TotalKillLabel.TextSpans", Message.raw("Mobs Killed: " + totalKills));
 
+        boolean gameComplete = current >= max && !WaveManager.isWaveInProgress();
         String status;
-        if (current >= max && !WaveManager.isWaveInProgress()) {
+        if (gameComplete) {
             status = "All waves complete!";
         } else if (WaveManager.isWaveInProgress()) {
             status = "Wave in progress! " + remaining + " out of " + waveTotal + "mobs remain.";
@@ -67,6 +84,8 @@ public class WaveUI extends InteractiveCustomUIPage<WaveUI.Data> {
             status = "Click to start the next wave";
         }
         builder.set("#StatusLabel.TextSpans", Message.raw(status));
+        builder.set("#StartWaveBtnContainer.Visible", !gameComplete);
+        builder.set("#ResetBtnContainer.Visible", gameComplete);
     }
 
     public static class Data {

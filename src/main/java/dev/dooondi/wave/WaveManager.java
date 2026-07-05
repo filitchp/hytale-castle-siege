@@ -2,8 +2,14 @@ package dev.dooondi.wave;
 
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
-import com.hypixel.hytale.math.vector.Vector3d;
-import com.hypixel.hytale.math.vector.Vector3f;
+import com.hypixel.hytale.math.vector.Rotation3f;
+import com.hypixel.hytale.math.vector.Transform;
+import com.hypixel.hytale.server.core.inventory.InventoryComponent;
+import com.hypixel.hytale.server.core.inventory.ItemStack;
+import com.hypixel.hytale.server.core.inventory.container.CombinedItemContainer;
+import com.hypixel.hytale.server.core.universe.world.spawn.ISpawnProvider;
+import dev.dooondi.events.WelcomeEvent;
+import org.joml.Vector3d;
 import com.hypixel.hytale.protocol.Color;
 import com.hypixel.hytale.protocol.SoundCategory;
 import com.hypixel.hytale.server.core.Message;
@@ -486,6 +492,37 @@ public class WaveManager {
         refreshAllWaveHuds(store);
     }
 
+    public static void fullReset(World world, Store<EntityStore> store) {
+        resetGame(store);
+
+        ISpawnProvider spawnProvider = world.getWorldConfig().getSpawnProvider();
+
+        store.forEachChunk(Player.getComponentType(), (chunk, buffer) -> {
+            for (int i = 0; i < chunk.size(); i++) {
+                Ref<EntityStore> pRef = chunk.getReferenceTo(i);
+                Player player = store.getComponent(pRef, Player.getComponentType());
+                PlayerRef playerRef = store.getComponent(pRef, PlayerRef.getComponentType());
+                if (player == null || playerRef == null) continue;
+
+                Transform spawn = spawnProvider.getSpawnPoint(world, playerRef.getUuid());
+                if (spawn != null) {
+                    Vector3d pos = spawn.getPosition();
+                    player.moveTo(pRef, pos.x, pos.y, pos.z, store);
+                }
+
+                CombinedItemContainer everything = InventoryComponent.getCombined(
+                        store, pRef, InventoryComponent.EVERYTHING);
+                everything.clear();
+
+                player.giveItem(new ItemStack(WelcomeEvent.HAMMER_ID, 1), pRef, store);
+                player.giveItem(new ItemStack("Weapon_Axe_Crude", 1), pRef, store);
+
+                playerRef.sendMessage(Message.raw(
+                        "Castle Siege has been reset. You have the Wave Hammer and a Crude Axe."));
+            }
+        });
+    }
+
     /**
      * Called from MobDeathTracker when a tracked wave mob dies.
      * Removes the mob from the alive set, bumps wave+lifetime counters,
@@ -599,7 +636,7 @@ public class WaveManager {
                 EventTitleUtil.DEFAULT_FADE_DURATION,
                 store);
 
-        var rotation = new Vector3f(0f, 0f, 0f);
+        var rotation = new Rotation3f(0f, 0f, 0f);
 
         // Look up prefab paths: close, med, far approach, and all loop variants.
         WorldPathData pathData = store.getResource(WorldPathData.getResourceType());
@@ -744,7 +781,7 @@ public class WaveManager {
                     pendingBoss.set(false);
                     return;
                 }
-                Vector3f rotation = new Vector3f(0f, 0f, 0f);
+                Rotation3f rotation = new Rotation3f(0f, 0f, 0f);
                 Pair<Ref<EntityStore>, INonPlayerCharacter> result =
                         NPCPlugin.get().spawnNPC(store, BOSS_ROLE, null, BOSS_SPAWN_POS, rotation);
                 if (result == null) {
@@ -885,7 +922,7 @@ public class WaveManager {
                 Ref<EntityStore> ref = chunk.getReferenceTo(i);
                 Player player = store.getComponent(ref, Player.getComponentType());
                 if (player == null) continue;
-                if (player.getHudManager().getCustomHud() instanceof WaveHUD hud) {
+                if (player.getHudManager().getCustomHud(WaveHUD.KEY) instanceof WaveHUD hud) {
                     hud.setWaveLabel(current, max);
                     hud.setStatus(status);
                 }

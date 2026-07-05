@@ -1,0 +1,13 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Run Dev Server" type="Application" factoryName="Application">
+    <option name="ALTERNATIVE_JRE_PATH" value="25" />
+    <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
+    <option name="MAIN_CLASS_NAME" value="com.hypixel.hytale.Main" />
+    <module name="dev.dooondi.castlesiege.main" />
+    <option name="PROGRAM_PARAMETERS" value="--allow-op --disable-sentry --assets=$USER_HOME$/.var/app/com.hypixel.HytaleLauncher/data/Hytale/install/release/package/game/latest/Assets.zip --mods=$PROJECT_DIR$/src/main" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/devserver" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

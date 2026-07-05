@@ -9,8 +9,10 @@ import javax.annotation.Nonnull;
 
 public class WaveHUD extends CustomUIHud {
 
+    public static final String KEY = "CastleSiege:WaveHUD";
+
     public WaveHUD(@Nonnull PlayerRef playerRef) {
-        super(playerRef);
+        super(playerRef, KEY);
     }
 
     @Override

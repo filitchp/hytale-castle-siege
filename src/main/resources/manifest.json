@@ -1,7 +1,7 @@
 {
     "Group": "Dooondi",
     "Name": "CastleSiege",
-    "Version": "1.0.0",
+    "Version": "1.0.1",
     "Description": "Co-op tower-defense inspired minigame. Must use with the provided map",
     "Authors": [
         {
@@ -15,11 +15,11 @@
             "Url": "https://pooky.world"
         }
     ],
-    "Website": "https://legacy.curseforge.com/hytale/worlds/castle-siege",
+    "Website": "https://www.curseforge.com/hytale/worlds/castle-siege",
     "DisabledByDefault": false,
     "IncludesAssetPack": false,
     "Dependencies": {},
     "OptionalDependencies": {},
-    "ServerVersion": "2026.03.26-89796e57b",
+    "ServerVersion": "^0.5.6",
     "Main": "dev.dooondi.CastleSiege"
 }

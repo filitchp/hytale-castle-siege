@@ -23,14 +23,14 @@ Run Castle Siege locally or on a server. At spawn, you receive a custom game too
 - **Co-op multiplayer** - All players fight together (pvp disabled by default). Per-player stats and team stats are tracked.
 
 ### Getting Started
-1. Simply add the included world to your Hytale saves directory (or your server directory).
+1. After **[downloading](https://www.curseforge.com/hytale/worlds/castle-siege)** simply add the included world to your Hytale saves directory (or your server directory).
 
    _The mod (.jar) file is included in the world `mods` directory._
 
     **Easiest way:**
         Open the game launcher, go to **settings** (the gear icon next to the play button), and click "open directory" to find the UserData\Saves folder. 
 
-    **Key Locations:**
+    **Locations Lookup:**
    - Windows: `%appdata%\Hytale\UserData\Saves\`
    - Linux: `~/.var/app/com.hypixel.HytaleLauncher/data/Hytale/UserData/Saves/`
    - macOS: `~/Library/Application Support/Hytale/UserData/Saves/`

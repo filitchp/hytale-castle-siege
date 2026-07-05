@@ -10,6 +10,7 @@ import com.hypixel.hytale.protocol.GameMode;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.event.events.ecs.PlaceBlockEvent;
+import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 
@@ -36,8 +37,11 @@ public class BlockPlaceEventSystem extends EntityEventSystem<EntityStore, PlaceB
         }
 
         event.setCancelled(true);
-        player.sendMessage(Message.raw("You can't place this block in the minigame.")
-                .color(Color.RED).bold(true));
+        PlayerRef playerRef = store.getComponent(entityStoreRef, PlayerRef.getComponentType());
+        if (playerRef != null) {
+            playerRef.sendMessage(Message.raw("You can't place this block in the minigame.")
+                    .color(Color.RED).bold(true));
+        }
     }
 
     @NonNullDecl

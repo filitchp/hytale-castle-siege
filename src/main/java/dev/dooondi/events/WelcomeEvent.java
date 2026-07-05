@@ -3,7 +3,7 @@ package dev.dooondi.events;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.math.vector.Transform;
-import com.hypixel.hytale.math.vector.Vector3d;
+import org.joml.Vector3d;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.event.events.player.PlayerReadyEvent;
@@ -70,12 +70,14 @@ public class WelcomeEvent {
 
     public static void onPlayerReady(PlayerReadyEvent event) {
         Player player = event.getPlayer();
-        player.sendMessage(Message.raw("Welcome " + player.getDisplayName()));
 
         Ref<EntityStore> ref = event.getPlayerRef();
         Store<EntityStore> store = ref.getStore();
 
         PlayerRef joinPlayerRef = store.getComponent(ref, PlayerRef.getComponentType());
+        if (joinPlayerRef != null) {
+            joinPlayerRef.sendMessage(Message.raw("Welcome " + joinPlayerRef.getUsername()));
+        }
         boolean firstJoin = false;
         if (joinPlayerRef != null) {
             UUID uuid = joinPlayerRef.getUuid();
@@ -119,7 +121,7 @@ public class WelcomeEvent {
 
                 CompletableFuture.runAsync(() -> {
                     WaveHUD hud = new WaveHUD(playerRef);
-                    player.getHudManager().setCustomHud(playerRef, hud);
+                    player.getHudManager().addCustomHud(playerRef, hud);
                     WaveManager.refreshWaveHud(hud);
                 }, world);
             }
