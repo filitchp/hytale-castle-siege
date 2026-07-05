@@ -63,9 +63,24 @@ Group {
         Padding: (Full: 5);
       }
 
-      $Common.@TextButton #StartWaveBtn {
-        @Anchor = (Width: 250, Top: 10);
-        @Text = "Start Next Wave";
+      Group #StartWaveBtnContainer {
+        Anchor: (Width: 250, Height: 40, Top: 10);
+        Visible: true;
+
+        $Common.@TextButton #StartWaveBtn {
+          @Anchor = (Width: 250);
+          @Text = "Start Next Wave";
+        }
+      }
+
+      Group #ResetBtnContainer {
+        Anchor: (Width: 250, Height: 40, Top: 10);
+        Visible: false;
+
+        $Common.@TextButton #ResetBtn {
+          @Anchor = (Width: 250);
+          @Text = "Reset to Wave 1";
+        }
       }
     }
 

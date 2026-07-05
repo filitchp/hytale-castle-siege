@@ -2,8 +2,6 @@ package dev.dooondi.commands;
 
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
-import com.hypixel.hytale.math.vector.Transform;
-import org.joml.Vector3d;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.command.system.CommandContext;
 import com.hypixel.hytale.server.core.command.system.arguments.system.FlagArg;
@@ -12,14 +10,9 @@ import com.hypixel.hytale.server.core.command.system.arguments.system.RequiredAr
 import com.hypixel.hytale.server.core.command.system.arguments.types.ArgTypes;
 import com.hypixel.hytale.server.core.command.system.basecommands.AbstractTargetPlayerCommand;
 import com.hypixel.hytale.server.core.entity.entities.Player;
-import com.hypixel.hytale.server.core.inventory.InventoryComponent;
-import com.hypixel.hytale.server.core.inventory.ItemStack;
-import com.hypixel.hytale.server.core.inventory.container.CombinedItemContainer;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
-import com.hypixel.hytale.server.core.universe.world.spawn.ISpawnProvider;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
-import dev.dooondi.events.WelcomeEvent;
 import dev.dooondi.ui.WaveHUD;
 import dev.dooondi.ui.WaveUI;
 import dev.dooondi.wave.WaveManager;
@@ -89,35 +82,7 @@ public class CsCommand extends AbstractTargetPlayerCommand {
 
         // All store-mutating work runs on the world thread.
         CompletableFuture.runAsync(() -> {
-            WaveManager.resetGame(store);
-
-            ISpawnProvider spawnProvider = world.getWorldConfig().getSpawnProvider();
-
-            store.forEachChunk(Player.getComponentType(), (chunk, buffer) -> {
-                for (int i = 0; i < chunk.size(); i++) {
-                    Ref<EntityStore> pRef = chunk.getReferenceTo(i);
-                    Player player = store.getComponent(pRef, Player.getComponentType());
-                    PlayerRef playerRef = store.getComponent(pRef, PlayerRef.getComponentType());
-                    if (player == null || playerRef == null) continue;
-
-                    Transform spawn = spawnProvider.getSpawnPoint(world, playerRef.getUuid());
-                    if (spawn != null) {
-                        Vector3d pos = spawn.getPosition();
-                        player.moveTo(pRef, pos.x, pos.y, pos.z, store);
-                    }
-
-                    CombinedItemContainer everything = InventoryComponent.getCombined(
-                            store, pRef, InventoryComponent.EVERYTHING);
-                    everything.clear();
-
-                    player.giveItem(new ItemStack(WelcomeEvent.HAMMER_ID, 1), pRef, store);
-                    player.giveItem(new ItemStack("Weapon_Axe_Crude", 1), pRef, store);
-
-                    playerRef.sendMessage(Message.raw(
-                            "Castle Siege has been reset. You have the Wave Hammer and a Crude Axe."));
-                }
-            });
-
+            WaveManager.fullReset(world, store);
             commandContext.sendMessage(Message.raw("Castle Siege reset complete."));
         }, world);
     }

@@ -3,6 +3,12 @@ package dev.dooondi.wave;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.math.vector.Rotation3f;
+import com.hypixel.hytale.math.vector.Transform;
+import com.hypixel.hytale.server.core.inventory.InventoryComponent;
+import com.hypixel.hytale.server.core.inventory.ItemStack;
+import com.hypixel.hytale.server.core.inventory.container.CombinedItemContainer;
+import com.hypixel.hytale.server.core.universe.world.spawn.ISpawnProvider;
+import dev.dooondi.events.WelcomeEvent;
 import org.joml.Vector3d;
 import com.hypixel.hytale.protocol.Color;
 import com.hypixel.hytale.protocol.SoundCategory;
@@ -484,6 +490,37 @@ public class WaveManager {
         lastDefeatedWave.set(0);
         saveProgress();
         refreshAllWaveHuds(store);
+    }
+
+    public static void fullReset(World world, Store<EntityStore> store) {
+        resetGame(store);
+
+        ISpawnProvider spawnProvider = world.getWorldConfig().getSpawnProvider();
+
+        store.forEachChunk(Player.getComponentType(), (chunk, buffer) -> {
+            for (int i = 0; i < chunk.size(); i++) {
+                Ref<EntityStore> pRef = chunk.getReferenceTo(i);
+                Player player = store.getComponent(pRef, Player.getComponentType());
+                PlayerRef playerRef = store.getComponent(pRef, PlayerRef.getComponentType());
+                if (player == null || playerRef == null) continue;
+
+                Transform spawn = spawnProvider.getSpawnPoint(world, playerRef.getUuid());
+                if (spawn != null) {
+                    Vector3d pos = spawn.getPosition();
+                    player.moveTo(pRef, pos.x, pos.y, pos.z, store);
+                }
+
+                CombinedItemContainer everything = InventoryComponent.getCombined(
+                        store, pRef, InventoryComponent.EVERYTHING);
+                everything.clear();
+
+                player.giveItem(new ItemStack(WelcomeEvent.HAMMER_ID, 1), pRef, store);
+                player.giveItem(new ItemStack("Weapon_Axe_Crude", 1), pRef, store);
+
+                playerRef.sendMessage(Message.raw(
+                        "Castle Siege has been reset. You have the Wave Hammer and a Crude Axe."));
+            }
+        });
     }
 
     /**
