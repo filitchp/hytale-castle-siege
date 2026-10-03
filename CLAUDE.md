@@ -11,6 +11,7 @@ Guidance for working on **CastleSiege**, a Hytale server-side co-op tower-defens
 - **Plugin entry:** `dev.dooondi.CastleSiege` registers commands, events, ECS systems, interaction codecs, and loads persisted state.
 - **Manifest:** `"IncludesAssetPack": true` in `src/main/resources/manifest.json` is mandatory for custom UI / item / NPC JSON to load. If assets stop loading, check the built jar with `unzip -p build/libs/dev.dooondi.castlesiege.jar manifest.json`. Keep `ServerVersion` in step with the resolved server version when bumping Hytale. (It was kept `false` in source on older builds, apparently to work around a bug there; `true` works on 0.6.8.)
 - **Release scripts** (`scripts/`): `bump_version.py [major|minor|patch|X.Y.Z]` updates the manifest `Version` and the dev world's `DisplayName`. It is a dry run unless you pass `--no-dry-run`. `release.py` builds and packages the world + jar into `release/v<version>/`.
+- **World data** (`devserver/`): the map, prefab paths (stored in `universe/worlds/default/chunks/*.region.bin`), world/server config and `permissions.json` are tracked. `auth.enc`, `logs/`, `telemetry/`, `universe/players/`, `mods/` (runtime state), `bans.json` and `*.bak` are gitignored and must stay that way. Any server run rewrites the region files (~20 MB of binaries), so only commit `devserver/` changes made on purpose, with the server stopped. Discard play-session changes with `git restore devserver/`. Never `git add` `devserver_*` backups.
 
 ### Key source layout
 
@@ -31,6 +32,7 @@ src/main/resources/
   Server/Item/RootInteractions/ — Root_OpenWaveUI.json, Root_TriggerWave.json
   Server/NPC/Roles/Wave/        — wave mob role variants, all suffixed `_CS` (e.g. Rat_CS, Skeleton_Burnt_Praetorian_CS)
 
+devserver/     — dev server + Castle Siege world, tracked in git (no LFS for now)
 temp_assets/   — vanilla Hytale assets for reference (gitignored, read-only, do not edit)
 ```
 

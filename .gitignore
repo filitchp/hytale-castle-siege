@@ -45,7 +45,18 @@ build/
 /com
 /temp_assets
 /release
-/devserver*
+
+### Dev server ###
+# World data is tracked; credentials, player data and runtime state are not.
+/devserver_*
+/devserver/auth.enc
+/devserver/logs/
+/devserver/telemetry/
+/devserver/universe/players/
+/devserver/mods/
+/devserver/bans.json
+/devserver/whitelist.json*
+/devserver/**/*.bak
 /media/gitignore
 
 ### Misc ###

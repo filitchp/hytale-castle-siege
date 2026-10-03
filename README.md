@@ -64,6 +64,23 @@ See their complete getting started guide [here](https://hytalemodding.dev/en/doc
 With that you will be prompted in the output to authorize your server, and then you can start
 developing your plugin while the server is live reloading the code changes.
 
+### World Data
+
+The Castle Siege world lives in `devserver/` and is tracked in git, so a fresh clone can launch the full map. 
+On first launch the server prompts you to authenticate with `/auth login browser` or `/auth login device` 
+(this uses `auth.enc` to store credentials to run the server).
+
+Credentials, player data and runtime state are gitignored: `auth.enc`, `logs/`, `telemetry/`, `universe/players/`, `mods/`, `bans.json` and `*.bak` backups.
+
+Running the server rewrites the world's region files even if you don't change anything. Only commit `devserver/` 
+changes when you've intentionally edited the map, and stop the server first. 
+
+To discard changes from a play session:
+
+```
+git restore devserver/
+```
+
 ### Scaffoldit Plugin
 
 While there are multiple plugins made for Hytale, the template currently uses a zero-boilerplate one

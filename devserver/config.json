@@ -1,0 +1,46 @@
+{
+  "Version": 4,
+  "ServerName": "Castle Siege",
+  "MOTD": "Defend your castle or perish trying.",
+  "Password": "",
+  "MaxPlayers": 4,
+  "MaxViewRadius": 32,
+  "Defaults": {
+    "World": "default",
+    "GameMode": "Creative",
+    "HardcoreMode": "None",
+    "CrashRecovery": {}
+  },
+  "ConnectionTimeouts": {},
+  "RateLimit": {},
+  "Modules": {
+    "PathPlugin": {
+      "Modules": {}
+    },
+    "Telemetry": {
+      "Modules": {}
+    }
+  },
+  "LogLevels": {},
+  "Mods": {},
+  "DefaultModsEnabled": true,
+  "RequireJoinPermission": false,
+  "DisplayTmpTagsInStrings": false,
+  "PlayerStorage": {
+    "Type": "Hytale"
+  },
+  "UniverseResourceStorage": {
+    "Type": "Hytale"
+  },
+  "BanStorage": {
+    "Type": "Disk",
+    "Path": "bans.json"
+  },
+  "AuthCredentialStore": {
+    "Type": "Encrypted",
+    "Path": "auth.enc"
+  },
+  "Update": {},
+  "Backup": {},
+  "WorldMap": {}
+}
