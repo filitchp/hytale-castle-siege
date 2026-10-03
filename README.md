@@ -3,8 +3,8 @@
 [![Java](https://img.shields.io/badge/Java-v25.0-bf710a?style=for-the-badge)](https://openjdk.org)
 [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE.md)
 
-Castle Siege is a cooperative tower-defense inspired minigame for Hytale. Defend your castle against 20 waves of increasingly difficult mobs. 
-Play it solo or with your friends. **[Download it here](https://www.curseforge.com/hytale/worlds/castle-siege)**
+Castle Siege is a cooperative tower-defense inspired minigame for [Hytale](https://hytale.com/). Defend your castle against 20 waves of increasingly difficult mobs. 
+Play it solo or with your friends. **Available in Hytale through _Mods->Browse->Search_** or alternatively [Download it from Curseforge](https://www.curseforge.com/hytale/worlds/castle-siege)
 
 <p align="center">
   <a href="media/screenshots/main.jpg"><img src="media/screenshots/main.jpg" alt="Main" height="125"></a>
@@ -23,19 +23,10 @@ Run Castle Siege locally or on a server. At spawn, you receive a custom game too
 - **Co-op multiplayer** - All players fight together (pvp disabled by default). Per-player stats and team stats are tracked.
 
 ### Getting Started
-1. After **[downloading](https://www.curseforge.com/hytale/worlds/castle-siege)** simply add the included world to your Hytale saves directory (or your server directory).
 
-   _The mod (.jar) file is included in the world `mods` directory._
+1. Start Hytale and in-game go to _Mods->Browse_ and press on the search icon (top right) to search for "Castle Siege". Press install.
 
-    **Easiest way:**
-        Open the game launcher, go to **settings** (the gear icon next to the play button), and click "open directory" to find the UserData\Saves folder. 
-
-    **Locations Lookup:**
-   - Windows: `%appdata%\Hytale\UserData\Saves\`
-   - Linux: `~/.var/app/com.hypixel.HytaleLauncher/data/Hytale/UserData/Saves/`
-   - macOS: `~/Library/Application Support/Hytale/UserData/Saves/`
-
-   Add the Castle Siege world there.
+<a href="media/screenshots/gameplay-1.jpg"><img src="media/screenshots/castle-siege-search.png" alt="Gameplay 1" width="350"></a>
 
 2. Start/join the included world, and you will be given a crude ax and a Castle Siege game tool "hammer"
 3. Right click while holding the Castle Siege "hammer" to open the Wave UI and start Wave 1.
@@ -109,6 +100,23 @@ The script will:
     - `preview.png` (a 576x360 cropped/resized version of `media/icon.png`)
 
 **Requirements:** Python 3 with [Pillow](https://pypi.org/project/Pillow/) installed (`pip install Pillow`).
+
+## Alternative Install
+
+1. **[Download Castle Siege](https://www.curseforge.com/hytale/worlds/castle-siege)** for Curseforge.
+2. Add the downloaded world to your Hytale saves directory (or your server directory).
+
+   _The mod (.jar) file is included in the world `mods` directory._
+
+   **Easiest way:**
+   Open the game launcher, go to **settings** (the gear icon next to the play button), and click "open directory" to find the UserData\Saves folder.
+
+   **Locations Lookup:**
+    - Windows: `%appdata%\Hytale\UserData\Saves\`
+    - Linux: `~/.var/app/com.hypixel.HytaleLauncher/data/Hytale/UserData/Saves/`
+    - macOS: `~/Library/Application Support/Hytale/UserData/Saves/`
+
+   Add the Castle Siege world there.
 
 ## Additional Resources
 
