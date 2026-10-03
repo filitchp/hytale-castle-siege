@@ -3,8 +3,8 @@
 [![Java](https://img.shields.io/badge/Java-v25.0-bf710a?style=for-the-badge)](https://openjdk.org)
 [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE.md)
 
-Castle Siege is a cooperative tower-defense inspired minigame for Hytale. Defend your castle against 20 waves of increasingly difficult mobs. 
-Play it solo or with your friends. **[Download it here](https://www.curseforge.com/hytale/worlds/castle-siege)**
+Castle Siege is a cooperative tower-defense inspired minigame for [Hytale](https://hytale.com/). Defend your castle against 20 waves of increasingly difficult mobs. 
+Play it solo or with your friends. **Available in Hytale through _Mods->Browse->Search_** or alternatively [Download it from Curseforge](https://www.curseforge.com/hytale/worlds/castle-siege)
 
 <p align="center">
   <a href="media/screenshots/main.jpg"><img src="media/screenshots/main.jpg" alt="Main" height="125"></a>
@@ -23,19 +23,10 @@ Run Castle Siege locally or on a server. At spawn, you receive a custom game too
 - **Co-op multiplayer** - All players fight together (pvp disabled by default). Per-player stats and team stats are tracked.
 
 ### Getting Started
-1. After **[downloading](https://www.curseforge.com/hytale/worlds/castle-siege)** simply add the included world to your Hytale saves directory (or your server directory).
 
-   _The mod (.jar) file is included in the world `mods` directory._
+1. Start Hytale and in-game go to _Mods->Browse_ and press on the search icon (top right) to search for "Castle Siege". Press install.
 
-    **Easiest way:**
-        Open the game launcher, go to **settings** (the gear icon next to the play button), and click "open directory" to find the UserData\Saves folder. 
-
-    **Locations Lookup:**
-   - Windows: `%appdata%\Hytale\UserData\Saves\`
-   - Linux: `~/.var/app/com.hypixel.HytaleLauncher/data/Hytale/UserData/Saves/`
-   - macOS: `~/Library/Application Support/Hytale/UserData/Saves/`
-
-   Add the Castle Siege world there.
+<a href="media/screenshots/gameplay-1.jpg"><img src="media/screenshots/castle-siege-search.png" alt="Gameplay 1" width="350"></a>
 
 2. Start/join the included world, and you will be given a crude ax and a Castle Siege game tool "hammer"
 3. Right click while holding the Castle Siege "hammer" to open the Wave UI and start Wave 1.
@@ -73,6 +64,23 @@ See their complete getting started guide [here](https://hytalemodding.dev/en/doc
 With that you will be prompted in the output to authorize your server, and then you can start
 developing your plugin while the server is live reloading the code changes.
 
+### World Data
+
+The Castle Siege world lives in `devserver/` and is tracked in git, so a fresh clone can launch the full map. 
+On first launch the server prompts you to authenticate with `/auth login browser` or `/auth login device` 
+(this uses `auth.enc` to store credentials to run the server).
+
+Credentials, player data and runtime state are gitignored: `auth.enc`, `logs/`, `telemetry/`, `universe/players/`, `mods/`, `bans.json` and `*.bak` backups.
+
+Running the server rewrites the world's region files even if you don't change anything. Only commit `devserver/` 
+changes when you've intentionally edited the map, and stop the server first. 
+
+To discard changes from a play session:
+
+```
+git restore devserver/
+```
+
 ### Scaffoldit Plugin
 
 While there are multiple plugins made for Hytale, the template currently uses a zero-boilerplate one
@@ -94,6 +102,24 @@ For in-depth configuration, you can visit the [ScaffoldIt Plugin Docs](https://s
 
 ### Releases
 
+#### Bumping the version
+
+Use `scripts/bump_version.py` to bump the release version before packaging. It updates both places the version appears:
+- `Version` in `src/main/resources/manifest.json`
+- `DisplayName` in `devserver/universe/worlds/default/config.json` (e.g. `Castle Siege v1.0.2`)
+
+```
+python3 scripts/bump_version.py                     # preview a patch bump (1.0.2 -> 1.0.3)
+python3 scripts/bump_version.py --no-dry-run        # apply a patch bump
+python3 scripts/bump_version.py minor --no-dry-run  # 1.0.2 -> 1.1.0
+python3 scripts/bump_version.py major --no-dry-run  # 1.0.2 -> 2.0.0
+python3 scripts/bump_version.py 1.2.0 --no-dry-run  # set an explicit version
+```
+
+The script is a dry run by default: it prints the planned change and writes nothing. Pass `--no-dry-run` to update the files. Running it with the current version re-syncs the world `DisplayName` if it has drifted from the manifest.
+
+#### Packaging
+
 Use `scripts/release.py` to package a distributable world for the version declared in `src/main/resources/manifest.json`.
 
 ```
@@ -109,6 +135,23 @@ The script will:
     - `preview.png` (a 576x360 cropped/resized version of `media/icon.png`)
 
 **Requirements:** Python 3 with [Pillow](https://pypi.org/project/Pillow/) installed (`pip install Pillow`).
+
+## Alternative Install
+
+1. **[Download Castle Siege](https://www.curseforge.com/hytale/worlds/castle-siege)** for Curseforge.
+2. Add the downloaded world to your Hytale saves directory (or your server directory).
+
+   _The mod (.jar) file is included in the world `mods` directory._
+
+   **Easiest way:**
+   Open the game launcher, go to **settings** (the gear icon next to the play button), and click "open directory" to find the UserData\Saves folder.
+
+   **Locations Lookup:**
+    - Windows: `%appdata%\Hytale\UserData\Saves\`
+    - Linux: `~/.var/app/com.hypixel.HytaleLauncher/data/Hytale/UserData/Saves/`
+    - macOS: `~/Library/Application Support/Hytale/UserData/Saves/`
+
+   Add the Castle Siege world there.
 
 ## Additional Resources
 
