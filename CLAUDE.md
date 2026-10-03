@@ -9,7 +9,8 @@ Guidance for working on **CastleSiege**, a Hytale server-side co-op tower-defens
 - **Language / build:** Java 25, Gradle with the `dev.scaffoldit` plugin (`settings.gradle.kts`). `./gradlew build` packages the jar and launches `:runServer` (long-running). Use `./gradlew compileJava` for a quick compile check.
 - **Server API:** `com.hypixel.hytale:Server:0.6.8`. The version isn't pinned: `settings.gradle.kts` uses `usePatchline("release")` + `useVersion("latest")`, so a new Hytale release can break the build without any code change. The API is early access, and some documented APIs don't work (see "What doesn't work" below).
 - **Plugin entry:** `dev.dooondi.CastleSiege` registers commands, events, ECS systems, interaction codecs, and loads persisted state.
-- **Manifest:** `"IncludesAssetPack": true` in `src/main/resources/manifest.json` is mandatory for custom UI / item / NPC JSON to load. If assets stop loading, check the built jar with `unzip -p build/libs/dev.dooondi.castlesiege.jar manifest.json`. Keep `ServerVersion` in step with the resolved server version when bumping Hytale.
+- **Manifest:** `"IncludesAssetPack": true` in `src/main/resources/manifest.json` is mandatory for custom UI / item / NPC JSON to load. If assets stop loading, check the built jar with `unzip -p build/libs/dev.dooondi.castlesiege.jar manifest.json`. Keep `ServerVersion` in step with the resolved server version when bumping Hytale. (It was kept `false` in source on older builds, apparently to work around a bug there; `true` works on 0.6.8.)
+- **Release scripts** (`scripts/`): `bump_version.py [major|minor|patch|X.Y.Z]` updates the manifest `Version` and the dev world's `DisplayName`. It is a dry run unless you pass `--no-dry-run`. `release.py` builds and packages the world + jar into `release/v<version>/`.
 
 ### Key source layout
 
