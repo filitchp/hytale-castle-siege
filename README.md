@@ -85,6 +85,24 @@ For in-depth configuration, you can visit the [ScaffoldIt Plugin Docs](https://s
 
 ### Releases
 
+#### Bumping the version
+
+Use `scripts/bump_version.py` to bump the release version before packaging. It updates both places the version appears:
+- `Version` in `src/main/resources/manifest.json`
+- `DisplayName` in `devserver/universe/worlds/default/config.json` (e.g. `Castle Siege v1.0.2`)
+
+```
+python3 scripts/bump_version.py                     # preview a patch bump (1.0.2 -> 1.0.3)
+python3 scripts/bump_version.py --no-dry-run        # apply a patch bump
+python3 scripts/bump_version.py minor --no-dry-run  # 1.0.2 -> 1.1.0
+python3 scripts/bump_version.py major --no-dry-run  # 1.0.2 -> 2.0.0
+python3 scripts/bump_version.py 1.2.0 --no-dry-run  # set an explicit version
+```
+
+The script is a dry run by default: it prints the planned change and writes nothing. Pass `--no-dry-run` to update the files. Running it with the current version re-syncs the world `DisplayName` if it has drifted from the manifest.
+
+#### Packaging
+
 Use `scripts/release.py` to package a distributable world for the version declared in `src/main/resources/manifest.json`.
 
 ```
