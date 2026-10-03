@@ -569,7 +569,7 @@ public class WaveManager {
                     EventTitleUtil.DEFAULT_DURATION,
                     EventTitleUtil.DEFAULT_FADE_DURATION,
                     EventTitleUtil.DEFAULT_FADE_DURATION,
-                    store);
+                    store.getExternalData().getWorld());
 
             if (finalWave) {
                 playVictorySound(store);
@@ -634,7 +634,7 @@ public class WaveManager {
                 EventTitleUtil.DEFAULT_DURATION,
                 EventTitleUtil.DEFAULT_FADE_DURATION,
                 EventTitleUtil.DEFAULT_FADE_DURATION,
-                store);
+                store.getExternalData().getWorld());
 
         var rotation = new Rotation3f(0f, 0f, 0f);
 
