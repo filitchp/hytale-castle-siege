@@ -28,7 +28,7 @@ Run Castle Siege locally or on a server. At spawn, you receive a custom game too
 
 **IMPORTANT:** If you are updating be sure to **Create World** from the updated mod (the old world will still use the old mod).
 
-<a href="media/screenshots/gameplay-1.jpg"><img src="media/screenshots/castle-siege-search.png" alt="Gameplay 1" width="350"></a>
+<a href="media/screenshots/castle-siege-search.png"><img src="media/screenshots/castle-siege-search.png" alt="Gameplay 1" width="350"></a>
 
 2. Start/join the Castle Siege world, and you will be given a crude ax and a Castle Siege game tool "hammer"
 3. Right click while holding the Castle Siege "hammer" to open the Wave UI and start Wave 1.
