@@ -14,17 +14,19 @@ Play it solo or with your friends. **Available in Hytale through _Mods->Browse->
 </p>
 
 ### How It Works
-Run Castle Siege locally or on a server. At spawn, you receive a custom game tool "hammer" - right-click it to open the minigame UI and start the first wave. Enemies march in formation - utilizing Hytale's prefab AI path hints - forcing players to choose their strategy carefully. Clear every mob in a wave to advance to the next one.
+Run Castle Siege locally or on a server. At spawn, you receive a custom game tool "hammer" - right-click it to open the minigame UI and start the first wave. Enemies march in formation - utilizing Hytale's prefab AI path hints - forcing you and your team to choose a careful strategy. Clear every mob in a wave to advance to the next one.
 
 ### Features
 - **20 hand-crafted waves** - Progressively difficult mob formations.
-- **10+ custom mobs** - Enhanced AI and combat abilities designed for castle warfare.
+- **10+ customized Hytale mobs** - Enhanced AI and combat abilities.
 - **Unique rewards** - Earn materials (wood, ore, health potions, etc) to craft and gear up the next wave.
 - **Co-op multiplayer** - All players fight together (pvp disabled by default). Per-player stats and team stats are tracked.
 
 ### Getting Started
 
-1. Start Hytale and in-game go to _Mods->Browse_ and press on the search icon (top right) to search for "Castle Siege". Press install. Then from the mod press **Create World**. **IMPORTANT:** If you are updating be sure to **Create World** from the updated mod (the old world will still use the old mod).
+1. Start Hytale and in-game go to _Mods->Browse_ and press on the search icon (top right) to search for "Castle Siege". Press install. Then from the mod press **Create World**. 
+
+**IMPORTANT:** If you are updating be sure to **Create World** from the updated mod (the old world will still use the old mod).
 
 <a href="media/screenshots/gameplay-1.jpg"><img src="media/screenshots/castle-siege-search.png" alt="Gameplay 1" width="350"></a>
 
