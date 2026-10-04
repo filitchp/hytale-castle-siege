@@ -12,7 +12,7 @@
   "Appearance": "Wraith",
   "HotbarSize": 3,
   "HotbarItems": [
-    "Weapon_Crossbow_Iron"
+    "CastleSiege_Crossbow_Display"
   ],
   "MaxHealth": 100,
   "Invulnerable": true,

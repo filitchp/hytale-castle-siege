@@ -919,7 +919,8 @@ public class WaveManager {
     public static void refreshAllWaveHuds(Store<EntityStore> store) {
         int current = currentWave.get();
         int max = getMaxWave();
-        String status = computeHudStatus();
+        int mobs = getMobsRemaining();
+        int money = TeamBank.getBalance();
 
         store.forEachChunk(Player.getComponentType(), (chunk, buffer) -> {
             for (int i = 0; i < chunk.size(); i++) {
@@ -927,27 +928,14 @@ public class WaveManager {
                 Player player = store.getComponent(ref, Player.getComponentType());
                 if (player == null) continue;
                 if (player.getHudManager().getCustomHud(WaveHUD.KEY) instanceof WaveHUD hud) {
-                    hud.setWaveLabel(current, max);
-                    hud.setStatus(status);
-                    hud.setMoney(TeamBank.getBalance());
+                    hud.setValues(current, max, mobs, money);
                 }
             }
         });
     }
 
     public static void refreshWaveHud(WaveHUD hud) {
-        hud.setWaveLabel(currentWave.get(), getMaxWave());
-        hud.setStatus(computeHudStatus());
-        hud.setMoney(TeamBank.getBalance());
-    }
-
-    private static String computeHudStatus() {
-        // "Completed" only after the final wave has actually been beaten -
-        // not during wave 20 startup, before mobs (or the boss) have spawned.
-        if (lastDefeatedWave.get() >= getMaxWave()) {
-            return "All waves completed!";
-        }
-        return "Mobs remaining: " + getMobsRemaining();
+        hud.setValues(currentWave.get(), getMaxWave(), getMobsRemaining(), TeamBank.getBalance());
     }
 
     private static void playWaveStartSound(Store<EntityStore> store) {

@@ -1,15 +1,8 @@
 {
   "users": {
-    "12e48af6-e1fe-43e5-b178-5a5877a7a39a": {
-      "groups": [
-        "CastleSiege",
-        "hytale:Admin"
-      ]
-    },
     "15f0b516-4be4-4958-90df-1af49557c02a": {
       "groups": [
-        "CastleSiege",
-        "hytale:Admin"
+        "CastleSiege"
       ]
     }
   },
