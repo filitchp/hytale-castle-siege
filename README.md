@@ -19,7 +19,7 @@ Run Castle Siege locally or on a server. At spawn, you receive a custom game too
 ### Features
 - **20 hand-crafted waves** - Progressively difficult mob formations.
 - **10+ custom mobs** - Enhanced AI and combat abilities designed for castle warfare.
-- **Unique rewards** - Earn materials (wood, ore, health potions, etc) to craft and gear up the next wave.
+- **Team economy** - Every kill earns money for the whole team. Spend it at the Outlander Merchant on swords, shields and armor to gear up for the next wave.
 - **Co-op multiplayer** - All players fight together (pvp disabled by default). Per-player stats and team stats are tracked.
 
 ### Getting Started

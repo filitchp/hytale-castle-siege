@@ -360,7 +360,7 @@ public class WaveManager {
     // when new wave roles land or when balance shifts.
     private static final Map<String, MobCombatStats> MOB_STATS = Map.ofEntries(
             Map.entry("Rat_CS",                       new MobCombatStats(2.0,  2.0)),  // bite
-            Map.entry("Snake_Rattle_CS",              new MobCombatStats(2.0,  3.0)),  // bite
+            Map.entry("Snake_Rattle_CS",              new MobCombatStats(2.0,  2.4)),  // bite
             Map.entry("Skeleton_Weak_CS",             new MobCombatStats(3.0,  5.0)),  // bone sword
             Map.entry("Skeleton_Sturdy_CS",           new MobCombatStats(3.5,  8.0)),  // iron battleaxe
             Map.entry("Skeleton_Pirate_Captain_CS",   new MobCombatStats(3.0,  7.0)),  // cutlass
@@ -489,6 +489,7 @@ public class WaveManager {
         pendingBoss.set(false);
         lastDefeatedWave.set(0);
         saveProgress();
+        TeamBank.reset();
         refreshAllWaveHuds(store);
     }
 
@@ -543,6 +544,8 @@ public class WaveManager {
         currentWaveKills.incrementAndGet();
         if (killerUuid != null) {
             playerKills.computeIfAbsent(killerUuid, k -> new AtomicInteger(0)).incrementAndGet();
+            NPCEntity npc = store.getComponent(mobRef, NPCEntity.getComponentType());
+            TeamBank.earn(TeamBank.getKillReward(npc != null ? npc.getRoleName() : null));
         }
 
         refreshAllWaveHuds(store);
@@ -594,6 +597,7 @@ public class WaveManager {
             playerKills.clear();
             playerDeaths.clear();
             totalKills.set(0);
+            TeamBank.reset();
         }
         messageSender.accept("Get Ready to Fight! Starting wave " + wave);
         spawnWave(wave, store, messageSender, false);
@@ -925,6 +929,7 @@ public class WaveManager {
                 if (player.getHudManager().getCustomHud(WaveHUD.KEY) instanceof WaveHUD hud) {
                     hud.setWaveLabel(current, max);
                     hud.setStatus(status);
+                    hud.setMoney(TeamBank.getBalance());
                 }
             }
         });
@@ -933,6 +938,7 @@ public class WaveManager {
     public static void refreshWaveHud(WaveHUD hud) {
         hud.setWaveLabel(currentWave.get(), getMaxWave());
         hud.setStatus(computeHudStatus());
+        hud.setMoney(TeamBank.getBalance());
     }
 
     private static String computeHudStatus() {

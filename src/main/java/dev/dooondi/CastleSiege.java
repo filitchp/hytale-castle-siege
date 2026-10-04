@@ -5,14 +5,17 @@ import com.hypixel.hytale.server.core.modules.interaction.interaction.config.Int
 import com.hypixel.hytale.server.core.permissions.PermissionsModule;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
+import com.hypixel.hytale.server.npc.NPCPlugin;
 import dev.dooondi.commands.CsCommand;
 import dev.dooondi.commands.PrefabPathCommand;
 import dev.dooondi.events.InputListener;
 import dev.dooondi.events.WelcomeEvent;
+import dev.dooondi.shop.OpenShopActionBuilder;
 import dev.dooondi.systems.BlockBreakEventSystem;
 import dev.dooondi.systems.BlockPlaceEventSystem;
 import dev.dooondi.wave.MobDeathTracker;
 import dev.dooondi.wave.OpenWaveUIInteraction;
+import dev.dooondi.wave.TeamBank;
 import dev.dooondi.wave.TriggerWaveInteraction;
 import dev.dooondi.wave.WaveManager;
 
@@ -28,6 +31,7 @@ public class CastleSiege extends JavaPlugin {
     protected void setup() {
         WaveManager.initPersistence(this.getDataDirectory());
         WelcomeEvent.initPersistence(this.getDataDirectory());
+        TeamBank.initPersistence(this.getDataDirectory());
 
         CsCommand csCommand = new CsCommand();
         this.getCommandRegistry().registerCommand(csCommand);
@@ -58,5 +62,8 @@ public class CastleSiege extends JavaPlugin {
                 .register("TriggerWave", TriggerWaveInteraction.class, TriggerWaveInteraction.CODEC);
         this.getCodecRegistry(Interaction.CODEC)
                 .register("OpenWaveUI", OpenWaveUIInteraction.class, OpenWaveUIInteraction.CODEC);
+
+        // Must be registered before NPC roles load so CastleSiege_Merchant can reference it.
+        NPCPlugin.get().registerCoreComponentType(OpenShopActionBuilder.TYPE, OpenShopActionBuilder::new);
     }
 }

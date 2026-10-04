@@ -4,7 +4,7 @@ Group {
   LayoutMode: Top;
 
   Group #WavePanel {
-    Anchor: (Top: 10, Width: 250, Height: 80);
+    Anchor: (Top: 10, Width: 250, Height: 115);
     LayoutMode: Center;
 
     Label #WaveLabel {
@@ -18,6 +18,13 @@ Group {
       Style: (FontSize: 16, Alignment: Center);
       Anchor: (Top: 5);
       Text: "Mobs remaining: 0";
+      Padding: (Full: 5);
+    }
+
+    Label #MoneyLabel {
+      Style: (FontSize: 20, Alignment: Center, TextColor: #e8c547, RenderBold: true);
+      Anchor: (Top: 2);
+      Text: "$0";
       Padding: (Full: 5);
     }
   }

@@ -11,12 +11,12 @@ import com.hypixel.hytale.server.core.modules.entitystats.asset.DefaultEntitySta
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 /**
  * Library that awards items to each online player at the start and end of each wave.
+ * Only health potions: crafting materials were dropped when team money and the shop replaced crafting.
  * To add or change a wave's rewards, edit {@link #WAVE_REWARDS}.
  */
 public final class WaveRewards {
@@ -37,182 +37,89 @@ public final class WaveRewards {
 
     public static final Map<Integer, WaveRewardSet> WAVE_REWARDS = Map.ofEntries(
             // ------------------
-            //       Wave 1
-            // ------------------
-            Map.entry(1, WaveRewardSet.startOnly(
-                    new RewardItem("Wood_Oak_Trunk", 100),
-                    new RewardItem("Ingredient_Fibre", 50)
-            )),
-            // ------------------
-            //       Wave 2
-            // ------------------
-            Map.entry(2, WaveRewardSet.startOnly(
-                    new RewardItem("Ore_Copper", 10)
-            )),
-            // ------------------
             //       Wave 3
             // ------------------
-            Map.entry(3, WaveRewardSet.of(
-                    Collections.singletonList(new RewardItem("Ore_Copper", 15)), // Start
-                    Collections.singletonList(new RewardItem("Potion_Health", 2))  // End
-            )),
-            // ------------------
-            //       Wave 4
-            // ------------------
-            Map.entry(4, WaveRewardSet.startOnly(
-                    new RewardItem("Ore_Copper", 20) // Start
-            )),
-            // ------------------
-            //       Wave 5
-            // ------------------
-            Map.entry(5, WaveRewardSet.of(
-                    // Start of wave
-                    List.of(new RewardItem("Ore_Iron", 10),
-                            new RewardItem("Rubble_Marble", 50),
-                            new RewardItem("Ingredient_Stick", 100)),
-                    // End of wave
-                    List.of(new RewardItem("Ingredient_Fabric_Scrap_Linen", 25),
-                            new RewardItem("Ingredient_Leather_Light", 10))
+            Map.entry(3, WaveRewardSet.endOnly(
+                    new RewardItem("Potion_Health", 2)
             )),
             // ------------------
             //       Wave 6
             // ------------------
-            Map.entry(6, WaveRewardSet.of(
-                    Collections.singletonList(new RewardItem("Ore_Iron", 10)), // Start
-                    Collections.singletonList(new RewardItem("Potion_Health_Greater", 2))  // End
-            )),
-            // ------------------
-            //       Wave 7
-            // ------------------
-            Map.entry(7, WaveRewardSet.of(
-                    // Start of wave
-                    List.of(new RewardItem("Ore_Iron", 10),
-                            new RewardItem("Rubble_Marble", 50),
-                            new RewardItem("Ingredient_Stick", 100)),
-                    // End of wave
-                    List.of(new RewardItem("Ingredient_Fabric_Scrap_Linen", 10),
-                            new RewardItem("Ingredient_Leather_Light", 10))
+            Map.entry(6, WaveRewardSet.endOnly(
+                    new RewardItem("Potion_Health_Greater", 2)
             )),
             // ------------------
             //       Wave 8
             // ------------------
             Map.entry(8, WaveRewardSet.startOnly(
-                    new RewardItem("Ore_Iron", 15),
                     new RewardItem("Potion_Health_Greater", 2)
             )),
             // ------------------
             //       Wave 9
             // ------------------
             Map.entry(9, WaveRewardSet.startOnly(
-                    new RewardItem("Ore_Iron", 20),
-                    new RewardItem("Potion_Health_Greater", 1),
-                    new RewardItem("Wood_Oak_Trunk", 100)  // Finally some more wood!
+                    new RewardItem("Potion_Health_Greater", 1)
             )),
             // ------------------
             //       Wave 10
             // ------------------
-            Map.entry(10, WaveRewardSet.of(
-                    // Start of wave
-                    List.of(new RewardItem("Ore_Thorium", 20),
-                            new RewardItem("Rubble_Marble", 50),
-                            new RewardItem("Ingredient_Stick", 100),
-                            new RewardItem("Ingredient_Leather_Medium", 10),
-                            new RewardItem("Wood_Oak_Trunk", 50)
-                    ),
-                    // End of wave
-                    List.of(new RewardItem("Potion_Health_Greater", 1))
+            Map.entry(10, WaveRewardSet.endOnly(
+                    new RewardItem("Potion_Health_Greater", 1)
             )),
             // ------------------
             //       Wave 11
             // ------------------
-            Map.entry(11, WaveRewardSet.of(
-                    // Start of wave
-                    List.of(new RewardItem("Ore_Thorium", 10)),
-                    // End of wave
-                    List.of(new RewardItem("Potion_Health_Greater", 1))
+            Map.entry(11, WaveRewardSet.endOnly(
+                    new RewardItem("Potion_Health_Greater", 1)
             )),
             // ------------------
             //       Wave 12
             // ------------------
-            Map.entry(12, WaveRewardSet.of(
-                    // Start of wave
-                    List.of(
-                            new RewardItem("Ore_Thorium", 15),
-                            new RewardItem("Ingredient_Leather_Medium", 4)
-                    ),
-                    // End of wave
-                    List.of(new RewardItem("Potion_Health_Greater", 1))
+            Map.entry(12, WaveRewardSet.endOnly(
+                    new RewardItem("Potion_Health_Greater", 1)
             )),
             // ------------------
             //       Wave 13
             // ------------------
-            Map.entry(13, WaveRewardSet.of(
-                    // Start of wave
-                    List.of(new RewardItem("Ore_Thorium", 5),
-                            new RewardItem("Ingredient_Leather_Medium", 4)),
-                    // End of wave
-                    List.of(new RewardItem("Potion_Health_Greater", 2))
+            Map.entry(13, WaveRewardSet.endOnly(
+                    new RewardItem("Potion_Health_Greater", 2)
             )),
             // ------------------
             //       Wave 14
             // ------------------
-            Map.entry(14, WaveRewardSet.of(
-                    // Start of wave
-                    List.of(new RewardItem("Ore_Thorium", 5),
-                            new RewardItem("Ingredient_Leather_Medium", 4)),
-                    // End of wave
-                    List.of(new RewardItem("Potion_Health_Greater", 2))
+            Map.entry(14, WaveRewardSet.endOnly(
+                    new RewardItem("Potion_Health_Greater", 2)
             )),
             // ------------------
             //       Wave 15
             // ------------------
-            Map.entry(15, WaveRewardSet.of(
-                    // Start of wave
-                    List.of(new RewardItem("Ore_Adamantite", 25), // Straight to adamantite
-                            new RewardItem("Ingredient_Leather_Heavy", 8),
-                            new RewardItem("Ingredient_Venom", 2),
-                            new RewardItem("Wood_Oak_Trunk", 50)),
-                    // End of wave
-                    List.of(new RewardItem("Potion_Health_Greater", 1)) // Back off a little on the health
+            Map.entry(15, WaveRewardSet.endOnly(
+                    new RewardItem("Potion_Health_Greater", 1)
             )),
             // ------------------
             //       Wave 16
             // ------------------
-            Map.entry(16, WaveRewardSet.of(
-                    // Start of wave
-                    List.of(new RewardItem("Ore_Adamantite", 25),
-                            new RewardItem("Ingredient_Leather_Heavy", 8),
-                            new RewardItem("Ingredient_Venom", 2),
-                            new RewardItem("Ingredient_Fabric_Scrap_Cindercloth", 6)
-
-                    ),
-                    // End of wave
-                    List.of(new RewardItem("Potion_Health_Greater", 1)) // Back off a little on the health
+            Map.entry(16, WaveRewardSet.endOnly(
+                    new RewardItem("Potion_Health_Greater", 1)
             )),
             // ------------------
             //       Wave 17
             // ------------------
-            Map.entry(17, WaveRewardSet.of(
-                    // Start of wave
-                    List.of(new RewardItem("Wood_Oak_Trunk", 50)), // Not a lucky wave!
-                    // End of wave
-                    List.of(new RewardItem("Potion_Health_Greater", 1)) // Back off a little on the health
+            Map.entry(17, WaveRewardSet.endOnly(
+                    new RewardItem("Potion_Health_Greater", 1)
             )),
-
             // ------------------
             //       Wave 18
             // ------------------
             Map.entry(18, WaveRewardSet.endOnly(
                     new RewardItem("Potion_Health_Greater", 1) // Better save these
             )),
-
             // ------------------
             //       Wave 19
             // ------------------
             Map.entry(19, WaveRewardSet.endOnly(
-                    new RewardItem("Potion_Health_Greater", 1)  // One more for the boss
+                    new RewardItem("Potion_Health_Greater", 1) // One more for the boss
             ))
-
     );
 
     private WaveRewards() {}

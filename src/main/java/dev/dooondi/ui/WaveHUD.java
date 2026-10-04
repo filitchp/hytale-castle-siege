@@ -4,6 +4,7 @@ import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.entity.entities.player.hud.CustomUIHud;
 import com.hypixel.hytale.server.core.ui.builder.UICommandBuilder;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
+import dev.dooondi.wave.TeamBank;
 
 import javax.annotation.Nonnull;
 
@@ -23,6 +24,12 @@ public class WaveHUD extends CustomUIHud {
     public void setWaveLabel(int currentWave, int maxWave) {
         UICommandBuilder builder = new UICommandBuilder();
         builder.set("#WaveLabel.TextSpans", Message.raw("Wave " + currentWave + " / " + maxWave));
+        update(false, builder);
+    }
+
+    public void setMoney(int money) {
+        UICommandBuilder builder = new UICommandBuilder();
+        builder.set("#MoneyLabel.TextSpans", Message.raw(TeamBank.format(money)));
         update(false, builder);
     }
 
