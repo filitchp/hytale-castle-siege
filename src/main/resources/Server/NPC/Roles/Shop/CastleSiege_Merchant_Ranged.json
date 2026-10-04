@@ -2,14 +2,18 @@
   "Type": "Generic",
   "Parameters": {
     "NameTranslationKey": {
-      "Value": "castlesiege.npcRoles.CastleSiege_Merchant.name",
+      "Value": "castlesiege.npcRoles.CastleSiege_Merchant_Ranged.name",
       "Description": "Translation key for NPC name display"
     }
   },
   "StartState": "Idle",
   "DefaultNPCAttitude": "Ignore",
   "DefaultPlayerAttitude": "Neutral",
-  "Appearance": "Outlander_Stalker",
+  "Appearance": "Wraith",
+  "HotbarSize": 3,
+  "HotbarItems": [
+    "Weapon_Crossbow_Iron"
+  ],
   "MaxHealth": 100,
   "Invulnerable": true,
   "KnockbackScale": 0,
@@ -235,7 +239,7 @@
               },
               {
                 "Type": "OpenCastleSiegeShop",
-                "Shop": "Armory"
+                "Shop": "Ranged"
               },
               {
                 "Type": "State",

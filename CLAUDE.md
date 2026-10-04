@@ -21,7 +21,7 @@ src/main/java/dev/dooondi/
   commands/          — CsCommand (/cs <action>), PrefabPathCommand (/prefabpath <action>)
   events/            — WelcomeEvent (PlayerReadyEvent), InputListener (PlayerChatEvent filter)
   systems/           — ECS EntityEventSystems: BlockBreakEventSystem, BlockPlaceEventSystem
-  shop/              — ShopCatalog (items + prices), ShopUI (shop page), OpenShopAction/OpenShopActionBuilder (custom NPC action)
+  shop/              — ShopCatalog (stores, items + prices), ShopUI (shop page), OpenShopAction/OpenShopActionBuilder (custom NPC action)
   ui/                — WaveHUD (CustomUIHud), WaveUI (InteractiveCustomUIPage)
   wave/              — WaveManager, WaveRewards, TeamBank, MobDeathTracker, OpenWaveUIInteraction, TriggerWaveInteraction
 
@@ -32,7 +32,7 @@ src/main/resources/
   Server/Item/Interactions/     — OpenWaveUI.json, TriggerWave.json
   Server/Item/RootInteractions/ — Root_OpenWaveUI.json, Root_TriggerWave.json
   Server/NPC/Roles/Wave/        — wave mob role variants, all suffixed `_CS` (e.g. Rat_CS, Skeleton_Burnt_Praetorian_CS)
-  Server/NPC/Roles/Shop/        — CastleSiege_Merchant (shopkeeper NPC)
+  Server/NPC/Roles/Shop/        — merchant NPCs: CastleSiege_Merchant (armory), _Potions, _Ranged
   Server/Languages/en-US/       — castlesiege.lang (keys are prefixed `castlesiege.` from the file name)
 
 devserver/     — dev server + Castle Siege world, tracked in git (no LFS for now)
@@ -213,7 +213,12 @@ Death tracking runs on the ECS tick thread; UI updates run on button clicks; pos
 - **Wave HUD** (`WaveHUD`, key `CastleSiege:WaveHUD`): added automatically on join and toggled with `/cs hud`. Refreshed for all players via `WaveManager.refreshAllWaveHuds`.
 - **Kill/death tracking** (`MobDeathTracker`): per-player kills and deaths, plus total and per-wave kills. Stats reset when wave 1 starts.
 - **Team money** (`TeamBank`): one balance shared by all players, shown on the Wave HUD as `$1,234`. Player kills of wave mobs pay per role (`KILL_REWARDS`). Starts at $100 and resets when wave 1 starts or on reset. `trySpend` is compare-and-set, so concurrent purchases can't overdraw.
-- **Shop** (`ShopUI`, `ShopCatalog`): right-click the `CastleSiege_Merchant` NPC (Outlander Stalker model, unarmed, invulnerable) to buy swords, shields and armor with team money. Cards are appended at runtime (`ui.append("#ItemGrid", "ShopItemCard.ui")`, addressed as `#ItemGrid[i] #Child`). Purchases are refunded if the buyer's inventory is full (`giveItem` returns a remainder; it doesn't drop overflow).
+- **Shops** (`ShopUI`, `ShopCatalog`): three merchant NPCs sell items for team money. Each role calls `{ "Type": "OpenCastleSiegeShop", "Shop": "<id>" }` with a store ID from `ShopCatalog.SHOPS`. All are unarmed or display-only, invulnerable and stationary.
+  - `CastleSiege_Merchant` (Outlander Stalker, `Armory`): swords, shields, armor.
+  - `CastleSiege_Merchant_Potions` (Klops Gentleman, `Potions`): small/large health potions.
+  - `CastleSiege_Merchant_Ranged` (Wraith holding a crossbow via `HotbarItems`, `Ranged`): bows, crossbows, arrow bundles. Sell only `Weapon_Arrow_Crude`, because every bow and crossbow interaction consumes that ID and the other arrow types aren't usable as ammo.
+  - Cards are appended at runtime (`ui.append("#ItemGrid", "ShopItemCard.ui")`, addressed as `#ItemGrid[i] #Child`). `ShopItem` has a quantity for stacked items. `giveItem` returns a remainder and doesn't drop overflow, so a purchase that doesn't fully fit is refunded pro rata.
+  - Merchant greetings use the `Alerted` animation. Outlander, Klops and Wraith models have no `Wave` animation.
 - **Wave rewards** (`WaveRewards`): `WAVE_REWARDS` map of start/end `RewardItem`s per wave, granted to all online players. Health potions only. Crafting materials were removed along with the crafting stations, since gear now comes from the shop.
 - **Block restrictions** (`BlockBreakEventSystem`, `BlockPlaceEventSystem`): non-Creative players can't break or place blocks.
 - **Join flow** (`WelcomeEvent`): adds the player to the `CastleSiege` permission group, teleports them to the world spawn (deferred so the saved position doesn't override it), and adds the Wave HUD. On **first join only** (tracked in `seen_players.txt`) it clears the inventory, grants the Wave Hammer and a Crude Axe, and shows a welcome title.

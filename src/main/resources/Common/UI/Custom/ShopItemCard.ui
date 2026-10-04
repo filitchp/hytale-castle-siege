@@ -34,14 +34,29 @@ Group {
         Padding: (Top: 6);
         LayoutMode: CenterMiddle;
 
-        Group #ItemSlotBorder {
+        Group #ItemSlotContainer {
           Anchor: (Width: 68, Height: 68);
-          Background: #1a2530;
-          Padding: 2;
 
-          ItemSlot #ItemSlot {
+          Group #ItemSlotBorder {
             Anchor: (Full: 0);
-            ShowQualityBackground: true;
+            Background: #1a2530;
+            Padding: 2;
+
+            ItemSlot #ItemSlot {
+              Anchor: (Full: 0);
+              ShowQualityBackground: true;
+            }
+          }
+
+          Label #Quantity {
+            Anchor: (Right: 8, Bottom: 5);
+            Style: (
+              FontSize: 15,
+              TextColor: #ffffff,
+              HorizontalAlignment: End,
+              VerticalAlignment: End,
+              RenderBold: true,
+            );
           }
         }
       }

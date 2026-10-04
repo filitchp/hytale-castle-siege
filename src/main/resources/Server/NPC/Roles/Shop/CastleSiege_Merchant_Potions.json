@@ -2,14 +2,14 @@
   "Type": "Generic",
   "Parameters": {
     "NameTranslationKey": {
-      "Value": "castlesiege.npcRoles.CastleSiege_Merchant.name",
+      "Value": "castlesiege.npcRoles.CastleSiege_Merchant_Potions.name",
       "Description": "Translation key for NPC name display"
     }
   },
   "StartState": "Idle",
   "DefaultNPCAttitude": "Ignore",
   "DefaultPlayerAttitude": "Neutral",
-  "Appearance": "Outlander_Stalker",
+  "Appearance": "Klops_Gentleman",
   "MaxHealth": 100,
   "Invulnerable": true,
   "KnockbackScale": 0,
@@ -235,7 +235,7 @@
               },
               {
                 "Type": "OpenCastleSiegeShop",
-                "Shop": "Armory"
+                "Shop": "Potions"
               },
               {
                 "Type": "State",
