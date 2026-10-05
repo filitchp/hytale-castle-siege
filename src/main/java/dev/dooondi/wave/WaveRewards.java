@@ -16,7 +16,8 @@ import java.util.Map;
 
 /**
  * Library that awards items to each online player at the start and end of each wave.
- * Only health potions: crafting materials were dropped when team money and the shop replaced crafting.
+ * Mostly health potions: crafting materials were dropped when team money and the shop replaced
+ * crafting, except wood after wave 1 for cooking.
  * To add or change a wave's rewards, edit {@link #WAVE_REWARDS}.
  */
 public final class WaveRewards {
@@ -36,6 +37,12 @@ public final class WaveRewards {
     }
 
     public static final Map<Integer, WaveRewardSet> WAVE_REWARDS = Map.ofEntries(
+            // ------------------
+            //       Wave 1
+            // ------------------
+            Map.entry(1, WaveRewardSet.endOnly(
+                    new RewardItem("Wood_Oak_Trunk", 50) // Fuel for cooking rat meat
+            )),
             // ------------------
             //       Wave 3
             // ------------------
