@@ -1,0 +1,88 @@
+$C = "Common.ui";
+
+Group {
+  Anchor: (Width: 166, Height: 170);
+  Padding: (Horizontal: 4, Vertical: 4);
+
+  ItemSlotButton #BuyButton {
+    Anchor: (Full: 0);
+    LayoutMode: Full;
+    Padding: 2;
+    Style: (
+      Default: (
+        Background: #252f3a,
+      ),
+      Hovered: (
+        Background: #c9a050,
+      ),
+      Pressed: (
+        Background: #a08040,
+      ),
+      Disabled: (
+        Background: #1a1e24,
+      ),
+      Sounds: $C.@ButtonSounds,
+    );
+
+    Group #CardContent {
+      Anchor: (Full: 0);
+      LayoutMode: Top;
+      Background: #1c2835;
+
+      Group #IconSection {
+        Anchor: (Height: 80);
+        Padding: (Top: 6);
+        LayoutMode: CenterMiddle;
+
+        Group #ItemSlotContainer {
+          Anchor: (Width: 68, Height: 68);
+
+          Group #ItemSlotBorder {
+            Anchor: (Full: 0);
+            Background: #1a2530;
+            Padding: 2;
+
+            ItemSlot #ItemSlot {
+              Anchor: (Full: 0);
+              ShowQualityBackground: true;
+            }
+          }
+
+          Label #Quantity {
+            Anchor: (Right: 8, Bottom: 5);
+            Style: (
+              FontSize: 15,
+              TextColor: #ffffff,
+              HorizontalAlignment: End,
+              VerticalAlignment: End,
+              RenderBold: true,
+            );
+          }
+        }
+      }
+
+      Label #ItemName {
+        Anchor: (Height: 38);
+        Padding: (Horizontal: 6);
+        Style: (
+          FontSize: 13,
+          TextColor: #dde4ea,
+          HorizontalAlignment: Center,
+          VerticalAlignment: Center,
+          Wrap: true,
+        );
+      }
+
+      Label #Price {
+        Anchor: (Height: 26);
+        Style: (
+          FontSize: 17,
+          TextColor: #e8c547,
+          HorizontalAlignment: Center,
+          VerticalAlignment: Center,
+          RenderBold: true,
+        );
+      }
+    }
+  }
+}
