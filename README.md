@@ -18,7 +18,7 @@ Run Castle Siege locally or on a server. At spawn, you receive a custom game too
 
 ### Features
 - **20 hand-crafted waves** - Progressively difficult mob formations.
-- **10+ custom mobs** - Enhanced AI and combat abilities designed for castle warfare.
+- **10+ customized Hytale mobs** - Enhanced AI and combat abilities designed for castle warfare.
 - **Team economy** - Every kill earns money for the whole team. Spend it at three merchants (armor and melee weapons, health potions, bows and crossbows) to gear up for the next wave.
 - **Co-op multiplayer** - All players fight together (pvp disabled by default). Per-player stats and team stats are tracked.
 
@@ -28,7 +28,9 @@ Run Castle Siege locally or on a server. At spawn, you receive a custom game too
 
 <a href="media/screenshots/gameplay-1.jpg"><img src="media/screenshots/castle-siege-search.png" alt="Gameplay 1" width="350"></a>
 
-2. Start/join the included world, and you will be given a crude ax and a Castle Siege game tool "hammer"
+<a href="media/screenshots/castle-siege-search.png"><img src="media/screenshots/castle-siege-search.png" alt="Gameplay 1" width="350"></a>
+
+2. Start/join the Castle Siege world, and you will be given a crude ax and a Castle Siege game tool "hammer"
 3. Right click while holding the Castle Siege "hammer" to open the Wave UI and start Wave 1.
 4. Fight!
 
