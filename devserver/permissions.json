@@ -2,8 +2,8 @@
   "users": {
     "15f0b516-4be4-4958-90df-1af49557c02a": {
       "groups": [
-        "hytale:Admin",
-        "CastleSiege"
+        "CastleSiege",
+        "hytale:Admin"
       ]
     }
   },
