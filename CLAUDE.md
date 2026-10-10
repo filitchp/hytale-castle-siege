@@ -28,7 +28,7 @@ src/main/java/dev/dooondi/
 src/main/resources/
   manifest.json
   Common/UI/Custom/             — WaveHUD.ui, WaveUI.ui
-  Server/Item/Items/            — CastleSiege_WaveHammer.json, CastleSiege_Crossbow_Display.json (NPC prop)
+  Server/Item/Items/            — CastleSiege_WaveHammer.json
   Server/Item/Interactions/     — OpenWaveUI.json, TriggerWave.json
   Server/Item/RootInteractions/ — Root_OpenWaveUI.json, Root_TriggerWave.json
   Server/NPC/Roles/Wave/        — wave mob role variants, all suffixed `_CS` (e.g. Rat_CS, Skeleton_Burnt_Praetorian_CS)
@@ -78,7 +78,7 @@ Run these as standalone bash commands (not chained through `&&`), because `jar` 
 - **HUD** (`CustomUIHud`): non-blocking overlay; the player keeps control. HUDs are **keyed**: `super(playerRef, KEY)`, then `hudManager.addCustomHud(playerRef, hud)`, `getCustomHud(KEY)`, `removeCustomHud(playerRef, KEY)`. Example: `ui/WaveHUD.java`. Push runtime changes via `update(false, builder)`.
 - **Page** (`InteractiveCustomUIPage<DataClass>`): modal, freezes movement, unlocks the mouse. Example: `ui/WaveUI.java`. Push runtime changes via `sendUpdate(builder)`.
 - `.ui` files live under `Common/UI/Custom/`. Reference `$Common = "Common.ui";` to use the vanilla button/label styles.
-- **Textures:** `Background: "Path.png"` (stretched) or `Background: (TexturePath: "Path.png", Border: N)` (9-slice; `N` px at 1x scale stay unstretched). Paths are relative to the `.ui` file. Vanilla ships textures only as `Name@2x.png` and references them as `Name.png`, so ship ours the same way. Stock panels live in `Common/` (e.g. `Common/ContainerPatch.png`, `Border: 23`). Our own art goes in `Common/UI/Custom/CastleSiege/`, with source files in `media/assets/`.
+- **Textures:** `Background: "Path.png"` (stretched) or `Background: (TexturePath: "Path.png", Border: N)` (9-slice; `N` px at 1x scale stay unstretched). Paths are relative to the `.ui` file. Vanilla ships textures only as `Name@2x.png` and references them as `Name.png`, so ship ours the same way. Stock panels live in `Common/` (e.g. `Common/ContainerPatch.png`, `Border: 23`). Our own art goes in `Common/UI/Custom/CastleSiege/`.
 - Pages can bind events on elements: `uiEventBuilder.addEventBinding(CustomUIEventBindingType.Activating, "#Btn")`. Button clicks route to `handleDataEvent` on the page.
 - `UICommandBuilder.set(selector, value)` updates elements at runtime: `#Label.TextSpans` → `Message.raw(...)`, and `#Container.Visible` → `boolean`. To swap buttons, toggle the visibility of their containers (`#StartWaveBtnContainer` / `#ResetBtnContainer` in `WaveUI`).
 
@@ -179,6 +179,7 @@ Calling store-mutating APIs (`spawnNPC`, `openCustomPage`, etc.) directly inside
 
 - **The default `RunThreshold` (0.3) is higher than the patrol path `RelSpeed` (0.18–0.25)**, so mobs always walk. Set `RunThreshold: 0.1` in each wave role JSON, and raise `MaxSpeed` as needed.
 - **Wave roles inherit default weapons from `Template_Intelligent`** and get swords equipped. **Fix:** set `"Weapons"` / `"OffHand"` explicitly (empty `[]` for creatures), plus `_InteractionVars` overrides defining the creature's natural attacks (e.g. Rat_Bite). The error if you miss this: `Missing replacement interactions for interaction: *Root_NPC_<X>_Attack_Interactions_0`.
+- **Role `HotbarItems` / `OffHandItems` / armor apply only at spawn** (`Role.spawned` → `initialiseInventories`). Placed NPCs save their inventory in the chunk data, so changing a role's items does **not** update NPCs already in the world. Remove and `/npc spawn` them again, then commit `devserver/`. Instructions and interactions do follow the role asset: adding `"Shop": "Armory"` reached the already-placed merchant.
 - **Always double-check that the attack reference matches the creature family.** Snake_Rattle once had `Root_NPC_Rat_Attack` copy-pasted from the rat config.
 - **New roles need a `MOB_STATS` entry** in `WaveManager` or `/cs debugmobs` warns `missing MOB_STATS entries`.
 
@@ -214,10 +215,10 @@ Death tracking runs on the ECS tick thread; UI updates run on button clicks; pos
 - **Wave HUD** (`WaveHUD`, key `CastleSiege:WaveHUD`): a thin single-row bar on the shop panel texture showing `[wave icon] 3 / 20 │ [skull] 12 │ $1,250`. Added automatically on join and toggled with `/cs hud`. All values are pushed in one update via `WaveHUD.setValues(...)`, called from `WaveManager.refreshAllWaveHuds` / `refreshWaveHud`.
 - **Kill/death tracking** (`MobDeathTracker`): per-player kills and deaths, plus total and per-wave kills. Stats reset when wave 1 starts.
 - **Team money** (`TeamBank`): one balance shared by all players, shown on the Wave HUD as `$1,234`. Player kills of wave mobs pay per role (`KILL_REWARDS`). Starts at $100 and resets when wave 1 starts or on reset. `trySpend` is compare-and-set, so concurrent purchases can't overdraw.
-- **Shops** (`ShopUI`, `ShopCatalog`): three merchant NPCs sell items for team money. Each role calls `{ "Type": "OpenCastleSiegeShop", "Shop": "<id>" }` with a store ID from `ShopCatalog.SHOPS`. All are unarmed or display-only, invulnerable and stationary.
+- **Shops** (`ShopUI`, `ShopCatalog`): three merchant NPCs sell items for team money. Each role calls `{ "Type": "OpenCastleSiegeShop", "Shop": "<id>" }` with a store ID from `ShopCatalog.SHOPS`. All are unarmed, invulnerable and stationary.
   - `CastleSiege_Merchant` (Outlander Stalker, `Armory`): swords, shields, armor.
   - `CastleSiege_Merchant_Potions` (Klops Gentleman, `Potions`): small/large health potions.
-  - `CastleSiege_Merchant_Ranged` (Wraith holding `CastleSiege_Crossbow_Display` via `HotbarItems`, `Ranged`). The display item is the iron crossbow's model with `PlayerAnimationsId: "Item"`. The real crossbow's animations inherit `Handgun`, whose idle pose aims forward, so with head-watching the NPC pointed it at players. Use the same trick for any other prop an NPC should hold without aiming. Sells bows, crossbows and arrow bundles. Sell only `Weapon_Arrow_Crude`, because every bow and crossbow interaction consumes that ID and the other arrow types aren't usable as ammo.
+  - `CastleSiege_Merchant_Ranged` (Wraith, unarmed, `Ranged`). He used to hold a crossbow via `HotbarItems`, but its idle pose (inherited from `Handgun`) is aimed, so with head-watching he pointed it at players. A display copy with `PlayerAnimationsId: "Item"` was tried, but never actually reached the placed NPC (see the next gotcha), so it's untested. Merchants are now unarmed. Sells bows, crossbows and arrow bundles. Sell only `Weapon_Arrow_Crude`, because every bow and crossbow interaction consumes that ID and the other arrow types aren't usable as ammo.
   - Cards are appended at runtime (`ui.append("#ItemGrid", "ShopItemCard.ui")`, addressed as `#ItemGrid[i] #Child`). `ShopItem` has a quantity for stacked items. `giveItem` returns a remainder and doesn't drop overflow, so a purchase that doesn't fully fit is refunded pro rata.
   - Merchant greetings use the `Alerted` animation. Outlander, Klops and Wraith models have no `Wave` animation.
 - **Wave rewards** (`WaveRewards`): `WAVE_REWARDS` map of start/end `RewardItem`s per wave, granted to all online players. Health potions, plus 50 oak wood at the end of wave 1 for cooking rat meat. Other crafting materials were removed along with the crafting stations, since gear now comes from the shop.

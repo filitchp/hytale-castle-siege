@@ -10,10 +10,6 @@
   "DefaultNPCAttitude": "Ignore",
   "DefaultPlayerAttitude": "Neutral",
   "Appearance": "Wraith",
-  "HotbarSize": 3,
-  "HotbarItems": [
-    "CastleSiege_Crossbow_Display"
-  ],
   "MaxHealth": 100,
   "Invulnerable": true,
   "KnockbackScale": 0,
